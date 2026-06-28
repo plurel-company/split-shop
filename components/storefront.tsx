@@ -12,7 +12,12 @@ type StorefrontProps = {
 
 export function Storefront({ merchantId, publishableKey }: StorefrontProps) {
   return (
-    <AnteProvider merchantId={merchantId} publishableKey={publishableKey} theme="light">
+    <AnteProvider
+      merchantId={merchantId}
+      publishableKey={publishableKey}
+      environment="sandbox"
+      theme="light"
+    >
       <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
         <ProductGrid />
         <CheckoutPanel />

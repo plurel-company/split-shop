@@ -1,10 +1,27 @@
-import { createCartSignature } from "@splitante/sdk/signing";
 import type { Cart } from "@splitante/sdk";
 
+import { createCartSignature } from "@/lib/cart-signing";
+
 export async function POST(req: Request) {
-  const signingSecret = process.env.ANTE_SIGNING_SECRET;
+  const signingSecret = process.env.ANTE_SIGNING_SECRET?.trim();
   if (!signingSecret) {
-    return Response.json({ error: "ANTE_SIGNING_SECRET is not configured" }, { status: 500 });
+    return Response.json(
+      {
+        error:
+          "ANTE_SIGNING_SECRET is not configured on this deployment. Copy your signing secret from Ante → Developers → Signing and add it in Vercel/host env vars.",
+      },
+      { status: 503 },
+    );
+  }
+
+  if (!signingSecret.startsWith("ante_sign_")) {
+    return Response.json(
+      {
+        error:
+          "ANTE_SIGNING_SECRET looks invalid (expected ante_sign_…). Copy the full value from Ante → Developers → Signing.",
+      },
+      { status: 500 },
+    );
   }
 
   let body: { cart?: Cart };
@@ -19,6 +36,11 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid cart" }, { status: 400 });
   }
 
-  const signature = createCartSignature(cart, signingSecret);
-  return Response.json({ signature });
+  try {
+    const signature = createCartSignature(cart, signingSecret);
+    return Response.json({ signature });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not sign cart";
+    return Response.json({ error: message }, { status: 400 });
+  }
 }

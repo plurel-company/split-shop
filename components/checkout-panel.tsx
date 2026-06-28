@@ -6,6 +6,20 @@ import { useMemo, useState } from "react";
 import { useCart } from "@/components/cart-context";
 import { buildAnteCart, formatUsd, makeOrderRef } from "@/lib/store";
 
+function checkoutErrorMessage(error: Error): string {
+  const message = error.message;
+  if (message.includes("Invalid cart signature") || message.includes("X-Ante-Signature")) {
+    return `${message} — Update ANTE_SIGNING_SECRET on your deployment to match Ante → Developers → Signing, then redeploy.`;
+  }
+  if (message.includes("ANTE_SIGNING_SECRET")) {
+    return message;
+  }
+  if (message.includes("Cart signing failed")) {
+    return `${message}. Check server env vars and /api/setup/status.`;
+  }
+  return message;
+}
+
 export function CheckoutPanel() {
   const { cart, itemCount, subtotal, clearCart } = useCart();
   const [orderRef] = useState(makeOrderRef);
@@ -80,7 +94,7 @@ export function CheckoutPanel() {
               clearCart();
             },
             onError: (error) => {
-              setStatus(error.message);
+              setStatus(checkoutErrorMessage(error));
             },
           }}
         />

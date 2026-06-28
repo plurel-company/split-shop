@@ -1,4 +1,5 @@
 import { CartProvider } from "@/components/cart-context";
+import { SetupBanner } from "@/components/setup-banner";
 import { StoreShell } from "@/components/store-shell";
 import { Storefront } from "@/components/storefront";
 
@@ -10,6 +11,7 @@ export default function HomePage() {
   return (
     <CartProvider>
       <StoreShell configured={configured}>
+        <SetupBanner />
         {configured ? (
           <Storefront merchantId={merchantId} publishableKey={publishableKey} />
         ) : (
