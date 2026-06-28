@@ -1,4 +1,4 @@
-import { publishableKeyMode } from "@/lib/ante-env";
+import { publishableKeyMode, validateCredentialShapes } from "@/lib/ante-env";
 
 export async function GET() {
   const merchantId = process.env.NEXT_PUBLIC_ANTE_MERCHANT_ID?.trim() ?? "";
@@ -7,28 +7,23 @@ export async function GET() {
   const webhookSecret = process.env.ANTE_WEBHOOK_SECRET?.trim() ?? "";
   const keyMode = publishableKeyMode(publishableKey);
 
-  const issues: string[] = [];
+  const issues: string[] = validateCredentialShapes({
+    merchantId,
+    publishableKey,
+    signingSecret,
+  });
 
   if (!merchantId) {
     issues.push("Set NEXT_PUBLIC_ANTE_MERCHANT_ID (ante_merch_… from the dashboard).");
-  } else if (!merchantId.startsWith("ante_merch_")) {
-    issues.push("Merchant ID should start with ante_merch_.");
   }
-
   if (!publishableKey) {
     issues.push("Set NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY (ante_pk_test_* or ante_pk_live_*).");
-  } else if (!keyMode) {
-    issues.push("Publishable key should start with ante_pk_test_ or ante_pk_live_.");
   }
-
   if (!signingSecret) {
     issues.push(
       "Set ANTE_SIGNING_SECRET on the server (Developers → Signing). Without it, checkout cannot sign carts.",
     );
-  } else if (!signingSecret.startsWith("ante_sign_")) {
-    issues.push("ANTE_SIGNING_SECRET should start with ante_sign_.");
   }
-
   if (!webhookSecret) {
     issues.push("Optional: set ANTE_WEBHOOK_SECRET (whsec_…) to receive group.funded events.");
   }
@@ -38,6 +33,7 @@ export async function GET() {
     merchantId: Boolean(merchantId),
     publishableKey: Boolean(publishableKey),
     publishableKeyMode: keyMode,
+    publishableKeyLength: publishableKey.length,
     signingSecret: Boolean(signingSecret),
     webhookSecret: Boolean(webhookSecret),
     issues,

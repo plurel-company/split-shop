@@ -8,7 +8,7 @@ import { explainAnteApiError } from "@/lib/ante-env";
 import { buildAnteCart, formatUsd, makeOrderRef } from "@/lib/store";
 
 function checkoutErrorMessage(error: Error): string {
-  return explainAnteApiError(401, error.message);
+  return explainAnteApiError(error.message);
 }
 
 export function CheckoutPanel() {

@@ -4,8 +4,8 @@ import { StoreShell } from "@/components/store-shell";
 import { Storefront } from "@/components/storefront";
 
 export default function HomePage() {
-  const merchantId = process.env.NEXT_PUBLIC_ANTE_MERCHANT_ID ?? "";
-  const publishableKey = process.env.NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY ?? "";
+  const merchantId = process.env.NEXT_PUBLIC_ANTE_MERCHANT_ID?.trim() ?? "";
+  const publishableKey = process.env.NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY?.trim() ?? "";
   const configured = Boolean(merchantId && publishableKey);
 
   return (

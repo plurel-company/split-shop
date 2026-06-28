@@ -75,7 +75,7 @@ export async function POST() {
   return Response.json(
     {
       ok: false,
-      error: explainAnteApiError(response.status, apiError),
+      error: explainAnteApiError(apiError, response.status),
       detail: apiError,
       anteStatus: response.status,
     },

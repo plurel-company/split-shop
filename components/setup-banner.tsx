@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 type SetupStatus = {
   ok: boolean;
   issues: string[];
+  publishableKeyLength?: number;
 };
 
 export function SetupBanner() {
@@ -24,11 +25,17 @@ export function SetupBanner() {
     setVerifyMessage(null);
     try {
       const res = await fetch("/api/setup/verify", { method: "POST" });
-      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        message?: string;
+        detail?: string;
+      };
       if (data.ok) {
         setVerifyMessage(data.message ?? "Credentials verified.");
       } else {
-        setVerifyMessage(data.error ?? "Verification failed.");
+        const detail = data.detail && data.detail !== data.error ? ` (${data.detail})` : "";
+        setVerifyMessage(`${data.error ?? "Verification failed."}${detail}`);
       }
     } catch {
       setVerifyMessage("Could not reach setup verification.");
@@ -37,12 +44,31 @@ export function SetupBanner() {
     }
   }
 
-  if (!status || status.ok) {
-    return verifyMessage ? (
-      <p className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-        {verifyMessage}
-      </p>
-    ) : null;
+  const verifyControl = (
+    <div className="mt-4 flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        onClick={() => void verifyCredentials()}
+        disabled={verifying}
+        className="rounded-lg bg-stone-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
+      >
+        {verifying ? "Verifying…" : "Verify Ante credentials"}
+      </button>
+      {verifyMessage ? <span className="text-sm">{verifyMessage}</span> : null}
+    </div>
+  );
+
+  if (!status) {
+    return null;
+  }
+
+  if (status.ok) {
+    return (
+      <div className="mb-6 rounded-xl border border-stone-200 bg-white px-4 py-4 text-sm text-stone-700">
+        <p>Env vars look configured{status.publishableKeyLength ? ` (publishable key length: ${status.publishableKeyLength})` : ""}.</p>
+        {verifyControl}
+      </div>
+    );
   }
 
   return (
@@ -53,17 +79,7 @@ export function SetupBanner() {
           <li key={issue}>{issue}</li>
         ))}
       </ul>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={() => void verifyCredentials()}
-          disabled={verifying}
-          className="rounded-lg bg-amber-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60"
-        >
-          {verifying ? "Verifying…" : "Verify Ante credentials"}
-        </button>
-        {verifyMessage ? <span>{verifyMessage}</span> : null}
-      </div>
+      {verifyControl}
     </div>
   );
 }
