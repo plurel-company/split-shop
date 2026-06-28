@@ -43,6 +43,10 @@ export function explainAnteApiError(apiError: string, status?: number): string {
     return "Key mode mismatch — use ante_pk_live_* for live merchants or ante_pk_test_* for sandbox merchants.";
   }
 
+  if (message.includes("Cart total does not match") || message.includes("does not match subtotal")) {
+    return `${message} Ensure cart.total includes tax and shipping, and that line item unit_price values are in cents.`;
+  }
+
   if (message.includes("Order total must be at least")) {
     return `${message} Add more items to your cart — this demo enforces the same minimum as your Ante merchant settings.`;
   }
