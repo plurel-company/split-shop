@@ -11,6 +11,7 @@ import { explainAnteApiError } from "@/lib/ante-env";
 import type { FundedOrder } from "@/lib/order-store";
 import {
   buildAnteCart,
+  buildCartFeeSummary,
   formatUsd,
   makeOrderRef,
   MINIMUM_ORDER_CENTS,
@@ -44,6 +45,7 @@ export function CheckoutPanel() {
   const [pollingOrderRef, setPollingOrderRef] = useState<string | null>(null);
 
   const anteCart = useMemo(() => buildAnteCart(cart, orderRef), [cart, orderRef]);
+  const feeLines = useMemo(() => buildCartFeeSummary(cart), [cart]);
   const tax = anteCart.tax ?? 0;
   const shipping = anteCart.shipping ?? 0;
   const total = anteCart.total;
@@ -113,6 +115,12 @@ export function CheckoutPanel() {
           <dt className="text-stone-500">Subtotal</dt>
           <dd>{formatUsd(subtotal)}</dd>
         </div>
+        {feeLines.map((fee) => (
+          <div key={fee.id} className="flex justify-between">
+            <dt className="text-stone-500">{fee.label}</dt>
+            <dd>{formatUsd(fee.amount)}</dd>
+          </div>
+        ))}
         <div className="flex justify-between">
           <dt className="text-stone-500">Tax (8%)</dt>
           <dd>{formatUsd(tax)}</dd>
