@@ -46,9 +46,18 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
 
       <ul className="mt-4 space-y-2 text-sm">
         {order.lines.map((line) => (
-          <li key={line.id} className="flex justify-between gap-4 text-stone-700">
-            <span>
-              {line.name} × {line.quantity}
+          <li key={line.id} className="flex items-center justify-between gap-4 text-stone-700">
+            <span className="flex min-w-0 items-center gap-3">
+              {line.image_url ? (
+                <img
+                  src={line.image_url}
+                  alt=""
+                  className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                />
+              ) : null}
+              <span className="truncate">
+                {line.name} × {line.quantity}
+              </span>
             </span>
             <span>{formatUsd(line.quantity * line.unit_price)}</span>
           </li>

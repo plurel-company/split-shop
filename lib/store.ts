@@ -6,12 +6,14 @@ export type Product = {
   description: string;
   unitPrice: number;
   emoji: string;
+  /** Absolute HTTPS URL — Ante hosted checkout loads this cross-origin. */
+  imageUrl: string;
 };
 
 /** Ante default minimum order (matches splitante.com merchant settings). */
 export const MINIMUM_ORDER_CENTS = 1000;
 
-/** Prices in cents (USD). */
+/** Prices in cents (USD). Images are stable Unsplash CDN URLs. */
 export const PRODUCTS: Product[] = [
   {
     id: "mug",
@@ -19,6 +21,8 @@ export const PRODUCTS: Product[] = [
     description: "12 oz matte finish, dishwasher safe.",
     unitPrice: 1800,
     emoji: "☕",
+    imageUrl:
+      "https://images.unsplash.com/photo-1514228742589-6fe4aeb8fe47?auto=format&fit=crop&w=400&q=80",
   },
   {
     id: "tote",
@@ -26,6 +30,8 @@ export const PRODUCTS: Product[] = [
     description: "Heavy cotton, fits a laptop.",
     unitPrice: 2400,
     emoji: "👜",
+    imageUrl:
+      "https://images.unsplash.com/photo-1590874103328-eac13a696196?auto=format&fit=crop&w=400&q=80",
   },
   {
     id: "stickers",
@@ -33,6 +39,8 @@ export const PRODUCTS: Product[] = [
     description: "Five weatherproof vinyl stickers.",
     unitPrice: 1200,
     emoji: "✨",
+    imageUrl:
+      "https://images.unsplash.com/photo-1611532736596-ef5c63186a06?auto=format&fit=crop&w=400&q=80",
   },
 ];
 
@@ -41,6 +49,7 @@ export type CartLine = {
   name: string;
   quantity: number;
   unit_price: number;
+  image_url?: string;
 };
 
 export type ConfirmedOrder = {
@@ -63,8 +72,13 @@ export function buildCartLines(cart: CartState): CartLine[] {
     name: product.name,
     quantity: cart[product.id],
     unit_price: product.unitPrice,
+    image_url: product.imageUrl,
   }));
 }
+
+export type AnteCart = Cart & {
+  items: (Cart["items"][number] & { image_url?: string })[];
+};
 
 export function cartSubtotal(cart: CartState): number {
   return buildCartLines(cart).reduce(
@@ -84,7 +98,7 @@ export function makeOrderRef(): string {
   return `ORD-${Date.now().toString(36).toUpperCase()}`;
 }
 
-export function buildAnteCart(cart: CartState, orderRef: string): Cart {
+export function buildAnteCart(cart: CartState, orderRef: string): AnteCart {
   const items = buildCartLines(cart);
   const subtotal = cartSubtotal(cart);
   const tax = Math.round(subtotal * 0.08);

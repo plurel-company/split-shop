@@ -12,6 +12,7 @@ function pendingFromCart(cart: Cart) {
     name: item.name,
     quantity: item.quantity,
     unit_price: item.unit_price,
+    image_url: "image_url" in item && typeof item.image_url === "string" ? item.image_url : undefined,
   }));
 
   const subtotal = lines.reduce((sum, line) => sum + line.quantity * line.unit_price, 0);
