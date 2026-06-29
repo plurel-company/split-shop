@@ -4,6 +4,7 @@ import { AnteButton, type Cart } from "@splitante/react-sdk";
 import { useCallback, useMemo, useState } from "react";
 
 import { useCart } from "@/components/cart-context";
+import { useAnteMode } from "@/components/ante-mode-provider";
 import { OrderConfirmation } from "@/components/order-confirmation";
 import { useOrderFundingPoll } from "@/hooks/use-order-funding-poll";
 import { explainAnteApiError } from "@/lib/ante-env";
@@ -36,6 +37,7 @@ function fundedOrderToConfirmed(order: FundedOrder): ConfirmedOrder {
 
 export function CheckoutPanel() {
   const { cart, itemCount, subtotal, clearCart } = useCart();
+  const { modeHeaders, mode } = useAnteMode();
   const [orderRef, setOrderRef] = useState(makeOrderRef);
   const [status, setStatus] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<ConfirmedOrder | null>(null);
@@ -67,7 +69,7 @@ export function CheckoutPanel() {
   async function signCart(cartToSign: Cart) {
     const response = await fetch("/api/cart/sign", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...modeHeaders },
       body: JSON.stringify({ cart: cartToSign }),
     });
 
@@ -155,8 +157,9 @@ export function CheckoutPanel() {
       {status ? <p className="mt-4 text-sm text-stone-600">{status}</p> : null}
 
       <p className="mt-4 text-xs leading-relaxed text-stone-400">
-        Order confirmation appears after Ante sends <code className="rounded bg-stone-100 px-1">group.funded</code>{" "}
-        to <code className="rounded bg-stone-100 px-1">/api/webhooks/ante</code>.
+        Checkout uses <strong>{mode === "live" ? "live" : "test"}</strong> Ante keys. Order confirmation
+        appears after Ante sends <code className="rounded bg-stone-100 px-1">group.funded</code> to{" "}
+        <code className="rounded bg-stone-100 px-1">/api/webhooks/ante</code>.
       </p>
     </aside>
   );

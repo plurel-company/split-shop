@@ -1,5 +1,6 @@
 import { verifyWebhookSignature } from "@splitante/sdk/signing";
 
+import { listWebhookSecrets } from "@/lib/ante-credentials";
 import { listFundedOrderRefs, markOrderFunded } from "@/lib/order-store";
 
 type AnteWebhookEvent = {
@@ -9,16 +10,24 @@ type AnteWebhookEvent = {
   data: Record<string, unknown>;
 };
 
+function verifyWithAnySecret(
+  rawBody: string,
+  signatureHeader: string,
+  secrets: string[],
+): boolean {
+  return secrets.some((secret) => verifyWebhookSignature(rawBody, secret, signatureHeader));
+}
+
 export async function POST(req: Request) {
-  const webhookSecret = process.env.ANTE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    return Response.json({ error: "ANTE_WEBHOOK_SECRET is not configured" }, { status: 500 });
+  const secrets = listWebhookSecrets();
+  if (secrets.length === 0) {
+    return Response.json({ error: "No webhook secret configured" }, { status: 500 });
   }
 
   const rawBody = await req.text();
   const signatureHeader = req.headers.get("ante-signature") ?? "";
 
-  if (!verifyWebhookSignature(rawBody, webhookSecret, signatureHeader)) {
+  if (!verifyWithAnySecret(rawBody, signatureHeader, secrets)) {
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 

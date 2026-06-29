@@ -1,5 +1,13 @@
 import type { Cart } from "@splitante/sdk";
 
+import {
+  merchantId,
+  modeLabel,
+  parseAnteCredentialMode,
+  resolvePublishableKey,
+  signingSecret,
+  ANTE_KEY_MODE_HEADER,
+} from "@/lib/ante-credentials";
 import { explainAnteApiError } from "@/lib/ante-env";
 import { createCartSignature } from "@/lib/cart-signing";
 
@@ -11,28 +19,29 @@ const PROBE_CART: Cart = {
 };
 
 /** Signs a probe cart and checks credentials against splitante.com without leaving a session open. */
-export async function POST() {
-  const merchantId = process.env.NEXT_PUBLIC_ANTE_MERCHANT_ID?.trim();
-  const publishableKey = process.env.NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY?.trim();
-  const signingSecret = process.env.ANTE_SIGNING_SECRET?.trim();
+export async function POST(req: Request) {
+  const mode = parseAnteCredentialMode(req.headers.get(ANTE_KEY_MODE_HEADER));
+  const id = merchantId();
+  const publishableKey = resolvePublishableKey(mode);
+  const secret = signingSecret();
 
-  if (!merchantId || !publishableKey || !signingSecret) {
+  if (!id || !publishableKey || !secret) {
     return Response.json(
       {
         ok: false,
-        error: "Missing merchant ID, publishable key, or ANTE_SIGNING_SECRET.",
+        error: `Missing merchant ID, ${modeLabel(mode).toLowerCase()} publishable key, or ANTE_SIGNING_SECRET.`,
       },
       { status: 503 },
     );
   }
 
-  const signature = createCartSignature(PROBE_CART, signingSecret);
+  const signature = createCartSignature(PROBE_CART, secret);
 
   const response = await fetch("https://splitante.com/api/v1/sessions", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${publishableKey}`,
-      "X-Merchant-ID": merchantId,
+      "X-Merchant-ID": id,
       "Content-Type": "application/json",
       "X-Ante-Signature": signature,
     },
@@ -57,7 +66,7 @@ export async function POST() {
           method: "POST",
           headers: {
             Authorization: `Bearer ${publishableKey}`,
-            "X-Merchant-ID": merchantId,
+            "X-Merchant-ID": id,
             "Content-Type": "application/json",
           },
         },
@@ -66,7 +75,7 @@ export async function POST() {
 
     return Response.json({
       ok: true,
-      message: "Credentials and cart signing are configured correctly.",
+      message: `${modeLabel(mode)} credentials and cart signing are configured correctly.`,
     });
   }
 

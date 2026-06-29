@@ -1,26 +1,36 @@
 import { CartProvider } from "@/components/cart-context";
+import { AnteModeProvider } from "@/components/ante-mode-provider";
 import { SetupBanner } from "@/components/setup-banner";
 import { StoreShell } from "@/components/store-shell";
 import { Storefront } from "@/components/storefront";
+import { credentialAvailability, merchantId, resolvePublishableKey } from "@/lib/ante-credentials";
 
 export default function HomePage() {
-  const merchantId = process.env.NEXT_PUBLIC_ANTE_MERCHANT_ID?.trim() ?? "";
-  const publishableKey = process.env.NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY?.trim() ?? "";
-  const configured = Boolean(merchantId && publishableKey);
+  const id = merchantId();
+  const testPublishableKey = resolvePublishableKey("sandbox");
+  const livePublishableKey = resolvePublishableKey("live");
+  const availability = credentialAvailability();
+  const configured = availability.merchantId && (availability.testKey || availability.liveKey);
 
   return (
     <CartProvider>
-      <StoreShell configured={configured}>
-        <SetupBanner />
-        {configured ? (
-          <Storefront merchantId={merchantId} publishableKey={publishableKey} />
-        ) : (
-          <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
-            Copy <code>.env.example</code> to <code>.env.local</code> and add your Ante sandbox
-            credentials from the merchant dashboard.
-          </aside>
-        )}
-      </StoreShell>
+      <AnteModeProvider
+        merchantId={id}
+        testPublishableKey={testPublishableKey}
+        livePublishableKey={livePublishableKey}
+      >
+        <StoreShell configured={configured}>
+          <SetupBanner />
+          {configured ? (
+            <Storefront />
+          ) : (
+            <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+              Copy <code>.env.example</code> to <code>.env.local</code> and add your Ante credentials
+              from the merchant dashboard. Set test and/or live publishable keys.
+            </aside>
+          )}
+        </StoreShell>
+      </AnteModeProvider>
     </CartProvider>
   );
 }

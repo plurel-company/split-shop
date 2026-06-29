@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { AnteModeSwitch } from "@/components/ante-mode-switch";
+
 type StoreShellProps = {
   configured: boolean;
   children: React.ReactNode;
@@ -17,7 +19,7 @@ export function StoreShell({ configured, children }: StoreShellProps) {
             checkout modal.
           </p>
         </div>
-        <div className="flex flex-wrap gap-3 text-sm">
+        <div className="flex flex-wrap items-center gap-3 text-sm">
           <Link
             href="https://splitante.com/docs"
             className="rounded-full border border-stone-200 bg-white px-4 py-2 text-stone-700 hover:bg-stone-100"
@@ -26,15 +28,12 @@ export function StoreShell({ configured, children }: StoreShellProps) {
           >
             Ante docs
           </Link>
-          {configured ? (
-            <span className="rounded-full bg-emerald-100 px-4 py-2 font-medium text-emerald-800">
-              Sandbox ready
-            </span>
-          ) : (
+          {configured ? <AnteModeSwitch /> : null}
+          {!configured ? (
             <span className="rounded-full bg-amber-100 px-4 py-2 font-medium text-amber-800">
               Configure env
             </span>
-          )}
+          ) : null}
         </div>
       </header>
 
