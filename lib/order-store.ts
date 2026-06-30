@@ -1,8 +1,15 @@
 import type { CartLine } from "@/lib/store";
 
+export type OrderFee = {
+  id: string;
+  label: string;
+  amount: number;
+};
+
 export type PendingOrder = {
   orderRef: string;
   lines: CartLine[];
+  fees?: OrderFee[];
   subtotal: number;
   tax: number;
   shipping: number;

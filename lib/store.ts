@@ -1,4 +1,4 @@
-import type { Cart } from "@splitante/sdk";
+import type { Cart, CartFee } from "@splitante/sdk";
 
 /** Public site origin for absolute product image URLs (Ante hosted checkout). */
 const SITE_URL =
@@ -165,6 +165,7 @@ export type ConfirmedOrder = {
   orderRef: string;
   groupId: string;
   lines: CartLine[];
+  fees?: CartFeeLine[];
   subtotal: number;
   tax: number;
   shipping: number;
@@ -193,44 +194,35 @@ export function buildProductCartLines(cart: CartState): CartLine[] {
   }));
 }
 
-export function buildFeeCartLines(cart: CartState): CartLine[] {
-  const lines: CartLine[] = [];
+export function buildCartFees(cart: CartState): CartFee[] {
+  const fees: CartFee[] = [];
 
   for (const product of PRODUCTS) {
     const nights = cart[product.id] ?? 0;
     if (nights === 0 || !product.fees?.length) continue;
 
     for (const fee of product.fees) {
-      if (fee.billing === "per_night") {
-        lines.push({
-          id: `fee-${product.id}-${fee.id}`,
-          name: fee.label,
-          quantity: nights,
-          unit_price: fee.amount,
-        });
-      } else {
-        lines.push({
-          id: `fee-${product.id}-${fee.id}`,
-          name: fee.label,
-          quantity: 1,
-          unit_price: fee.amount,
-        });
-      }
+      const amount = fee.billing === "per_night" ? fee.amount * nights : fee.amount;
+      fees.push({
+        id: `${product.id}-${fee.id}`,
+        label: fee.label,
+        amount,
+      });
     }
   }
 
-  return lines.sort((a, b) => a.id.localeCompare(b.id));
+  return fees.sort((a, b) => a.id.localeCompare(b.id));
 }
 
 export function buildCartLines(cart: CartState): CartLine[] {
-  return [...buildProductCartLines(cart), ...buildFeeCartLines(cart)];
+  return buildProductCartLines(cart);
 }
 
 export function buildCartFeeSummary(cart: CartState): CartFeeLine[] {
-  return buildFeeCartLines(cart).map((line) => ({
-    id: line.id,
-    label: line.name,
-    amount: line.quantity * line.unit_price,
+  return buildCartFees(cart).map((fee) => ({
+    id: fee.id,
+    label: fee.label,
+    amount: fee.amount,
   }));
 }
 
@@ -267,18 +259,20 @@ export function makeOrderRef(): string {
 }
 
 export function buildAnteCart(cart: CartState, orderRef: string): AnteCart {
-  const items = buildCartLines(cart);
+  const items = buildProductCartLines(cart);
+  const fees = buildCartFees(cart);
+  const feesTotal = fees.reduce((sum, fee) => sum + fee.amount, 0);
   const merchandiseSubtotal = cartSubtotal(cart);
   const tax = Math.round(merchandiseSubtotal * 0.08);
   const shipping = cartHasShopItems(cart) ? 500 : 0;
-  const lineTotal = items.reduce((sum, line) => sum + line.quantity * line.unit_price, 0);
 
   return {
-    total: lineTotal + tax + shipping,
+    total: merchandiseSubtotal + tax + shipping + feesTotal,
     currency: "usd",
     items,
     tax,
     shipping,
+    ...(fees.length > 0 ? { fees } : {}),
     metadata: { order_ref: orderRef },
   };
 }

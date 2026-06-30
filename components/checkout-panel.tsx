@@ -27,6 +27,7 @@ function fundedOrderToConfirmed(order: FundedOrder): ConfirmedOrder {
     orderRef: order.orderRef,
     groupId: order.groupId,
     lines: order.lines,
+    fees: order.fees,
     subtotal: order.subtotal,
     tax: order.tax,
     shipping: order.shipping,
@@ -146,7 +147,6 @@ export function CheckoutPanel() {
           getSignature={signCart}
           cart={anteCart}
           group={{ minSize: 2, maxSize: 6, defaultMode: "equal" }}
-          label="Pay with Ante"
           disabled={belowMinimum || pollingOrderRef !== null}
           className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
           callbacks={{

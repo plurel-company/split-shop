@@ -69,6 +69,12 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
           <dt className="text-stone-500">Subtotal</dt>
           <dd>{formatUsd(order.subtotal)}</dd>
         </div>
+        {order.fees?.map((fee) => (
+          <div key={fee.id} className="flex justify-between">
+            <dt className="text-stone-500">{fee.label}</dt>
+            <dd>{formatUsd(fee.amount)}</dd>
+          </div>
+        ))}
         <div className="flex justify-between">
           <dt className="text-stone-500">Tax</dt>
           <dd>{formatUsd(order.tax)}</dd>

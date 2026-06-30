@@ -18,10 +18,16 @@ function pendingFromCart(cart: Cart) {
   const subtotal = lines.reduce((sum, line) => sum + line.quantity * line.unit_price, 0);
   const tax = cart.tax ?? 0;
   const shipping = cart.shipping ?? 0;
+  const fees = cart.fees?.map((fee) => ({
+    id: fee.id,
+    label: fee.label,
+    amount: fee.amount,
+  }));
 
   return {
     orderRef,
     lines,
+    ...(fees?.length ? { fees } : {}),
     subtotal,
     tax,
     shipping,

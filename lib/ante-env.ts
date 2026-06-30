@@ -24,7 +24,7 @@ export function explainAnteApiError(apiError: string, status?: number): string {
   }
 
   if (message.includes("Invalid cart signature")) {
-    return "Signing secret mismatch — update ANTE_SIGNING_SECRET from Ante → Developers → Signing and redeploy.";
+    return "Cart signature rejected. Use ANTE_SIGNING_SECRET (ante_sign_… from Developers → Signing), not a secret API key (ante_sk_…). Paste the full value into Vercel, redeploy, and retry. If you rotated the signing secret in the dashboard, update env with the new value — rotation invalidates the old one immediately.";
   }
 
   if (message.includes("Invalid or revoked API key") || message.includes("Invalid API key format")) {

@@ -1,2 +1,5 @@
 allowBuilds:
   sharp: set this to true or false
+minimumReleaseAgeExclude:
+  - '@splitante/react-sdk@0.1.7'
+  - '@splitante/sdk@0.1.7'
