@@ -14,6 +14,17 @@ type UseOrderFundingPollOptions = {
   onError?: (message: string) => void;
 };
 
+export async function fetchFundedOrder(orderRef: string): Promise<FundedOrder | null> {
+  try {
+    const response = await fetch(`/api/orders/${encodeURIComponent(orderRef)}`);
+    if (!response.ok) return null;
+    const data = (await response.json()) as { order?: FundedOrder };
+    return data.order?.status === "funded" ? data.order : null;
+  } catch {
+    return null;
+  }
+}
+
 export function useOrderFundingPoll({
   orderRef,
   enabled,
@@ -40,17 +51,11 @@ export function useOrderFundingPoll({
 
     async function poll() {
       while (!cancelled && Date.now() - startedAt < TIMEOUT_MS) {
-        try {
-          const response = await fetch(`/api/orders/${encodeURIComponent(ref)}`);
-          if (response.ok) {
-            const data = (await response.json()) as { order?: FundedOrder };
-            if (data.order?.status === "funded") {
-              onFundedRef.current(data.order);
-              return;
-            }
-          }
-        } catch {
-          onErrorRef.current?.("Could not reach order status.");
+        const funded = await fetchFundedOrder(ref);
+        if (cancelled) return;
+        if (funded) {
+          onFundedRef.current(funded);
+          return;
         }
         await new Promise((resolve) => setTimeout(resolve, POLL_MS));
       }

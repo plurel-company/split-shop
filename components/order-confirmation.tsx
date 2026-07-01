@@ -24,8 +24,18 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
               Order confirmed
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-emerald-900/80">
-              Payment verified via <code className="rounded bg-white/80 px-1 text-xs">group.funded</code>{" "}
-              webhook — safe to fulfill.
+              {order.confirmedVia === "sdk" ? (
+                <>
+                  Payment confirmed in Ante checkout. Fulfillment is safest after your server
+                  receives <code className="rounded bg-white/80 px-1 text-xs">group.funded</code>.
+                </>
+              ) : (
+                <>
+                  Payment verified via{" "}
+                  <code className="rounded bg-white/80 px-1 text-xs">group.funded</code> webhook —
+                  safe to fulfill.
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -108,8 +118,18 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
       </button>
 
       <p className="px-6 pb-5 text-xs leading-relaxed text-emerald-900/55">
-        This screen updated after your server verified the Ante{" "}
-        <code className="rounded bg-white/80 px-1">group.funded</code> webhook.
+        {order.confirmedVia === "sdk" ? (
+          <>
+            Ante reported this session as funded before the webhook arrived. Configure{" "}
+            <code className="rounded bg-white/80 px-1">group.funded</code> on your deployment for
+            production fulfillment.
+          </>
+        ) : (
+          <>
+            This screen updated after your server verified the Ante{" "}
+            <code className="rounded bg-white/80 px-1">group.funded</code> webhook.
+          </>
+        )}
       </p>
     </aside>
   );

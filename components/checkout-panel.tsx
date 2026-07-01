@@ -14,11 +14,13 @@ import {
   buildAnteCart,
   buildCartFeeSummary,
   buildProductCartLines,
+  cartSubtotal,
   getProduct,
   makeOrderRef,
   MINIMUM_ORDER_CENTS,
   type ConfirmedOrder,
 } from "@/lib/store";
+import { fetchFundedOrder } from "@/hooks/use-order-funding-poll";
 
 function checkoutErrorMessage(error: Error): string {
   return explainAnteApiError(error.message);
@@ -40,7 +42,9 @@ function fundedOrderToConfirmed(order: FundedOrder): ConfirmedOrder {
 }
 
 function isWaitingStatus(status: string | null): boolean {
-  return status?.toLowerCase().includes("waiting") ?? false;
+  if (!status) return false;
+  const lower = status.toLowerCase();
+  return lower.includes("waiting") || lower.includes("confirming");
 }
 
 function isErrorStatus(status: string | null): boolean {
@@ -73,6 +77,52 @@ export function CheckoutPanel() {
       setStatus(null);
     },
     [clearCart],
+  );
+
+  const resetCheckoutWait = useCallback(() => {
+    setPollingOrderRef(null);
+    setStatus(null);
+  }, []);
+
+  const confirmFromSdk = useCallback(
+    (ref: string, sessionId: string) => {
+      const feeSummary = buildCartFeeSummary(cart);
+      setConfirmedOrder({
+        orderRef: ref,
+        groupId: sessionId,
+        lines: buildProductCartLines(cart),
+        fees: feeSummary.length > 0 ? feeSummary : undefined,
+        subtotal: cartSubtotal(cart),
+        tax: anteCart.tax ?? 0,
+        shipping: anteCart.shipping ?? 0,
+        total: anteCart.total,
+        confirmedAt: Date.now(),
+        confirmedVia: "sdk",
+      });
+      setPollingOrderRef(null);
+      clearCart();
+      setStatus(null);
+    },
+    [anteCart.shipping, anteCart.tax, anteCart.total, cart, clearCart],
+  );
+
+  const waitForWebhookConfirmation = useCallback(
+    async (ref: string, sessionId: string) => {
+      setPollingOrderRef(ref);
+      setStatus("Payment complete — confirming your order…");
+
+      for (let attempt = 0; attempt < 15; attempt += 1) {
+        const funded = await fetchFundedOrder(ref);
+        if (funded) {
+          handleWebhookFunded(funded);
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 400));
+      }
+
+      confirmFromSdk(ref, sessionId);
+    },
+    [confirmFromSdk, handleWebhookFunded],
   );
 
   useOrderFundingPoll({
@@ -235,8 +285,17 @@ export function CheckoutPanel() {
               setPollingOrderRef(orderRef);
               setStatus("Waiting for group.funded webhook to confirm your order…");
             },
+            onGroupFunded: (sessionId, fundedOrderRef) => {
+              void waitForWebhookConfirmation(fundedOrderRef ?? orderRef, sessionId);
+            },
+            onGroupCancelled: () => {
+              resetCheckoutWait();
+            },
+            onGroupExpired: () => {
+              resetCheckoutWait();
+            },
             onError: (error) => {
-              setPollingOrderRef(null);
+              resetCheckoutWait();
               setStatus(checkoutErrorMessage(error));
             },
           }}

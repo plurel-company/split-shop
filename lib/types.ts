@@ -59,7 +59,7 @@ export type ConfirmedOrder = {
   shipping: number;
   total: number;
   confirmedAt: number;
-  confirmedVia?: "webhook";
+  confirmedVia?: "webhook" | "sdk";
 };
 
 /** productId → quantity in the browser cart. */
