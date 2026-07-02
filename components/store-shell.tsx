@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { AnteModeSwitch } from "@/components/ante-mode-switch";
 
 type StoreShellProps = {
@@ -23,24 +21,11 @@ export function StoreShell({ configured, children }: StoreShellProps) {
                 Ante open demo
               </p>
             </div>
-            <div className="flex shrink-0 items-center gap-2.5">
-              {!configured ? (
-                <span className="rounded-full bg-terra-soft px-4 py-2 text-sm font-medium text-terra-deep">
-                  Configure env
-                </span>
-              ) : null}
-              <Link
-                href="https://splitante.com/docs"
-                className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-sm font-medium text-white transition hover:bg-[#26272D]"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Ante docs
-                <span aria-hidden className="text-white/60">
-                  ↗
-                </span>
-              </Link>
-            </div>
+            {!configured ? (
+              <span className="shrink-0 rounded-full bg-terra-soft px-4 py-2 text-sm font-medium text-terra-deep">
+                Configure env
+              </span>
+            ) : null}
           </div>
 
           {/* Title block, with the mode switch seated beside the lede. */}
@@ -78,7 +63,17 @@ export function StoreShell({ configured, children }: StoreShellProps) {
           >
             @splitante/react-sdk
           </a>
-          . Fulfill orders on <code className="text-ink-2">group.funded</code> webhooks.
+          . Fulfill orders on <code className="text-ink-2">group.funded</code> webhooks. Full guides
+          in the{" "}
+          <a
+            href="https://splitante.com/docs"
+            className="font-medium text-ink-2 underline decoration-hair-2 underline-offset-2 hover:text-ink"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Ante docs
+          </a>
+          {" "}↗
         </footer>
       </main>
     </div>
