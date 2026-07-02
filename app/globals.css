@@ -232,7 +232,7 @@ body {
 .cart-notice__dismiss {
   flex-shrink: 0;
   border-radius: 7px;
-  padding: 0.25rem 0.625rem;
+  padding: 0.4375rem 0.75rem;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--terra-deep);
@@ -452,9 +452,6 @@ code {
 
 @media (min-width: 1024px) {
   .checkout-panel--sticky {
-    position: sticky;
-    top: 84px;
-    align-self: start;
     max-height: calc(100vh - 98px);
     overflow-y: auto;
   }
@@ -664,15 +661,16 @@ code {
   -webkit-appearance: none;
   appearance: none;
   width: 5.5rem;
-  height: 0.25rem;
+  height: 1.75rem;
   border-radius: 9999px;
   background: linear-gradient(
-    to right,
-    var(--terra) 0%,
-    var(--terra) var(--slider-fill, 0%),
-    var(--hair-2) var(--slider-fill, 0%),
-    var(--hair-2) 100%
-  );
+      to right,
+      var(--terra) 0%,
+      var(--terra) var(--slider-fill, 0%),
+      var(--hair-2) var(--slider-fill, 0%),
+      var(--hair-2) 100%
+    )
+    center / 100% 0.25rem no-repeat;
   cursor: pointer;
   outline: none;
 }
@@ -828,7 +826,7 @@ code {
   margin: 0 auto;
   padding: 0 32px 88px;
 }
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .store-container {
     padding: 0 20px 64px;
   }
@@ -973,7 +971,7 @@ code {
   }
   .header-bar {
     grid-template-columns: 1fr auto;
-    padding: 12px 16px;
+    padding: 12px 32px;
   }
   .header-pill {
     display: none;
@@ -991,7 +989,7 @@ code {
   padding: 56px 32px 0;
   margin-top: clamp(64px, 9vw, 112px);
 }
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .site-footer {
     padding: 44px 20px 0;
   }
@@ -1032,6 +1030,7 @@ code {
   letter-spacing: -0.025em;
   line-height: 1.15;
   max-width: 440px;
+  min-width: min(280px, 100%);
 }
 .footer-quote em {
   font-family: var(--font-instrument-serif), serif;
@@ -1083,4 +1082,29 @@ code {
 }
 .site-footer__legal a:hover {
   color: var(--dark-ink);
+}
+
+/* Phones: the nowrap mode cluster (~346px) outgrows a 375px screen, and the
+   header-actions row overflows when the Configure-env pill is present. */
+@media (max-width: 640px) {
+  .header-bar {
+    padding: 12px 20px;
+  }
+}
+@media (max-width: 480px) {
+  .store-hero__cluster {
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 28px;
+  }
+  .header-demo {
+    padding: 7px 6px;
+  }
+  .header-env-pill {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
 }

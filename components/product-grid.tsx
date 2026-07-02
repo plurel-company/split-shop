@@ -49,7 +49,7 @@ export function ProductGrid() {
                     className={
                       isLodging
                         ? "mt-4 grid gap-5 sm:grid-cols-2"
-                        : "mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+                        : "mt-4 grid gap-5 min-[480px]:grid-cols-2 md:grid-cols-3"
                     }
                   >
                     {group.products.map((product) =>
