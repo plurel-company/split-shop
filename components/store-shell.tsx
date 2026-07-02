@@ -31,12 +31,12 @@ export function StoreShell({ configured, children }: StoreShellProps) {
               ) : null}
               <Link
                 href="https://splitante.com/docs"
-                className="inline-flex items-center gap-1.5 rounded-full border border-hair-2 bg-white/90 px-4 py-2 text-sm font-medium text-ink-2 backdrop-blur-sm transition hover:bg-white hover:text-ink"
+                className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-sm font-medium text-white transition hover:bg-[#26272D]"
                 target="_blank"
                 rel="noreferrer"
               >
                 Ante docs
-                <span aria-hidden className="text-ink-4">
+                <span aria-hidden className="text-white/60">
                   ↗
                 </span>
               </Link>
