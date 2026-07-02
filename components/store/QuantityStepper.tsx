@@ -35,7 +35,7 @@ export function QuantityStepper({
       <span className={`${countSize} text-center font-medium tabular-nums text-ink`}>
         {quantity}
         {quantity > 0 ? (
-          <span className="block font-mono text-[10px] font-normal uppercase tracking-wide text-ink-3">
+          <span className="block font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-ink-3">
             {plural}
           </span>
         ) : null}
@@ -44,7 +44,7 @@ export function QuantityStepper({
         type="button"
         onClick={onAdd}
         disabled={disabled}
-        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full bg-ink text-white transition hover:bg-[#26272D] disabled:cursor-not-allowed disabled:opacity-40`}
+        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full bg-ink text-white transition hover:bg-[var(--dark-3)] disabled:cursor-not-allowed disabled:opacity-40`}
         aria-label={`Add one ${unitLabel} at ${productName}`}
       >
         +

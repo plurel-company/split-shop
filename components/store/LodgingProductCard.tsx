@@ -10,7 +10,7 @@ import { type Product } from "@/lib/store";
 function MetaItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-ink-3">{label}</dt>
+      <dt className="font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-ink-3">{label}</dt>
       <dd className="text-sm font-medium text-ink-2">{value}</dd>
     </div>
   );
@@ -46,10 +46,10 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
+      <div className="flex flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-medium leading-snug tracking-[-0.025em] text-ink">
+            <h3 className="text-lg font-medium leading-snug tracking-[-0.02em] text-ink">
               {product.name}
             </h3>
             <p className="mt-1.5 text-sm leading-relaxed text-ink-3">{product.description}</p>
@@ -75,7 +75,7 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
             {lodging.amenities.map((amenity) => (
               <li
                 key={amenity}
-                className="rounded-full border border-hair-2 bg-white px-2.5 py-1 font-mono text-[11px] text-ink-2"
+                className="rounded-full border border-hair-2 bg-white px-2.5 py-1 font-mono text-[11px] tracking-[0.02em] text-ink-2"
               >
                 {amenity}
               </li>

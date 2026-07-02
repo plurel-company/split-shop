@@ -188,7 +188,7 @@ export function CheckoutPanel() {
           >
             🛒
           </span>
-          <h2 className="text-base font-medium tracking-[-0.015em] text-ink">Your cart is empty</h2>
+          <h2 className="text-lg font-medium tracking-[-0.02em] text-ink">Your cart is empty</h2>
           <p className="mt-1.5 max-w-[14rem] text-sm leading-relaxed text-ink-3">
             Add items from one currency region, then split the total with Ante group pay.
           </p>
@@ -215,7 +215,7 @@ export function CheckoutPanel() {
             <h2 className="text-lg font-medium tracking-[-0.02em] text-ink">Your cart</h2>
             {currency ? <CurrencyBadge currency={currency} size="md" /> : null}
           </div>
-          <p className="mt-0.5 text-xs text-ink-3">
+          <p className="mt-1 text-xs text-ink-3">
             {itemCount} {itemCount === 1 ? "item" : "items"} ·{" "}
             <span className="font-mono text-ink-3">{orderRef}</span>
           </p>

@@ -121,17 +121,17 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
         Continue shopping
       </button>
 
-      <p className="px-6 pb-5 text-xs leading-relaxed text-ink-3">
+      <p className="px-6 pb-6 text-[0.6875rem] leading-[1.55] text-ink-4">
         {order.confirmedVia === "sdk" ? (
           <>
             Ante reported this session as funded before the webhook arrived. Configure{" "}
-            <code className="rounded bg-white/80 px-1">group.funded</code> on your deployment for
+            <code className="rounded bg-white/80 px-1 text-[0.625rem]">group.funded</code> on your deployment for
             production fulfillment.
           </>
         ) : (
           <>
             This screen updated after your server verified the Ante{" "}
-            <code className="rounded bg-white/80 px-1">group.funded</code> webhook.
+            <code className="rounded bg-white/80 px-1 text-[0.625rem]">group.funded</code> webhook.
           </>
         )}
       </p>

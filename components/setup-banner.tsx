@@ -141,7 +141,7 @@ export function SetupBanner() {
 
   return (
     <div className="setup-banner setup-banner--warn">
-      <p className="font-semibold">{modeLabel(mode)} checkout is not fully configured</p>
+      <p className="font-medium">{modeLabel(mode)} checkout is not fully configured</p>
       <ul className="mt-2 list-disc space-y-1 pl-5 text-terra-deep/90">
         {status.issues.map((issue) => (
           <li key={issue}>{issue}</li>

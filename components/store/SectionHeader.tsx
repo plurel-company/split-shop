@@ -22,7 +22,7 @@ export function SectionHeader({
               {title}
             </h2>
             {count !== undefined ? (
-              <span className="rounded-full border border-hair-2 bg-white px-2.5 py-0.5 font-mono text-[11px] text-ink-2">
+              <span className="rounded-full border border-hair-2 bg-white px-2.5 py-0.5 font-mono text-[11px] tracking-[0.02em] text-ink-2">
                 {count} {count === 1 ? countLabel.replace(/s$/, "") : countLabel}
               </span>
             ) : null}

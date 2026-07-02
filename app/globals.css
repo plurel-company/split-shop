@@ -172,8 +172,8 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.75rem 1rem;
-  padding: 0.875rem 1rem;
-  border-radius: 0.875rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
   border: 1px solid var(--terra-dim);
   background: linear-gradient(135deg, var(--terra-soft) 0%, #ffffff 100%);
   color: var(--terra-deep);
@@ -183,7 +183,7 @@ body {
 
 .cart-notice__dismiss {
   flex-shrink: 0;
-  border-radius: 0.5rem;
+  border-radius: 7px;
   padding: 0.25rem 0.625rem;
   font-size: 0.75rem;
   font-weight: 600;
@@ -210,18 +210,14 @@ code {
     rgb(255 255 255 / 0.55) 0%,
     rgb(255 255 255 / 0) 100%
   );
-  border-radius: 0 0 1.5rem 1.5rem;
-  margin-left: -0.25rem;
-  margin-right: -0.25rem;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
+  border-radius: 0 0 0.75rem 0.75rem;
 }
 
 
 .checkout-panel {
   border: 1px solid var(--checkout-border);
   background: linear-gradient(180deg, #ffffff 0%, var(--bg-1) 100%);
-  border-radius: 1rem;
+  border-radius: 12px;
   box-shadow:
     0 1px 2px rgba(14, 14, 17, 0.03),
     0 6px 22px -14px rgba(0, 0, 0, 0.18);
@@ -252,7 +248,7 @@ code {
   flex-shrink: 0;
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 0.625rem;
+  border-radius: 8px;
   object-fit: cover;
   background: var(--bg-2);
   border: 1px solid var(--checkout-border);
@@ -267,7 +263,7 @@ code {
 
 .checkout-totals {
   border-top: 1px solid var(--checkout-border);
-  padding-top: 0.875rem;
+  padding-top: 1rem;
   margin-top: 0.5rem;
 }
 
@@ -298,7 +294,7 @@ code {
   gap: 0.625rem;
   align-items: flex-start;
   padding: 0.75rem 0.875rem;
-  border-radius: 0.75rem;
+  border-radius: 8px;
   border: 1px solid var(--checkout-warning-border);
   background: var(--checkout-warning-bg);
   color: var(--checkout-warning-text);
@@ -308,7 +304,7 @@ code {
 
 /* The Ante button stands on its own — no outlined frame behind the mark. */
 .checkout-ante-button-wrap {
-  margin-top: 1.25rem;
+  margin-top: 1rem;
 }
 
 .checkout-status {
@@ -317,7 +313,7 @@ code {
   align-items: flex-start;
   margin-top: 1rem;
   padding: 0.75rem 0.875rem;
-  border-radius: 0.75rem;
+  border-radius: 8px;
   font-size: 0.8125rem;
   line-height: 1.45;
   color: var(--ink-2);
@@ -371,9 +367,9 @@ code {
 @media (min-width: 1024px) {
   .checkout-panel--sticky {
     position: sticky;
-    top: 1.5rem;
+    top: 2rem;
     align-self: start;
-    max-height: calc(100vh - 3rem);
+    max-height: calc(100vh - 4rem);
     overflow-y: auto;
   }
 }
@@ -383,7 +379,7 @@ code {
 .order-confirmation {
   border: 1px solid var(--success-border);
   background: linear-gradient(165deg, var(--success-surface) 0%, #ffffff 55%);
-  border-radius: 1rem;
+  border-radius: 12px;
   box-shadow:
     0 1px 2px rgba(63, 122, 85, 0.06),
     0 8px 24px rgba(63, 122, 85, 0.08);
@@ -422,7 +418,7 @@ code {
 .order-confirmation__meta {
   margin-top: 1.25rem;
   padding: 1rem;
-  border-radius: 0.75rem;
+  border-radius: 8px;
   border: 1px solid var(--success-border);
   background: rgba(255, 255, 255, 0.75);
 }
@@ -457,7 +453,7 @@ code {
   justify-content: space-between;
   align-items: baseline;
   padding-top: 0.75rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
   border-top: 1px solid var(--success-border);
   font-size: 1.0625rem;
   font-weight: 600;
@@ -470,7 +466,8 @@ code {
   border-radius: 10px;
   padding: 0.8125rem 1rem;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 500;
+  letter-spacing: -0.005em;
   color: #ffffff;
   background: var(--ink);
   transition:
@@ -492,8 +489,8 @@ code {
 
 .setup-banner {
   margin-bottom: 1.5rem;
-  border-radius: 0.875rem;
-  padding: 1rem 1.125rem;
+  border-radius: 12px;
+  padding: 1.25rem;
   font-size: 0.875rem;
   line-height: 1.5;
 }
@@ -516,8 +513,9 @@ code {
   gap: 0.5rem;
   border-radius: 7px;
   padding: 0.5rem 0.875rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
   color: #ffffff;
   background: var(--ink);
   transition: opacity 0.15s ease;
@@ -535,9 +533,9 @@ code {
 .setup-verify-message {
   margin-top: 0.75rem;
   padding: 0.75rem 0.875rem;
-  border-radius: 0.625rem;
+  border-radius: 8px;
   font-size: 0.8125rem;
-  line-height: 1.5;
+  line-height: 1.45;
   white-space: pre-line;
 }
 
@@ -651,10 +649,10 @@ code {
 
 .ante-mode-label {
   min-width: 2rem;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   transition: color 0.15s ease;
 }
@@ -672,10 +670,10 @@ code {
   align-items: center;
   border-radius: 9999px;
   padding: 0.375rem 0.75rem;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .ante-mode-badge--live {

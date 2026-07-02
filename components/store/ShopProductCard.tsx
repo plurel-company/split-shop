@@ -35,7 +35,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
+      <div className="flex flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h3 className="text-base font-medium leading-snug tracking-[-0.015em] text-ink">{product.name}</h3>
@@ -48,7 +48,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
           </span>
         </div>
 
-        <div className="mt-auto pt-5">
+        <div className="mt-auto pt-4">
           <div className="flex items-end justify-between gap-4">
             <p className="font-mono text-base font-medium tabular-nums text-ink">
               {formatMoney(product.unitPrice, product.currency)}

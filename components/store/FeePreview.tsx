@@ -16,7 +16,7 @@ export function FeePreview({ fees, currency, compact = false }: FeePreviewProps)
       className={
         compact
           ? "mt-3 rounded-lg bg-paper-2/60 px-3 py-2.5"
-          : "mt-4 rounded-xl border border-hair bg-gradient-to-br from-paper-2/60 to-terra-soft/40 px-3.5 py-3"
+          : "mt-4 rounded-lg border border-hair bg-gradient-to-br from-paper-2/60 to-terra-soft/40 px-3.5 py-3"
       }
     >
       <p className="font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-ink-3">
