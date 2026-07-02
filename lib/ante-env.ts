@@ -49,7 +49,15 @@ export function explainAnteApiError(
   }
 
   if (message.includes("Invalid or revoked API key") || message.includes("Invalid API key format")) {
-    return "Publishable key is invalid or revoked. Paste the full key from the dashboard when it was created (not the prefix shown later).";
+    return "The demo's sandbox key is being rotated — group checkout is temporarily offline. Browsing, carts, and totals all still work.";
+  }
+
+  if (
+    message.includes("Load failed") ||
+    message.includes("Failed to fetch") ||
+    message.includes("NetworkError")
+  ) {
+    return "Couldn't reach Ante's sandbox API — check your connection and try again.";
   }
 
   if (message.includes("Missing Authorization bearer")) {
