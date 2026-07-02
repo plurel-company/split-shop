@@ -12,70 +12,73 @@ export function StoreShell({ configured, children }: StoreShellProps) {
     <div className="min-h-screen">
       <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <header className="store-hero mb-10 sm:mb-12">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-2xl">
-              <div className="flex items-center gap-2.5">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-sm font-bold text-white shadow-md shadow-emerald-500/25">
-                  A
+          {/* Top row reads as a navbar: brand on the left, docs anchored to the
+             top-right corner — never floating in the hero's whitespace. */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <span className="orb-sphere inline-flex h-8 w-8 items-center justify-center">
+                <span className="sr-only">A</span>
+              </span>
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-terra">
+                Ante open demo
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-2.5">
+              {!configured ? (
+                <span className="rounded-full bg-terra-soft px-4 py-2 text-sm font-medium text-terra-deep">
+                  Configure env
                 </span>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-orange-800/80">
-                  Ante open demo
-                </p>
-              </div>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl lg:text-[2.5rem]">
+              ) : null}
+              <Link
+                href="https://splitante.com/docs"
+                className="inline-flex items-center gap-1.5 rounded-full border border-hair-2 bg-white/90 px-4 py-2 text-sm font-medium text-ink-2 backdrop-blur-sm transition hover:bg-white hover:text-ink"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Ante docs
+                <span aria-hidden className="text-ink-4">
+                  ↗
+                </span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Title block, with the mode switch seated beside the lede. */}
+          <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <h1 className="text-3xl font-medium tracking-[-0.035em] text-ink sm:text-4xl lg:text-[2.5rem]">
                 Split Shop
               </h1>
-              <p className="mt-3 text-base leading-relaxed text-stone-600">
+              <p className="mt-3 text-base leading-relaxed text-ink-2">
                 Shop physical goods and book stays across USD, EUR, GBP, and JPY — then open
                 Ante&apos;s hosted group checkout to split payment with friends.
               </p>
             </div>
 
-            <div className="flex shrink-0 flex-col gap-3 sm:items-end">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <Link
-                  href="https://splitante.com/docs"
-                  className="inline-flex items-center gap-1.5 rounded-full border border-stone-200/90 bg-white/90 px-4 py-2 text-sm font-medium text-stone-700 shadow-sm backdrop-blur-sm transition hover:border-orange-200 hover:bg-white"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Ante docs
-                  <span aria-hidden className="text-stone-400">
-                    ↗
-                  </span>
-                </Link>
-                {!configured ? (
-                  <span className="rounded-full bg-amber-100 px-4 py-2 text-sm font-medium text-amber-800">
-                    Configure env
-                  </span>
-                ) : null}
+            {configured ? (
+              <div className="shrink-0 rounded-xl border border-hair bg-white/90 px-4 py-3 backdrop-blur-sm">
+                <p className="mb-2 font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-ink-3">
+                  Checkout mode
+                </p>
+                <AnteModeSwitch />
               </div>
-
-              {configured ? (
-                <div className="rounded-2xl border border-stone-200/80 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-sm">
-                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-stone-400">
-                    Checkout mode
-                  </p>
-                  <AnteModeSwitch />
-                </div>
-              ) : null}
-            </div>
+            ) : null}
           </div>
         </header>
 
         {children}
 
-        <footer className="mt-16 border-t border-stone-200/70 pt-8 text-xs leading-relaxed text-stone-400">
+        <footer className="mt-16 border-t border-hair pt-8 font-mono text-[11px] leading-relaxed tracking-[0.02em] text-ink-3">
           Built with{" "}
           <a
             href="https://splitante.com/docs/sdk"
-            className="font-medium text-stone-500 underline decoration-stone-300 underline-offset-2 hover:text-stone-700"
+            className="font-medium text-ink-2 underline decoration-hair-2 underline-offset-2 hover:text-ink"
             target="_blank"
             rel="noreferrer"
           >
             @splitante/react-sdk
           </a>
-          . Fulfill orders on <code className="text-stone-500">group.funded</code> webhooks.
+          . Fulfill orders on <code className="text-ink-2">group.funded</code> webhooks.
         </footer>
       </main>
     </div>

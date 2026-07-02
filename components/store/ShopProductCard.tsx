@@ -28,7 +28,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           <CurrencyBadge currency={product.currency} />
           {quantity > 0 ? (
-            <span className="rounded-full bg-stone-900/90 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+            <span className="rounded-full bg-ink/90 px-2.5 py-1 font-mono text-[11px] font-medium text-white backdrop-blur-sm">
               {quantity} in cart
             </span>
           ) : null}
@@ -38,8 +38,8 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="text-base font-semibold leading-snug text-stone-900">{product.name}</h3>
-            <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-stone-500">
+            <h3 className="text-base font-medium leading-snug tracking-[-0.015em] text-ink">{product.name}</h3>
+            <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-ink-3">
               {product.description}
             </p>
           </div>
@@ -50,7 +50,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
 
         <div className="mt-auto pt-5">
           <div className="flex items-end justify-between gap-4">
-            <p className="text-lg font-semibold tracking-tight text-stone-900">
+            <p className="font-mono text-base font-medium tabular-nums text-ink">
               {formatMoney(product.unitPrice, product.currency)}
             </p>
             <QuantityStepper

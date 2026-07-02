@@ -22,12 +22,12 @@ export function SectionHeader({
               {title}
             </h2>
             {count !== undefined ? (
-              <span className="rounded-full bg-orange-100/80 px-2.5 py-0.5 text-xs font-semibold text-orange-900/70">
+              <span className="rounded-full border border-hair-2 bg-white px-2.5 py-0.5 font-mono text-[11px] text-ink-2">
                 {count} {count === 1 ? countLabel.replace(/s$/, "") : countLabel}
               </span>
             ) : null}
           </div>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-stone-500">{subtitle}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-2">{subtitle}</p>
         </div>
       </div>
     </div>

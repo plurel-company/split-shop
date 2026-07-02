@@ -10,8 +10,8 @@ import { type Product } from "@/lib/store";
 function MetaItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">{label}</dt>
-      <dd className="text-sm font-medium text-stone-800">{value}</dd>
+      <dt className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-ink-3">{label}</dt>
+      <dd className="text-sm font-medium text-ink-2">{value}</dd>
     </div>
   );
 }
@@ -39,7 +39,7 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           <CurrencyBadge currency={product.currency} />
           {quantity > 0 ? (
-            <span className="rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-stone-900 shadow-sm backdrop-blur-sm">
+            <span className="rounded-full bg-white/95 px-2.5 py-1 font-mono text-[11px] font-medium text-ink shadow-sm backdrop-blur-sm">
               {quantity} {quantity === 1 ? "night" : "nights"}
             </span>
           ) : null}
@@ -49,10 +49,10 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
       <div className="flex flex-1 flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold leading-snug tracking-tight text-stone-900">
+            <h3 className="text-lg font-medium leading-snug tracking-[-0.025em] text-ink">
               {product.name}
             </h3>
-            <p className="mt-1.5 text-sm leading-relaxed text-stone-500">{product.description}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink-3">{product.description}</p>
           </div>
         </div>
 
@@ -75,7 +75,7 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
             {lodging.amenities.map((amenity) => (
               <li
                 key={amenity}
-                className="rounded-md border border-stone-200/80 bg-white px-2 py-1 text-xs font-medium text-stone-600"
+                className="rounded-full border border-hair-2 bg-white px-2.5 py-1 font-mono text-[11px] text-ink-2"
               >
                 {amenity}
               </li>
@@ -87,11 +87,11 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
           <FeePreview fees={product.fees} currency={product.currency} />
         ) : null}
 
-        <div className="mt-auto flex items-end justify-between gap-4 border-t border-stone-100 pt-4">
+        <div className="mt-auto flex items-end justify-between gap-4 border-t border-hair pt-4">
           <div>
-            <p className="text-xl font-semibold tracking-tight text-stone-900">
+            <p className="font-mono text-xl font-medium tabular-nums text-ink">
               {formatMoney(product.unitPrice, product.currency)}
-              <span className="text-sm font-normal text-stone-500"> / night</span>
+              <span className="font-sans text-sm font-normal text-ink-3"> / night</span>
             </p>
           </div>
           <QuantityStepper

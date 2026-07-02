@@ -27,15 +27,15 @@ export function QuantityStepper({
         type="button"
         onClick={onRemove}
         disabled={quantity === 0}
-        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-700 shadow-sm transition hover:border-stone-300 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-40`}
+        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full border border-hair-2 bg-white text-ink transition hover:bg-paper-2 disabled:cursor-not-allowed disabled:opacity-40`}
         aria-label={`Remove one ${unitLabel} at ${productName}`}
       >
         −
       </button>
-      <span className={`${countSize} text-center font-medium tabular-nums text-stone-900`}>
+      <span className={`${countSize} text-center font-medium tabular-nums text-ink`}>
         {quantity}
         {quantity > 0 ? (
-          <span className="block text-[10px] font-normal uppercase tracking-wide text-stone-400">
+          <span className="block font-mono text-[10px] font-normal uppercase tracking-wide text-ink-3">
             {plural}
           </span>
         ) : null}
@@ -44,7 +44,7 @@ export function QuantityStepper({
         type="button"
         onClick={onAdd}
         disabled={disabled}
-        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full bg-stone-900 text-white shadow-sm transition hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-40`}
+        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full bg-ink text-white transition hover:bg-[#26272D] disabled:cursor-not-allowed disabled:opacity-40`}
         aria-label={`Add one ${unitLabel} at ${productName}`}
       >
         +

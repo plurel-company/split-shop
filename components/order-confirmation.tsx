@@ -24,12 +24,12 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
           </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-semibold tracking-tight text-emerald-950">
+              <h2 className="text-lg font-medium tracking-[-0.02em] text-mint-deep">
                 Order confirmed
               </h2>
               <CurrencyBadge currency={order.currency} size="md" />
             </div>
-            <p className="mt-1 text-sm leading-relaxed text-emerald-900/80">
+            <p className="mt-1 text-sm leading-relaxed text-ink-2">
               {order.confirmedVia === "sdk" ? (
                 <>
                   Payment confirmed in Ante checkout. Fulfillment is safest after your server
@@ -48,18 +48,18 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
 
         <dl className="order-confirmation__meta text-sm">
           <div className="flex justify-between gap-4 py-1">
-            <dt className="text-stone-500">Order ref</dt>
-            <dd className="font-mono text-xs font-medium text-stone-900">{order.orderRef}</dd>
+            <dt className="text-ink-3">Order ref</dt>
+            <dd className="font-mono text-xs font-medium text-ink">{order.orderRef}</dd>
           </div>
-          <div className="flex justify-between gap-4 border-t border-emerald-100 py-1 pt-2">
-            <dt className="shrink-0 text-stone-500">Group ID</dt>
-            <dd className="truncate font-mono text-xs text-stone-700" title={order.groupId}>
+          <div className="flex justify-between gap-4 border-t border-mint-dim/60 py-1 pt-2">
+            <dt className="shrink-0 text-ink-3">Group ID</dt>
+            <dd className="truncate font-mono text-xs text-ink-2" title={order.groupId}>
               {order.groupId}
             </dd>
           </div>
-          <div className="flex justify-between gap-4 border-t border-emerald-100 py-1 pt-2">
-            <dt className="text-stone-500">Confirmed</dt>
-            <dd className="text-stone-700">{confirmedDate}</dd>
+          <div className="flex justify-between gap-4 border-t border-mint-dim/60 py-1 pt-2">
+            <dt className="text-ink-3">Confirmed</dt>
+            <dd className="text-ink-2">{confirmedDate}</dd>
           </div>
         </dl>
       </div>
@@ -78,13 +78,13 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
                   </span>
                 )}
                 <span className="min-w-0">
-                  <span className="block truncate font-medium text-stone-900">{line.name}</span>
-                  <span className="text-xs text-stone-500">
+                  <span className="block truncate font-medium text-ink">{line.name}</span>
+                  <span className="font-mono text-xs tabular-nums text-ink-3">
                     {format(line.unit_price)} × {line.quantity}
                   </span>
                 </span>
               </span>
-              <span className="shrink-0 font-medium">
+              <span className="shrink-0 font-mono font-medium tabular-nums">
                 {format(line.quantity * line.unit_price)}
               </span>
             </li>
@@ -94,22 +94,22 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
 
       <dl className="order-confirmation__totals text-sm" aria-label="Payment summary">
         <div className="checkout-total-row">
-          <dt className="text-stone-500">Subtotal</dt>
-          <dd className="text-stone-800">{format(order.subtotal)}</dd>
+          <dt className="text-ink-3">Subtotal</dt>
+          <dd className="font-mono tabular-nums text-ink-2">{format(order.subtotal)}</dd>
         </div>
         {order.fees?.map((fee) => (
           <div key={fee.id} className="checkout-total-row">
-            <dt className="text-stone-500">{fee.label}</dt>
-            <dd className="text-stone-800">{format(fee.amount)}</dd>
+            <dt className="text-ink-3">{fee.label}</dt>
+            <dd className="font-mono tabular-nums text-ink-2">{format(fee.amount)}</dd>
           </div>
         ))}
         <div className="checkout-total-row">
-          <dt className="text-stone-500">Tax</dt>
-          <dd className="text-stone-800">{format(order.tax)}</dd>
+          <dt className="text-ink-3">Tax</dt>
+          <dd className="font-mono tabular-nums text-ink-2">{format(order.tax)}</dd>
         </div>
         <div className="checkout-total-row">
-          <dt className="text-stone-500">Shipping</dt>
-          <dd className="text-stone-800">{format(order.shipping)}</dd>
+          <dt className="text-ink-3">Shipping</dt>
+          <dd className="font-mono tabular-nums text-ink-2">{format(order.shipping)}</dd>
         </div>
         <div className="order-confirmation__paid">
           <dt>Paid total</dt>
@@ -121,7 +121,7 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
         Continue shopping
       </button>
 
-      <p className="px-6 pb-5 text-xs leading-relaxed text-emerald-900/55">
+      <p className="px-6 pb-5 text-xs leading-relaxed text-ink-3">
         {order.confirmedVia === "sdk" ? (
           <>
             Ante reported this session as funded before the webhook arrived. Configure{" "}

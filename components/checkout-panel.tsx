@@ -183,13 +183,13 @@ export function CheckoutPanel() {
       >
         <div className="flex flex-col items-center text-center">
           <span
-            className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 text-xl"
+            className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-paper-2 text-xl"
             aria-hidden
           >
             🛒
           </span>
-          <h2 className="text-base font-semibold text-stone-800">Your cart is empty</h2>
-          <p className="mt-1.5 max-w-[14rem] text-sm leading-relaxed text-stone-500">
+          <h2 className="text-base font-medium tracking-[-0.015em] text-ink">Your cart is empty</h2>
+          <p className="mt-1.5 max-w-[14rem] text-sm leading-relaxed text-ink-3">
             Add items from one currency region, then split the total with Ante group pay.
           </p>
         </div>
@@ -212,16 +212,16 @@ export function CheckoutPanel() {
       <header className="flex items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold tracking-tight text-stone-900">Your cart</h2>
+            <h2 className="text-lg font-medium tracking-[-0.02em] text-ink">Your cart</h2>
             {currency ? <CurrencyBadge currency={currency} size="md" /> : null}
           </div>
-          <p className="mt-0.5 text-xs text-stone-500">
+          <p className="mt-0.5 text-xs text-ink-3">
             {itemCount} {itemCount === 1 ? "item" : "items"} ·{" "}
-            <span className="font-mono text-stone-600">{orderRef}</span>
+            <span className="font-mono text-ink-3">{orderRef}</span>
           </p>
         </div>
         {isWaiting ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-terra-soft px-2.5 py-1 font-mono text-[11px] font-medium text-terra-deep">
             <span className="checkout-spinner" aria-hidden />
             Confirming
           </span>
@@ -241,12 +241,12 @@ export function CheckoutPanel() {
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-stone-900">{line.name}</p>
-                <p className="text-xs text-stone-500">
+                <p className="truncate text-sm font-medium text-ink">{line.name}</p>
+                <p className="font-mono text-xs tabular-nums text-ink-3">
                   {format(line.unit_price)} × {line.quantity}
                 </p>
               </div>
-              <span className="shrink-0 text-sm font-medium text-stone-800">
+              <span className="shrink-0 font-mono text-sm font-medium tabular-nums text-ink-2">
                 {format(line.quantity * line.unit_price)}
               </span>
             </li>
@@ -256,22 +256,22 @@ export function CheckoutPanel() {
 
       <dl className="checkout-totals" aria-label="Order summary">
         <div className="checkout-total-row">
-          <dt className="text-stone-500">Subtotal</dt>
-          <dd className="text-stone-800">{format(subtotal)}</dd>
+          <dt className="text-ink-3">Subtotal</dt>
+          <dd className="font-mono tabular-nums text-ink-2">{format(subtotal)}</dd>
         </div>
         {feeLines.map((fee) => (
           <div key={fee.id} className="checkout-total-row">
-            <dt className="text-stone-500">{fee.label}</dt>
-            <dd className="text-stone-800">{format(fee.amount)}</dd>
+            <dt className="text-ink-3">{fee.label}</dt>
+            <dd className="font-mono tabular-nums text-ink-2">{format(fee.amount)}</dd>
           </div>
         ))}
         <div className="checkout-total-row">
-          <dt className="text-stone-500">Tax (8%)</dt>
-          <dd className="text-stone-800">{format(tax)}</dd>
+          <dt className="text-ink-3">Tax (8%)</dt>
+          <dd className="font-mono tabular-nums text-ink-2">{format(tax)}</dd>
         </div>
         <div className="checkout-total-row">
-          <dt className="text-stone-500">Shipping</dt>
-          <dd className="text-stone-800">{format(shipping)}</dd>
+          <dt className="text-ink-3">Shipping</dt>
+          <dd className="font-mono tabular-nums text-ink-2">{format(shipping)}</dd>
         </div>
         <div className="checkout-total-row checkout-total-row--grand">
           <dt>Total</dt>
@@ -297,7 +297,7 @@ export function CheckoutPanel() {
             group={{ minSize: 2, maxSize: 6, defaultMode: "equal" }}
             disabled={belowMinimum || pollingOrderRef !== null}
             appearance={{ fullWidth: true, size: "lg" }}
-            className="!rounded-xl"
+            className="!rounded-full"
             callbacks={{
               onGroupCreated: () => {
                 setPollingOrderRef(orderRef);

@@ -1,9 +1,9 @@
 import { type CurrencyCode } from "@/lib/currency";
 
 const CURRENCY_BADGE_STYLES: Record<CurrencyCode, string> = {
-  USD: "bg-sky-50 text-sky-800 ring-sky-200/80",
+  USD: "bg-paper-2 text-ink-2 ring-hair-2",
   EUR: "bg-indigo-50 text-indigo-800 ring-indigo-200/80",
-  GBP: "bg-violet-50 text-violet-800 ring-violet-200/80",
+  GBP: "bg-terra-soft text-terra-deep ring-terra-dim",
   JPY: "bg-rose-50 text-rose-800 ring-rose-200/80",
 };
 

@@ -125,8 +125,8 @@ export function SetupBanner() {
   if (status.ok) {
     return (
       <div className="setup-banner setup-banner--ok">
-        <p className="font-medium text-stone-800">{modeLabel(mode)} environment ready</p>
-        <p className="mt-1 text-stone-600">
+        <p className="font-medium text-ink-2">{modeLabel(mode)} environment ready</p>
+        <p className="mt-1 text-ink-3">
           {status.publishableKeyLength
             ? `Publishable key detected (${status.publishableKeyLength} chars).`
             : "Keys look configured."}
@@ -142,7 +142,7 @@ export function SetupBanner() {
   return (
     <div className="setup-banner setup-banner--warn">
       <p className="font-semibold">{modeLabel(mode)} checkout is not fully configured</p>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-amber-900/90">
+      <ul className="mt-2 list-disc space-y-1 pl-5 text-terra-deep/90">
         {status.issues.map((issue) => (
           <li key={issue}>{issue}</li>
         ))}

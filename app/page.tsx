@@ -24,7 +24,7 @@ export default function HomePage() {
           {configured ? (
             <Storefront />
           ) : (
-            <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+            <aside className="rounded-2xl border border-terra-dim bg-terra-soft p-6 text-sm text-terra-deep">
               Copy <code>.env.example</code> to <code>.env.local</code> and add your Ante credentials
               from the merchant dashboard. Set test and/or live publishable keys.
             </aside>
