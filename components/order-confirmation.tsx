@@ -74,7 +74,7 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
                   <img src={line.image_url} alt="" className="checkout-line-thumb" />
                 ) : (
                   <span className="checkout-line-thumb checkout-line-thumb--placeholder" aria-hidden>
-                    {product?.emoji ?? "📦"}
+                    {(line.name || "?").charAt(0).toUpperCase()}
                   </span>
                 )}
                 <span className="min-w-0">

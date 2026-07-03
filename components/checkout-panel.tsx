@@ -219,10 +219,13 @@ export function CheckoutPanel() {
       >
         <div className="flex flex-col items-center text-center">
           <span
-            className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-paper-2 text-xl"
+            className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-paper-2 text-ink-3"
             aria-hidden
           >
-            🛒
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 7h12l-1.2 12.2a1.6 1.6 0 0 1-1.6 1.3H8.8a1.6 1.6 0 0 1-1.6-1.3L6 7Z" />
+              <path d="M9 10V6a3 3 0 0 1 6 0v4" />
+            </svg>
           </span>
           <h2 className="text-lg font-medium tracking-[-0.02em] text-ink">Your cart is empty</h2>
           <p className="mt-1.5 max-w-[14rem] text-sm leading-relaxed text-ink-3">
@@ -273,7 +276,7 @@ export function CheckoutPanel() {
                 <img src={line.image_url} alt="" className="checkout-line-thumb" />
               ) : (
                 <span className="checkout-line-thumb checkout-line-thumb--placeholder" aria-hidden>
-                  {product?.emoji ?? "📦"}
+                  {(line.name || "?").charAt(0).toUpperCase()}
                 </span>
               )}
               <div className="min-w-0 flex-1">
@@ -317,7 +320,6 @@ export function CheckoutPanel() {
 
       {belowMinimum ? (
         <div className="checkout-minimum-warning mt-4" role="status">
-          <span aria-hidden>⚠️</span>
           <p>
             Minimum order is <strong>{format(minimumOrder)}</strong>. Add more items — current
             total is {format(total)}.

@@ -341,6 +341,10 @@ code {
 }
 
 .checkout-line-thumb--placeholder {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1107,4 +1111,11 @@ code {
     padding: 6px 10px;
     font-size: 12px;
   }
+}
+
+/* The SDK modal's close button straddles the panel's rounded corner — pin it
+   cleanly inside. (SDK-owned element; override until @splitante/sdk adjusts.) */
+#ante-checkout-modal .ante-modal-close {
+  top: 14px !important;
+  right: 14px !important;
 }

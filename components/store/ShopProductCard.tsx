@@ -43,9 +43,6 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
               {product.description}
             </p>
           </div>
-          <span className="text-lg opacity-35 transition group-hover:opacity-50" aria-hidden>
-            {product.emoji}
-          </span>
         </div>
 
         <div className="mt-auto pt-4">
