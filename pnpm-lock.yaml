@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@splitante/react-sdk':
-        specifier: ^0.1.9
-        version: 0.1.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^0.1.10
+        version: 0.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@splitante/sdk':
-        specifier: ^0.1.9
-        version: 0.1.9
+        specifier: ^0.1.10
+        version: 0.1.10
       next:
         specifier: ^15.3.3
         version: 15.5.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -276,15 +276,15 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@splitante/react-sdk@0.1.9':
-    resolution: {integrity: sha512-uEC0mazru0w6dMHXKLtNlpXTco68K0s8hpH1X0QGCjYifMdph8Q5pWRYzXMO/3aqV6OHOpLSqPNY09h2JKruGA==}
+  '@splitante/react-sdk@0.1.10':
+    resolution: {integrity: sha512-pbp2l5y0IGxBUZ3BqK6TOGOIIMtZqpk0fukG1KHZGj/Ps5glupIPeL/01qw3zxJ1OF/RgLQCiH5GzHFBovJd0g==}
     engines: {node: '>=20'}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  '@splitante/sdk@0.1.9':
-    resolution: {integrity: sha512-PrsbCcGA+gF3JftLXG/Z3697c0ue+MPDpvJiEv/ueQHUTbU/uS6cWbGixJB7zsLxgtsUfH2P9gIfwZu21TfqUQ==}
+  '@splitante/sdk@0.1.10':
+    resolution: {integrity: sha512-NfcpNRhqwNhItWBSFNwpLHWUa9F+jz6yGTe8FlL3P1g7Oc9VrZV9biD7dCMY0tpmBl+5NbY777ZtlsvyobH7dA==}
     engines: {node: '>=20'}
 
   '@swc/helpers@0.5.15':
@@ -738,13 +738,13 @@ snapshots:
   '@next/swc-win32-x64-msvc@15.5.19':
     optional: true
 
-  '@splitante/react-sdk@0.1.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@splitante/react-sdk@0.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@splitante/sdk': 0.1.9
+      '@splitante/sdk': 0.1.10
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@splitante/sdk@0.1.9': {}
+  '@splitante/sdk@0.1.10': {}
 
   '@swc/helpers@0.5.15':
     dependencies:

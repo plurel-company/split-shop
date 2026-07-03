@@ -91,7 +91,7 @@ Ante returns this with a `details` array listing common causes. It does **not** 
 
 1. Use **`ANTE_SIGNING_SECRET`** (`ante_sign_…`) — not `ante_sk_…` or `whsec_…`.
 2. Copy the **full** secret, redeploy after env changes, and update immediately if you rotated in the dashboard.
-3. Sign with **`createCartSignature`** from `@splitante/sdk/signing` (**≥ 0.1.9**). Ante always includes `fees: []` in the HMAC when the cart has no custom fees.
+3. Sign with **`createCartSignature`** from `@splitante/sdk/signing` (**≥ 0.1.10**). Ante always includes `fees: []` in the HMAC when the cart has no custom fees.
 4. Re-sign at checkout click if the cart changed after signing.
 
 Docs: [Cart signing](https://splitante.com/docs/cart-signing) · [Troubleshooting](https://splitante.com/docs/troubleshooting)

@@ -22,7 +22,7 @@ export function looksLikeKeyPrefix(key: string): boolean {
 export const INVALID_CART_SIGNATURE_HELP = [
   "Credential: use ANTE_SIGNING_SECRET (ante_sign_… from Developers → Signing), not ante_sk_… or whsec_….",
   "Value: paste the full secret into server env and redeploy. Dashboard rotation invalidates the old value immediately.",
-  "Canonical JSON: sign with createCartSignature from @splitante/sdk/signing (≥0.1.9). Ante always includes fees: [] in the HMAC when the cart has no custom fees.",
+  "Canonical JSON: sign with createCartSignature from @splitante/sdk/signing (≥0.1.10). Ante always includes fees: [] in the HMAC when the cart has no custom fees.",
   "Timing: re-sign at checkout click — cart edits after signing fail verification.",
 ] as const;
 
