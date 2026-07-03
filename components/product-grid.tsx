@@ -1,14 +1,14 @@
 "use client";
 
 import { useCart } from "@/components/cart-context";
-import { CurrencySubheader } from "@/components/store/CurrencySubheader";
 import { LodgingProductCard } from "@/components/store/LodgingProductCard";
 import { SectionHeader } from "@/components/store/SectionHeader";
 import { ShopProductCard } from "@/components/store/ShopProductCard";
-import { PRODUCT_SECTIONS, productsByCurrencyInCategory } from "@/lib/store";
+import { catalogInCurrency, PRODUCT_SECTIONS } from "@/lib/store";
 
 export function ProductGrid() {
-  const { notice, dismissNotice } = useCart();
+  const { notice, dismissNotice, currency } = useCart();
+  const catalog = catalogInCurrency(currency);
 
   return (
     <div className="space-y-14 lg:space-y-16">
@@ -22,9 +22,9 @@ export function ProductGrid() {
       ) : null}
 
       {PRODUCT_SECTIONS.map((section, sectionIndex) => {
-        const currencyGroups = productsByCurrencyInCategory(section.id);
+        const products = catalog.filter((product) => product.category === section.id);
         const isLodging = section.id === "lodging";
-        const productCount = currencyGroups.reduce((sum, group) => sum + group.products.length, 0);
+        const productCount = products.length;
 
         return (
           <section key={section.id} aria-labelledby={`section-${section.id}`}>
@@ -37,33 +37,20 @@ export function ProductGrid() {
               countLabel={isLodging ? "listings" : "products"}
             />
 
-            <div className="space-y-10">
-              {currencyGroups.map((group) => (
-                <div key={`${section.id}-${group.currency}`}>
-                  {currencyGroups.length > 1 ? (
-                    <CurrencySubheader
-                      currency={group.currency}
-                      productCount={group.products.length}
-                      countLabel={isLodging ? "listings" : "products"}
-                    />
-                  ) : null}
-                  <div
-                    className={
-                      isLodging
-                        ? "mt-4 grid gap-5 sm:grid-cols-2"
-                        : "mt-4 grid gap-5 min-[480px]:grid-cols-2 md:grid-cols-3"
-                    }
-                  >
-                    {group.products.map((product) =>
-                      isLodging ? (
-                        <LodgingProductCard key={product.id} product={product} />
-                      ) : (
-                        <ShopProductCard key={product.id} product={product} />
-                      ),
-                    )}
-                  </div>
-                </div>
-              ))}
+            <div
+              className={
+                isLodging
+                  ? "grid gap-5 sm:grid-cols-2"
+                  : "grid gap-5 min-[480px]:grid-cols-2 md:grid-cols-3"
+              }
+            >
+              {products.map((product) =>
+                isLodging ? (
+                  <LodgingProductCard key={product.id} product={product} />
+                ) : (
+                  <ShopProductCard key={product.id} product={product} />
+                ),
+              )}
             </div>
           </section>
         );

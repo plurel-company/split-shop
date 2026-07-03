@@ -1,6 +1,6 @@
 import type { CartFee } from "@splitante/sdk";
 
-import { PRODUCTS } from "@/lib/catalog";
+import { catalogInCurrency, PRODUCTS } from "@/lib/catalog";
 import {
   anteCurrencyCode,
   CURRENCY_META,
@@ -25,8 +25,10 @@ export function wouldMixCartCurrency(cart: CartState, productId: string): boolea
   return product.currency !== cartCurrency;
 }
 
-export function buildProductCartLines(cart: CartState): CartLine[] {
-  return PRODUCTS.filter((product) => (cart[product.id] ?? 0) > 0).map((product) => ({
+export function buildProductCartLines(cart: CartState, currency: CurrencyCode = "USD"): CartLine[] {
+  return catalogInCurrency(currency)
+    .filter((product) => (cart[product.id] ?? 0) > 0)
+    .map((product) => ({
     id: product.id,
     name: product.name,
     quantity: cart[product.id],
@@ -35,10 +37,10 @@ export function buildProductCartLines(cart: CartState): CartLine[] {
   }));
 }
 
-export function buildCartFees(cart: CartState): CartFee[] {
+export function buildCartFees(cart: CartState, currency: CurrencyCode = "USD"): CartFee[] {
   const fees: CartFee[] = [];
 
-  for (const product of PRODUCTS) {
+  for (const product of catalogInCurrency(currency)) {
     const nights = cart[product.id] ?? 0;
     if (nights === 0 || !product.fees?.length) continue;
 
@@ -55,23 +57,23 @@ export function buildCartFees(cart: CartState): CartFee[] {
   return fees.sort((a, b) => a.id.localeCompare(b.id));
 }
 
-export function buildCartFeeSummary(cart: CartState): CartFeeLine[] {
-  return buildCartFees(cart).map((fee) => ({
+export function buildCartFeeSummary(cart: CartState, currency: CurrencyCode = "USD"): CartFeeLine[] {
+  return buildCartFees(cart, currency).map((fee) => ({
     id: fee.id,
     label: fee.label,
     amount: fee.amount,
   }));
 }
 
-export function cartSubtotal(cart: CartState): number {
-  return buildProductCartLines(cart).reduce(
+export function cartSubtotal(cart: CartState, currency: CurrencyCode = "USD"): number {
+  return buildProductCartLines(cart, currency).reduce(
     (sum, line) => sum + line.quantity * line.unit_price,
     0,
   );
 }
 
-export function cartFeesTotal(cart: CartState): number {
-  return buildCartFeeSummary(cart).reduce((sum, fee) => sum + fee.amount, 0);
+export function cartFeesTotal(cart: CartState, currency: CurrencyCode = "USD"): number {
+  return buildCartFeeSummary(cart, currency).reduce((sum, fee) => sum + fee.amount, 0);
 }
 
 function cartHasShopItems(cart: CartState): boolean {
@@ -85,14 +87,17 @@ export function makeOrderRef(): string {
 }
 
 /** Build the signed cart payload for Ante checkout (tax/shipping are demo approximations). */
-export function buildAnteCart(cart: CartState, orderRef: string): AnteCart | null {
-  const currency = getCartCurrency(cart);
-  if (!currency) return null;
+export function buildAnteCart(
+  cart: CartState,
+  orderRef: string,
+  currency: CurrencyCode = "USD",
+): AnteCart | null {
+  if (!Object.values(cart).some((qty) => qty > 0)) return null;
 
-  const items = buildProductCartLines(cart);
-  const fees = buildCartFees(cart);
+  const items = buildProductCartLines(cart, currency);
+  const fees = buildCartFees(cart, currency);
   const feesTotal = fees.reduce((sum, fee) => sum + fee.amount, 0);
-  const merchandiseSubtotal = cartSubtotal(cart);
+  const merchandiseSubtotal = cartSubtotal(cart, currency);
   const tax = Math.round(merchandiseSubtotal * 0.08);
   const shipping = cartHasShopItems(cart) ? CURRENCY_META[currency].shopShippingMinor : 0;
 
@@ -107,15 +112,12 @@ export function buildAnteCart(cart: CartState, orderRef: string): AnteCart | nul
   };
 }
 
-export function cartMeetsMinimum(cart: CartState): boolean {
-  const currency = getCartCurrency(cart);
-  if (!currency) return true;
-  const anteCart = buildAnteCart(cart, "preview");
+export function cartMeetsMinimum(cart: CartState, currency: CurrencyCode = "USD"): boolean {
+  const anteCart = buildAnteCart(cart, "preview", currency);
   if (!anteCart) return true;
   return anteCart.total >= getMinimumOrderMinor(currency);
 }
 
-export function minimumOrderForCart(cart: CartState): number {
-  const currency = getCartCurrency(cart);
-  return currency ? getMinimumOrderMinor(currency) : getMinimumOrderMinor("USD");
+export function minimumOrderForCart(currency: CurrencyCode = "USD"): number {
+  return getMinimumOrderMinor(currency);
 }

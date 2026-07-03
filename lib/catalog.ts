@@ -1,5 +1,5 @@
 import type { CurrencyCode } from "@/lib/currency";
-import { CURRENCY_ORDER, getMinimumOrderMinor } from "@/lib/currency";
+import { CURRENCY_ORDER, convertFromUsd, getMinimumOrderMinor } from "@/lib/currency";
 import type { Product, ProductCategory } from "@/lib/types";
 
 /** Public site origin for absolute product image URLs (Ante hosted checkout). */
@@ -186,6 +186,24 @@ export const PRODUCTS: Product[] = [
 
 export function getProduct(id: string): Product | undefined {
   return PRODUCTS.find((product) => product.id === id);
+}
+
+/** A product re-priced into the selected display currency (base prices are USD). */
+export function productInCurrency(product: Product, currency: CurrencyCode): Product {
+  if (currency === "USD") return product;
+  return {
+    ...product,
+    currency,
+    unitPrice: convertFromUsd(product.unitPrice, currency),
+    fees: product.fees?.map((fee) => ({
+      ...fee,
+      amount: convertFromUsd(fee.amount, currency),
+    })),
+  };
+}
+
+export function catalogInCurrency(currency: CurrencyCode): Product[] {
+  return PRODUCTS.map((product) => productInCurrency(product, currency));
 }
 
 export function productsInCategory(category: ProductCategory): Product[] {

@@ -9,20 +9,24 @@ import {
   type ReactNode,
 } from "react";
 
+import { useEffect } from "react";
+
 import {
   cartSubtotal,
-  getCartCurrency,
+  CURRENCY_ORDER,
   getProduct,
-  wouldMixCartCurrency,
   type CartState,
   type CurrencyCode,
 } from "@/lib/store";
+
+const CURRENCY_STORAGE_KEY = "ante-demo-currency";
 
 type CartContextValue = {
   cart: CartState;
   itemCount: number;
   subtotal: number;
-  currency: CurrencyCode | null;
+  currency: CurrencyCode;
+  setCurrency: (currency: CurrencyCode) => void;
   notice: string | null;
   addItem: (productId: string) => void;
   removeItem: (productId: string) => void;
@@ -35,6 +39,36 @@ const CartContext = createContext<CartContextValue | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartState>({});
   const [notice, setNotice] = useState<string | null>(null);
+  const [currency, setCurrencyState] = useState<CurrencyCode>("USD");
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(CURRENCY_STORAGE_KEY) as CurrencyCode | null;
+      if (stored && CURRENCY_ORDER.includes(stored)) setCurrencyState(stored);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const setCurrency = useCallback((next: CurrencyCode) => {
+    if (!CURRENCY_ORDER.includes(next)) return;
+    setCurrencyState((prev) => {
+      if (next === prev) return prev;
+      setCart((current) => {
+        if (Object.values(current).some((qty) => qty > 0)) {
+          setNotice(`Prices switched to ${next} — your cart was cleared.`);
+          return {};
+        }
+        return current;
+      });
+      try {
+        localStorage.setItem(CURRENCY_STORAGE_KEY, next);
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }, []);
 
   const dismissNotice = useCallback(() => setNotice(null), []);
 
@@ -43,14 +77,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!product) return;
 
     setCart((current) => {
-      if (wouldMixCartCurrency(current, productId)) {
-        const cartCurrency = getCartCurrency(current);
-        setNotice(
-          `Your cart is in ${cartCurrency}. Finish checkout or remove items before adding ${product.currency} products.`,
-        );
-        return current;
-      }
-
       setNotice(null);
       return {
         ...current,
@@ -83,15 +109,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return {
       cart,
       itemCount,
-      subtotal: cartSubtotal(cart),
-      currency: getCartCurrency(cart),
+      subtotal: cartSubtotal(cart, currency),
+      currency,
+      setCurrency,
       notice,
       addItem,
       removeItem,
       clearCart,
       dismissNotice,
     };
-  }, [addItem, cart, clearCart, dismissNotice, notice, removeItem]);
+  }, [addItem, cart, clearCart, currency, dismissNotice, notice, removeItem, setCurrency]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

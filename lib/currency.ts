@@ -54,6 +54,23 @@ export function toMajorUnits(minorUnits: number, currency: CurrencyCode): number
   return minorUnits / CURRENCY_META[currency].minorUnitDivisor;
 }
 
+/** Demo FX rates (fixed, per USD) — catalog base prices are USD. */
+const DEMO_FX: Record<CurrencyCode, number> = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.79,
+  JPY: 155,
+};
+
+/** Convert USD minor units to another currency's minor units, rounded to
+ *  tidy demo prices (nearest 10 minor units — 10 cents, or 10 yen). */
+export function convertFromUsd(usdMinor: number, to: CurrencyCode): number {
+  if (to === "USD") return usdMinor;
+  const dollars = usdMinor / 100;
+  const raw = dollars * DEMO_FX[to] * CURRENCY_META[to].minorUnitDivisor;
+  return Math.max(1, Math.round(raw / 10) * 10);
+}
+
 /** Format stored minor units with Intl.NumberFormat for the given currency. */
 export function formatMoney(minorUnits: number, currency: CurrencyCode): string {
   const meta = CURRENCY_META[currency];

@@ -100,15 +100,15 @@ export function CheckoutPanel() {
     return () => clearTimeout(timer);
   }, [autoRetry, apiFallback]);
 
-  const cartLines = useMemo(() => buildProductCartLines(cart), [cart]);
-  const anteCart = useMemo(() => buildAnteCart(cart, orderRef), [cart, orderRef]);
-  const feeLines = useMemo(() => buildCartFeeSummary(cart), [cart]);
+  const cartLines = useMemo(() => buildProductCartLines(cart, currency), [cart, currency]);
+  const anteCart = useMemo(() => buildAnteCart(cart, orderRef, currency), [cart, currency, orderRef]);
+  const feeLines = useMemo(() => buildCartFeeSummary(cart, currency), [cart, currency]);
   const tax = anteCart?.tax ?? 0;
   const shipping = anteCart?.shipping ?? 0;
   const total = anteCart?.total ?? 0;
-  const displayCurrency = currency ?? "USD";
-  const minimumOrder = minimumOrderForCart(cart);
-  const belowMinimum = total > 0 && !cartMeetsMinimum(cart);
+  const displayCurrency = currency;
+  const minimumOrder = minimumOrderForCart(currency);
+  const belowMinimum = total > 0 && !cartMeetsMinimum(cart, currency);
   const isWaiting = pollingOrderRef !== null || isWaitingStatus(status);
 
   const format = useCallback(
@@ -118,7 +118,7 @@ export function CheckoutPanel() {
 
   const handleWebhookFunded = useCallback(
     (order: FundedOrder) => {
-      const orderCurrency = currency ?? "USD";
+      const orderCurrency = currency;
       setConfirmedOrder(fundedOrderToConfirmed(order, orderCurrency));
       setPollingOrderRef(null);
       clearCart();
@@ -134,15 +134,15 @@ export function CheckoutPanel() {
 
   const confirmFromSdk = useCallback(
     (ref: string, sessionId: string) => {
-      if (!anteCart || !currency) return;
-      const feeSummary = buildCartFeeSummary(cart);
+      if (!anteCart) return;
+      const feeSummary = buildCartFeeSummary(cart, currency);
       setConfirmedOrder({
         orderRef: ref,
         groupId: sessionId,
         currency,
-        lines: buildProductCartLines(cart),
+        lines: buildProductCartLines(cart, currency),
         fees: feeSummary.length > 0 ? feeSummary : undefined,
-        subtotal: cartSubtotal(cart),
+        subtotal: cartSubtotal(cart, currency),
         tax: anteCart.tax ?? 0,
         shipping: anteCart.shipping ?? 0,
         total: anteCart.total,

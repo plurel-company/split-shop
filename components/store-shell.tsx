@@ -1,4 +1,5 @@
 import { AnteModeSwitch } from "@/components/ante-mode-switch";
+import { CurrencyPicker } from "@/components/store/CurrencyPicker";
 
 type StoreShellProps = {
   configured: boolean;
@@ -38,6 +39,7 @@ export function StoreShell({ configured, children }: StoreShellProps) {
           </div>
 
           <div className="header-actions">
+            <CurrencyPicker />
             {!configured ? <span className="header-env-pill">Configure env</span> : null}
             <a
               className="header-demo"

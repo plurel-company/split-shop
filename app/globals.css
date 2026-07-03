@@ -1119,3 +1119,36 @@ code {
   top: 14px !important;
   right: 14px !important;
 }
+
+/* ── Header currency picker ──────────────────────────────────────── */
+.currency-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.currency-picker select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--hair-2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px 26px 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.currency-picker select:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+.currency-picker__chevron {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  font-size: 9px;
+  color: var(--ink-3);
+}
