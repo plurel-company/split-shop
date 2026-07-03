@@ -1,5 +1,7 @@
 # Ante Demo Store
 
+**Live sandbox:** [https://ante-demo-store.vercel.app](https://ante-demo-store.vercel.app)
+
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
@@ -7,6 +9,8 @@
 **Reference implementation** for [Ante](https://splitante.com) merchants — a minimal Next.js storefront that shows cart signing, hosted group checkout, and webhook fulfillment. Copy patterns from this repo into your own stack; it is not a production e-commerce platform.
 
 Official docs: [splitante.com/docs](https://splitante.com/docs)
+
+**Repository access:** This repo is **public** — anyone can clone or fork it. Only [Plurel](https://github.com/plurel-company) organization members can push to `main`. Merchants should fork into their own GitHub account or copy files into an existing project.
 
 ## What this demonstrates
 
@@ -142,7 +146,7 @@ Works on Vercel or any Node 20+ host. Set the same env vars in your deployment d
 
 ## Contributing
 
-This is a reference implementation — PRs that improve integration clarity and docs are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md).
+This is a reference implementation maintained by Plurel. The repo is public for **read and clone**; direct pushes to `main` are limited to Plurel org maintainers. If you are integrating Ante in your own stack, fork the repo or copy patterns into your codebase. PRs from forks that improve integration clarity are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Links
 
