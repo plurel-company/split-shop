@@ -13,9 +13,27 @@ const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ante-demo-store.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Ante Demo Store",
-  description: "Minimal storefront demo for Ante group checkout",
+  metadataBase: new URL(SITE_URL),
+  title: "Split Shop · Ante open demo",
+  description:
+    "An open reference storefront on Ante's production SDK in sandbox — build a cart, tap the Ante button, and split payment with friends. No real money moves.",
+  openGraph: {
+    title: "Split Shop · Ante open demo",
+    description:
+      "Build a cart, tap the Ante button, and split payment with friends — sandbox only, no real money moves.",
+    url: SITE_URL,
+    siteName: "Ante",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Split Shop · Ante open demo",
+    description:
+      "Build a cart, tap the Ante button, and split payment with friends — sandbox only, no real money moves.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
