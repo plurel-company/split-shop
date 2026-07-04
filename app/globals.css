@@ -94,10 +94,11 @@ body {
 
 .orb-sphere {
   position: relative;
-  display: inline-block;
+  display: block;
   flex-shrink: 0;
   border-radius: 50%;
   overflow: hidden;
+  contain: paint;
   background: radial-gradient(
     circle at 32% 28%,
     #ffe0cb 0%,
@@ -106,21 +107,22 @@ body {
     #b8421a 82%,
     #6e2510 100%
   );
-  box-shadow:
-    inset 0 2px 1px rgba(255, 255, 255, 0.55),
-    inset 0 -4px 8px rgba(110, 37, 16, 0.45),
-    0 2px 8px -2px rgba(215, 82, 30, 0.45);
+  /* Single inset shade only — NO outer drop shadow (it smudged into a boxy
+     halo a shade darker than the page). Matches splitante.com's orb exactly. */
+  box-shadow: inset 0 -3px 6px rgba(110, 37, 16, 0.35);
 }
 
 .orb-sphere::after {
+  /* Soft, small specular highlight — NOT the oversized hard disc that read as
+     a second sphere floating over the orb. */
   content: "";
   position: absolute;
-  top: 14%;
-  left: 22%;
-  width: 38%;
-  height: 26%;
+  top: 20%;
+  left: 20%;
+  width: 32%;
+  height: 22%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 65%);
 }
 
 /* ── Store layout & catalog ─────────────────────────────────────── */
@@ -881,18 +883,12 @@ code {
 .orb-sphere--xs {
   width: 14px;
   height: 14px;
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.55),
-    inset 0 -2px 4px rgba(110, 37, 16, 0.4),
-    0 1px 4px -1px rgba(215, 82, 30, 0.4);
+  box-shadow: inset 0 -2px 3px rgba(110, 37, 16, 0.3);
 }
 .orb-sphere--footer {
   width: 28px;
   height: 28px;
-  box-shadow:
-    inset 0 2px 1px rgba(255, 255, 255, 0.55),
-    inset 0 -4px 8px rgba(110, 37, 16, 0.45),
-    0 2px 6px -2px rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 -3px 6px rgba(110, 37, 16, 0.35);
 }
 
 .header-pill {
