@@ -1,7 +1,8 @@
-/** POST /api/client-log — temporary checkout-failure telemetry.
- *  Same-origin so it works even when cross-origin API calls fail on-device;
- *  entries land in Vercel runtime logs. Remove once the mobile failure is solved. */
+/** POST /api/client-log — dev-only checkout telemetry (disabled in production). */
 export async function POST(request: Request) {
+  if (process.env.NODE_ENV === "production") {
+    return new Response(null, { status: 404 });
+  }
   try {
     const body = (await request.json()) as Record<string, unknown>;
     console.error("[client-error]", JSON.stringify(body).slice(0, 2000));
