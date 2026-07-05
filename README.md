@@ -51,7 +51,18 @@ Cart state ──► buildAnteCart ──► POST /api/cart/sign ──► HMAC 
 Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄── POST /api/webhooks/ante
 ```
 
-**Fulfill on `group.funded`**, not on client callbacks alone. The demo uses an in-memory order store (`lib/order-store.ts`) — replace with your database in production.
+**Fulfill on `group.funded`**, not on client callbacks alone. The demo uses an in-memory order store (`lib/order-store.ts`) — replace with your database in production. On serverless hosts with multiple instances, use a shared store (Redis, Postgres, etc.) so webhooks and polling hit the same ledger.
+
+### Production patterns (read before copying)
+
+| Pattern | Demo behavior | Production recommendation |
+| --- | --- | --- |
+| Cart prices | Signed server-side in `/api/cart/sign` | **Always** sign carts on your server; never trust browser prices |
+| Webhook auth | Verifies against **all** configured secrets | Use separate test/live webhook secrets; do not pick secret from client headers |
+| Order fulfillment | Requires a registered **pending** order + valid `total` | Fail closed on unknown `order_ref` or underpayment |
+| Order store | In-memory map | Durable database with idempotent webhook handling |
+
+See [`lib/ante-credentials.ts`](./lib/ante-credentials.ts) (`verifyAnteWebhookSignature`) and [`app/api/webhooks/ante/route.ts`](./app/api/webhooks/ante/route.ts).
 
 ## Environment variables
 
