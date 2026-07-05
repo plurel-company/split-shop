@@ -1,8 +1,8 @@
 /** POST /api/webhooks/ante — verify Ante webhook signature; fulfill on group.funded. */
 import { verifyWebhookSignature } from "@splitante/sdk/signing";
 
-import { listWebhookSecrets } from "@/lib/ante-credentials";
-import { listFundedOrderRefs, markOrderFunded } from "@/lib/order-store";
+import { parseAnteCredentialMode, resolveWebhookSecret } from "@/lib/ante-credentials";
+import { getOrder, markOrderFunded } from "@/lib/order-store";
 
 type AnteWebhookEvent = {
   id: string;
@@ -11,24 +11,21 @@ type AnteWebhookEvent = {
   data: Record<string, unknown>;
 };
 
-function verifyWithAnySecret(
-  rawBody: string,
-  signatureHeader: string,
-  secrets: string[],
-): boolean {
-  return secrets.some((secret) => verifyWebhookSignature(rawBody, secret, signatureHeader));
+function webhookModeFromRequest(request: Request): "sandbox" | "live" {
+  return parseAnteCredentialMode(request.headers.get("x-ante-key-mode"));
 }
 
 export async function POST(req: Request) {
-  const secrets = listWebhookSecrets();
-  if (secrets.length === 0) {
-    return Response.json({ error: "No webhook secret configured" }, { status: 500 });
+  const mode = webhookModeFromRequest(req);
+  const secret = resolveWebhookSecret(mode);
+  if (!secret) {
+    return Response.json({ error: "No webhook secret configured for mode" }, { status: 500 });
   }
 
   const rawBody = await req.text();
   const signatureHeader = req.headers.get("ante-signature") ?? "";
 
-  if (!verifyWithAnySecret(rawBody, signatureHeader, secrets)) {
+  if (!verifyWebhookSignature(rawBody, secret, signatureHeader)) {
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -48,6 +45,14 @@ export async function POST(req: Request) {
       return Response.json({ error: "Missing order_ref" }, { status: 400 });
     }
 
+    const pending = getOrder(orderRef);
+    if (pending?.status === "pending" && totalPaid < pending.total) {
+      return Response.json(
+        { error: "Funded total is below order amount" },
+        { status: 400 },
+      );
+    }
+
     const funded = markOrderFunded({
       orderRef,
       sessionId,
@@ -60,6 +65,7 @@ export async function POST(req: Request) {
       orderRef,
       sessionId,
       totalPaid,
+      mode,
     });
 
     return Response.json({ received: true, order: funded });
@@ -72,6 +78,5 @@ export async function POST(req: Request) {
 export async function GET() {
   return Response.json({
     message: "Ante webhook endpoint. POST signed group.funded events from the merchant dashboard.",
-    fundedOrders: listFundedOrderRefs(),
   });
 }
