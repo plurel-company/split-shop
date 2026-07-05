@@ -46,8 +46,11 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         </div>
 
         <div className="mt-auto pt-4">
-          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
-            <p className="font-mono text-base font-medium tabular-nums text-ink">
+          {/* nowrap so a wider price ($349) can't push the stepper onto a
+              second line — that made the price row taller on some cards and
+              knocked the prices out of alignment across the row. */}
+          <div className="flex flex-nowrap items-center justify-between gap-x-3">
+            <p className="whitespace-nowrap font-mono text-base font-medium tabular-nums text-ink">
               {formatMoney(product.unitPrice, product.currency)}
             </p>
             <QuantityStepper
