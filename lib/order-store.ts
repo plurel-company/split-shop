@@ -1,4 +1,5 @@
 /** In-memory order ledger for demo fulfillment (pending → funded via webhook). */
+import type { AnteCredentialMode } from "@/lib/ante-credentials";
 import type { CartLine } from "@/lib/types";
 
 export type OrderFee = {
@@ -16,6 +17,8 @@ export type PendingOrder = {
   shipping: number;
   total: number;
   createdAt: number;
+  /** Credential mode active when the cart was signed — webhook must match. */
+  credentialMode: AnteCredentialMode;
 };
 
 export type FundedOrder = PendingOrder & {

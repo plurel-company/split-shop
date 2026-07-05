@@ -33,25 +33,42 @@ export function resolveWebhookSecret(mode: AnteCredentialMode): string {
   return process.env.ANTE_WEBHOOK_SECRET_TEST?.trim() || "";
 }
 
-/** All configured webhook secrets — used when inbound webhooks have no mode header. */
-export function listWebhookSecrets(): string[] {
-  const secrets = new Set<string>();
-  for (const value of [
-    process.env.ANTE_WEBHOOK_SECRET_TEST,
-    process.env.ANTE_WEBHOOK_SECRET_LIVE,
-    process.env.ANTE_WEBHOOK_SECRET,
-  ]) {
+type WebhookSecretCandidate = { secret: string; mode: AnteCredentialMode };
+
+function webhookSecretCandidates(): WebhookSecretCandidate[] {
+  const out: WebhookSecretCandidate[] = [];
+  const seen = new Set<string>();
+
+  const add = (value: string | undefined, mode: AnteCredentialMode) => {
     const trimmed = value?.trim();
-    if (trimmed) secrets.add(trimmed);
-  }
-  return [...secrets];
+    if (!trimmed || seen.has(trimmed)) return;
+    seen.add(trimmed);
+    out.push({ secret: trimmed, mode });
+  };
+
+  add(process.env.ANTE_WEBHOOK_SECRET_TEST, "sandbox");
+  add(process.env.ANTE_WEBHOOK_SECRET_LIVE, "live");
+  add(process.env.ANTE_WEBHOOK_SECRET, "live");
+
+  return out;
 }
 
-/** Verify signature against every configured secret — do not trust x-ante-key-mode for auth. */
-export function verifyAnteWebhookSignature(rawBody: string, signatureHeader: string): boolean {
-  const secrets = listWebhookSecrets();
-  if (secrets.length === 0) return false;
-  return secrets.some((secret) => verifyWebhookSignature(rawBody, secret, signatureHeader));
+/** All configured webhook secrets — used when inbound webhooks have no mode header. */
+export function listWebhookSecrets(): string[] {
+  return webhookSecretCandidates().map((candidate) => candidate.secret);
+}
+
+/** Verify signature; returns the credential mode of the secret that matched. */
+export function verifyAnteWebhookSignature(
+  rawBody: string,
+  signatureHeader: string,
+): AnteCredentialMode | null {
+  for (const candidate of webhookSecretCandidates()) {
+    if (verifyWebhookSignature(rawBody, candidate.secret, signatureHeader)) {
+      return candidate.mode;
+    }
+  }
+  return null;
 }
 
 export function merchantId(): string {

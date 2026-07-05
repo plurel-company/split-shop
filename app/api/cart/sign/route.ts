@@ -1,11 +1,18 @@
 /** POST /api/cart/sign — HMAC-sign cart with ANTE_SIGNING_SECRET; registers pending order. */
 import type { Cart } from "@splitante/sdk";
 
+import {
+  ANTE_KEY_MODE_HEADER,
+  parseAnteCredentialMode,
+} from "@/lib/ante-credentials";
 import { createCartSignature } from "@/lib/cart-signing";
 import { registerPendingOrder } from "@/lib/order-store";
 
 /** Map signed Ante cart → in-memory pending order (keyed by metadata.order_ref). */
-function pendingFromCart(cart: Cart) {
+function pendingFromCart(
+  cart: Cart,
+  credentialMode: ReturnType<typeof parseAnteCredentialMode>,
+) {
   const orderRef = cart.metadata?.order_ref;
   if (!orderRef) return null;
 
@@ -35,6 +42,7 @@ function pendingFromCart(cart: Cart) {
     shipping,
     total: cart.total,
     createdAt: Date.now(),
+    credentialMode,
   };
 }
 
@@ -74,7 +82,8 @@ export async function POST(req: Request) {
 
   try {
     const signature = createCartSignature(cart, signingSecret);
-    const pending = pendingFromCart(cart);
+    const credentialMode = parseAnteCredentialMode(req.headers.get(ANTE_KEY_MODE_HEADER));
+    const pending = pendingFromCart(cart, credentialMode);
     if (pending) {
       registerPendingOrder(pending);
     }

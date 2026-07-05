@@ -29,7 +29,8 @@ export async function POST(req: Request) {
   const rawBody = await req.text();
   const signatureHeader = req.headers.get("ante-signature") ?? "";
 
-  if (!verifyAnteWebhookSignature(rawBody, signatureHeader)) {
+  const verifiedMode = verifyAnteWebhookSignature(rawBody, signatureHeader);
+  if (!verifiedMode) {
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
@@ -66,8 +67,18 @@ export async function POST(req: Request) {
         orderRef,
         sessionId,
         modeHint,
+        verifiedMode,
       });
       return Response.json({ received: true, order: existing });
+    }
+
+    if (existing.credentialMode !== verifiedMode) {
+      console.error("[ante webhook] group.funded credential mode mismatch", {
+        orderRef,
+        orderMode: existing.credentialMode,
+        verifiedMode,
+      });
+      return Response.json({ error: "Webhook credential mode mismatch" }, { status: 401 });
     }
 
     if (totalPaid < existing.total) {
