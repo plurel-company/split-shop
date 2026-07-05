@@ -1,4 +1,6 @@
 /** Server/client env resolution for test vs live Ante credentials. */
+import { verifyWebhookSignature } from "@splitante/sdk/signing";
+
 import { publishableKeyMode } from "@/lib/ante-env";
 
 export type AnteCredentialMode = "sandbox" | "live";
@@ -43,6 +45,13 @@ export function listWebhookSecrets(): string[] {
     if (trimmed) secrets.add(trimmed);
   }
   return [...secrets];
+}
+
+/** Verify signature against every configured secret — do not trust x-ante-key-mode for auth. */
+export function verifyAnteWebhookSignature(rawBody: string, signatureHeader: string): boolean {
+  const secrets = listWebhookSecrets();
+  if (secrets.length === 0) return false;
+  return secrets.some((secret) => verifyWebhookSignature(rawBody, secret, signatureHeader));
 }
 
 export function merchantId(): string {
