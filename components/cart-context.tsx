@@ -105,7 +105,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(() => {
-    const itemCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+    // Count distinct products (line-items), not total units — a cart with
+    // 2 products (one qty 3) reads "2 items", with per-line qty shown per row.
+    const itemCount = Object.values(cart).filter((qty) => qty > 0).length;
     return {
       cart,
       itemCount,
