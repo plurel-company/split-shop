@@ -1,15 +1,17 @@
-/** Server/client env resolution for test vs live Ante credentials. */
+/** Server-only Ante credential resolution and webhook verification. */
+import "server-only";
+
 import { verifyWebhookSignature } from "@splitante/sdk/signing";
 
-import { publishableKeyMode } from "@/lib/ante-env";
+import type { AnteCredentialMode } from "@/lib/ante-credential-mode";
 
-export type AnteCredentialMode = "sandbox" | "live";
-
-export const ANTE_KEY_MODE_HEADER = "x-ante-key-mode";
-
-export function parseAnteCredentialMode(value: string | null | undefined): AnteCredentialMode {
-  return value?.toLowerCase() === "live" ? "live" : "sandbox";
-}
+export type { AnteCredentialMode } from "@/lib/ante-credential-mode";
+export {
+  ANTE_KEY_MODE_HEADER,
+  keyModeMatches,
+  modeLabel,
+  parseAnteCredentialMode,
+} from "@/lib/ante-credential-mode";
 
 /** Unqualified env vars (no _TEST suffix) are the live credentials — matches typical Vercel setup. */
 export function resolvePublishableKey(mode: AnteCredentialMode): string {
@@ -101,14 +103,4 @@ export function credentialAvailability(): {
       process.env.ANTE_WEBHOOK_SECRET_LIVE?.trim() || process.env.ANTE_WEBHOOK_SECRET?.trim(),
     ),
   };
-}
-
-export function modeLabel(mode: AnteCredentialMode): string {
-  return mode === "live" ? "Live" : "Test";
-}
-
-export function keyModeMatches(mode: AnteCredentialMode, key: string): boolean {
-  const detected = publishableKeyMode(key);
-  if (!detected) return true;
-  return mode === "live" ? detected === "live" : detected === "sandbox";
 }

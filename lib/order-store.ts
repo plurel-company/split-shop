@@ -1,5 +1,5 @@
 /** In-memory order ledger for demo fulfillment (pending → funded via webhook). */
-import type { AnteCredentialMode } from "@/lib/ante-credentials";
+import type { AnteCredentialMode } from "@/lib/ante-credential-mode";
 import type { CartLine } from "@/lib/types";
 
 export type OrderFee = {
