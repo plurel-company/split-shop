@@ -1,7 +1,9 @@
 /** POST /api/webhooks/ante — verify Ante webhook signature; fulfill on group.funded. */
-import { verifyWebhookSignature } from "@splitante/sdk/signing";
-
-import { parseAnteCredentialMode, resolveWebhookSecret } from "@/lib/ante-credentials";
+import {
+  listWebhookSecrets,
+  parseAnteCredentialMode,
+  verifyAnteWebhookSignature,
+} from "@/lib/ante-credentials";
 import { getOrder, markOrderFunded } from "@/lib/order-store";
 
 type AnteWebhookEvent = {
@@ -11,25 +13,28 @@ type AnteWebhookEvent = {
   data: Record<string, unknown>;
 };
 
-function webhookModeFromRequest(request: Request): "sandbox" | "live" {
-  return parseAnteCredentialMode(request.headers.get("x-ante-key-mode"));
+function parseFundedTotal(data: Record<string, unknown>): number | null {
+  const total = data.total;
+  if (typeof total !== "number" || !Number.isFinite(total) || total <= 0) {
+    return null;
+  }
+  return total;
 }
 
 export async function POST(req: Request) {
-  const mode = webhookModeFromRequest(req);
-  const secret = resolveWebhookSecret(mode);
-  if (!secret) {
-    return Response.json({ error: "No webhook secret configured for mode" }, { status: 500 });
+  if (listWebhookSecrets().length === 0) {
+    return Response.json({ error: "No webhook secret configured" }, { status: 500 });
   }
 
   const rawBody = await req.text();
   const signatureHeader = req.headers.get("ante-signature") ?? "";
 
-  if (!verifyWebhookSignature(rawBody, secret, signatureHeader)) {
+  if (!verifyAnteWebhookSignature(rawBody, signatureHeader)) {
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
   const event = JSON.parse(rawBody) as AnteWebhookEvent;
+  const modeHint = parseAnteCredentialMode(req.headers.get("x-ante-key-mode"));
 
   if (event.type === "group.funded") {
     const orderRef =
@@ -38,15 +43,34 @@ export async function POST(req: Request) {
       typeof event.data.session_id === "string" ? event.data.session_id : "";
     const groupId =
       typeof event.data.group_id === "string" ? event.data.group_id : sessionId;
-    const totalPaid = typeof event.data.total === "number" ? event.data.total : 0;
+    const totalPaid = parseFundedTotal(event.data);
 
     if (!orderRef) {
       console.error("[ante webhook] group.funded missing order_ref", event.data);
       return Response.json({ error: "Missing order_ref" }, { status: 400 });
     }
 
-    const pending = getOrder(orderRef);
-    if (pending?.status === "pending" && totalPaid < pending.total) {
+    if (totalPaid === null) {
+      console.error("[ante webhook] group.funded missing or invalid total", event.data);
+      return Response.json({ error: "Missing or invalid total" }, { status: 400 });
+    }
+
+    const existing = getOrder(orderRef);
+    if (!existing) {
+      console.error("[ante webhook] group.funded unknown order_ref", { orderRef });
+      return Response.json({ error: "Unknown order_ref" }, { status: 404 });
+    }
+
+    if (existing.status === "funded") {
+      console.info("[ante webhook] group.funded duplicate", {
+        orderRef,
+        sessionId,
+        modeHint,
+      });
+      return Response.json({ received: true, order: existing });
+    }
+
+    if (totalPaid < existing.total) {
       return Response.json(
         { error: "Funded total is below order amount" },
         { status: 400 },
@@ -61,11 +85,15 @@ export async function POST(req: Request) {
       fundedAt: Date.now(),
     });
 
+    if (!funded) {
+      return Response.json({ error: "Order is not pending fulfillment" }, { status: 409 });
+    }
+
     console.info("[ante webhook] group.funded", {
       orderRef,
       sessionId,
       totalPaid,
-      mode,
+      modeHint,
     });
 
     return Response.json({ received: true, order: funded });

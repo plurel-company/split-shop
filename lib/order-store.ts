@@ -62,31 +62,17 @@ export function markOrderFunded(input: {
 }): FundedOrder | null {
   const store = getStore();
   const pending = store.pending.get(input.orderRef);
+  if (!pending) return null;
 
-  const funded: FundedOrder = pending
-    ? {
-        ...pending,
-        status: "funded",
-        sessionId: input.sessionId,
-        groupId: input.groupId,
-        fundedAt: input.fundedAt,
-        totalPaid: input.totalPaid,
-        total: input.totalPaid,
-      }
-    : {
-        orderRef: input.orderRef,
-        lines: [],
-        subtotal: input.totalPaid,
-        tax: 0,
-        shipping: 0,
-        total: input.totalPaid,
-        createdAt: input.fundedAt,
-        status: "funded",
-        sessionId: input.sessionId,
-        groupId: input.groupId,
-        fundedAt: input.fundedAt,
-        totalPaid: input.totalPaid,
-      };
+  const funded: FundedOrder = {
+    ...pending,
+    status: "funded",
+    sessionId: input.sessionId,
+    groupId: input.groupId,
+    fundedAt: input.fundedAt,
+    totalPaid: input.totalPaid,
+    total: input.totalPaid,
+  };
 
   store.funded.set(input.orderRef, funded);
   store.pending.delete(input.orderRef);
