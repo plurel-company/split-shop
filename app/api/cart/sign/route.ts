@@ -1,11 +1,20 @@
 /** POST /api/cart/sign — HMAC-sign cart with ANTE_SIGNING_SECRET; registers pending order. */
 import type { Cart } from "@splitante/sdk";
 
+import {
+  ANTE_KEY_MODE_HEADER,
+  credentialModeFromPublishableKey,
+  keyModeMatches,
+  parseAnteCredentialMode,
+} from "@/lib/ante-credential-mode";
 import { createCartSignature } from "@/lib/cart-signing";
 import { registerPendingOrder } from "@/lib/order-store";
 
 /** Map signed Ante cart → in-memory pending order (keyed by metadata.order_ref). */
-function pendingFromCart(cart: Cart) {
+function pendingFromCart(
+  cart: Cart,
+  credentialMode: ReturnType<typeof parseAnteCredentialMode>,
+) {
   const orderRef = cart.metadata?.order_ref;
   if (!orderRef) return null;
 
@@ -35,6 +44,7 @@ function pendingFromCart(cart: Cart) {
     shipping,
     total: cart.total,
     createdAt: Date.now(),
+    credentialMode,
   };
 }
 
@@ -60,21 +70,31 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { cart?: Cart };
+  let body: { cart?: Cart; publishableKey?: string };
   try {
-    body = (await req.json()) as { cart?: Cart };
+    body = (await req.json()) as { cart?: Cart; publishableKey?: string };
   } catch {
     return Response.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { cart } = body;
+  const { cart, publishableKey } = body;
   if (!cart?.total || !cart.currency || !Array.isArray(cart.items) || cart.items.length === 0) {
     return Response.json({ error: "Invalid cart" }, { status: 400 });
   }
 
+  const key = publishableKey?.trim();
+  if (!key) {
+    return Response.json({ error: "publishableKey is required" }, { status: 400 });
+  }
+
   try {
     const signature = createCartSignature(cart, signingSecret);
-    const pending = pendingFromCart(cart);
+    const credentialMode = credentialModeFromPublishableKey(key);
+    const headerMode = parseAnteCredentialMode(req.headers.get(ANTE_KEY_MODE_HEADER));
+    if (!keyModeMatches(headerMode, key)) {
+      return Response.json({ error: "Publishable key does not match x-ante-key-mode" }, { status: 400 });
+    }
+    const pending = pendingFromCart(cart, credentialMode);
     if (pending) {
       registerPendingOrder(pending);
     }

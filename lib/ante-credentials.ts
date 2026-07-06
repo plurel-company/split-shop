@@ -1,13 +1,17 @@
-/** Server/client env resolution for test vs live Ante credentials. */
-import { publishableKeyMode } from "@/lib/ante-env";
+/** Server-only Ante credential resolution and webhook verification. */
+import "server-only";
 
-export type AnteCredentialMode = "sandbox" | "live";
+import type { AnteCredentialMode } from "@/lib/ante-credential-mode";
 
-export const ANTE_KEY_MODE_HEADER = "x-ante-key-mode";
+export type { AnteCredentialMode } from "@/lib/ante-credential-mode";
+export {
+  ANTE_KEY_MODE_HEADER,
+  keyModeMatches,
+  modeLabel,
+  parseAnteCredentialMode,
+} from "@/lib/ante-credential-mode";
 
-export function parseAnteCredentialMode(value: string | null | undefined): AnteCredentialMode {
-  return value?.toLowerCase() === "live" ? "live" : "sandbox";
-}
+export { listWebhookSecrets, verifyAnteWebhookSignature } from "@/lib/ante-webhook-verification";
 
 /** Unqualified env vars (no _TEST suffix) are the live credentials — matches typical Vercel setup. */
 export function resolvePublishableKey(mode: AnteCredentialMode): string {
@@ -29,20 +33,6 @@ export function resolveWebhookSecret(mode: AnteCredentialMode): string {
     );
   }
   return process.env.ANTE_WEBHOOK_SECRET_TEST?.trim() || "";
-}
-
-/** All configured webhook secrets — used when inbound webhooks have no mode header. */
-export function listWebhookSecrets(): string[] {
-  const secrets = new Set<string>();
-  for (const value of [
-    process.env.ANTE_WEBHOOK_SECRET_TEST,
-    process.env.ANTE_WEBHOOK_SECRET_LIVE,
-    process.env.ANTE_WEBHOOK_SECRET,
-  ]) {
-    const trimmed = value?.trim();
-    if (trimmed) secrets.add(trimmed);
-  }
-  return [...secrets];
 }
 
 export function merchantId(): string {
@@ -75,14 +65,4 @@ export function credentialAvailability(): {
       process.env.ANTE_WEBHOOK_SECRET_LIVE?.trim() || process.env.ANTE_WEBHOOK_SECRET?.trim(),
     ),
   };
-}
-
-export function modeLabel(mode: AnteCredentialMode): string {
-  return mode === "live" ? "Live" : "Test";
-}
-
-export function keyModeMatches(mode: AnteCredentialMode, key: string): boolean {
-  const detected = publishableKeyMode(key);
-  if (!detected) return true;
-  return mode === "live" ? detected === "live" : detected === "sandbox";
 }

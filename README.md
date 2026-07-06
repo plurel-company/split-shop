@@ -51,7 +51,26 @@ Cart state ──► buildAnteCart ──► POST /api/cart/sign ──► HMAC 
 Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄── POST /api/webhooks/ante
 ```
 
-**Fulfill on `group.funded`**, not on client callbacks alone. The demo uses an in-memory order store (`lib/order-store.ts`) — replace with your database in production.
+**Fulfill on `group.funded`**, not on client callbacks alone.
+
+### In-memory order store (demo only)
+
+`lib/order-store.ts` keeps pending and funded orders in a **process-local `Map`**. That is fine for local dev and single-instance demos, but it is **not** production-safe:
+
+- Restarts wipe all orders.
+- Serverless / multi-instance hosts may route the webhook and the browser poll to **different** instances, so funding never appears in the UI.
+- There is no cross-region durability or replay protection beyond idempotent webhook handling in this route.
+
+**Production pattern:** persist orders in Postgres, Redis, or your OMS before opening checkout; fulfill inside the webhook with idempotent updates keyed by `order_ref` (and optionally `event.id`). The demo’s fail-closed checks (registered pending order, matching credential mode, minimum `total`) should carry over unchanged.
+
+| Pattern | Demo behavior | Production recommendation |
+| --- | --- | --- |
+| Cart prices | Signed server-side in `/api/cart/sign` | **Always** sign carts on your server; never trust browser prices |
+| Webhook auth | Verifies against **all** configured secrets | Use separate test/live webhook secrets; do not pick secret from client headers |
+| Order fulfillment | Requires a registered **pending** order + valid `total` | Fail closed on unknown `order_ref` or underpayment |
+| Order store | In-memory map | Durable database with idempotent webhook handling |
+
+See [`lib/ante-credentials.ts`](./lib/ante-credentials.ts) (`verifyAnteWebhookSignature`) and [`app/api/webhooks/ante/route.ts`](./app/api/webhooks/ante/route.ts).
 
 ## Environment variables
 
@@ -139,6 +158,7 @@ hooks/use-order-funding-poll.ts  # Poll until webhook marks funded
 | `pnpm dev` | Start Next.js dev server |
 | `pnpm build` | Production build |
 | `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm test` | Unit tests (`lib/*.test.ts`) |
 
 ## Deploy
 

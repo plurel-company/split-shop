@@ -16,7 +16,7 @@ import {
   ANTE_KEY_MODE_HEADER,
   modeLabel,
   parseAnteCredentialMode,
-} from "@/lib/ante-credentials";
+} from "@/lib/ante-credential-mode";
 
 const STORAGE_KEY = "ante-demo-key-mode";
 

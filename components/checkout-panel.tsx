@@ -81,7 +81,7 @@ function isErrorStatus(status: string | null): boolean {
 
 export function CheckoutPanel() {
   const { cart, itemCount, subtotal, currency, clearCart } = useCart();
-  const { modeHeaders, mode, apiFallback, enableApiFallback } = useAnteMode();
+  const { modeHeaders, mode, publishableKey, apiFallback, enableApiFallback } = useAnteMode();
   const [orderRef, setOrderRef] = useState(makeOrderRef);
   const [status, setStatus] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<ConfirmedOrder | null>(null);
@@ -186,7 +186,7 @@ export function CheckoutPanel() {
     const response = await fetch("/api/cart/sign", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...modeHeaders },
-      body: JSON.stringify({ cart: cartToSign }),
+      body: JSON.stringify({ cart: cartToSign, publishableKey }),
     });
 
     if (!response.ok) {
