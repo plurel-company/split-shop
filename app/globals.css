@@ -2,7 +2,10 @@
 
 @theme inline {
   --font-sans: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
+  /* Mono retired from the storefront (read as "Consolas" to viewers) — labels and
+     figures render in Geist like the marketing site; the token stays so every old
+     var(--font-mono) usage flips together. */
+  --font-mono: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-instrument-serif), "Instrument Serif", serif;
   --color-paper: #fafaf7;
   --color-paper-2: #f1efe9;
@@ -247,7 +250,7 @@ body {
 }
 
 code {
-  font-family: var(--font-geist-mono), "Geist Mono", ui-monospace, monospace;
+  font-family: var(--font-sans);
 }
 
 /* ── Checkout panel ─────────────────────────────────────────────── */
