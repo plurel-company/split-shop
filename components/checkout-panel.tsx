@@ -24,32 +24,10 @@ import {
   type CurrencyCode,
 } from "@/lib/store";
 import { fetchFundedOrder } from "@/hooks/use-order-funding-poll";
+import { reportClientError } from "@/lib/report-client-error";
 
 function checkoutErrorMessage(error: Error): string {
   return explainAnteApiError(error.message);
-}
-
-/** Temporary: ship the on-device failure detail to our own backend (same-origin,
- *  reachable even when cross-origin calls fail) so mobile errors are debuggable. */
-function reportClientError(stage: string, error: Error) {
-  try {
-    void fetch("/api/client-log", {
-      method: "POST",
-      keepalive: true,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        stage,
-        name: error.name,
-        message: String(error.message).slice(0, 500),
-        ua: typeof navigator !== "undefined" ? navigator.userAgent : "?",
-        href: typeof location !== "undefined" ? location.href : "?",
-        online: typeof navigator !== "undefined" ? navigator.onLine : null,
-        ts: new Date().toISOString(),
-      }),
-    });
-  } catch {
-    /* never let telemetry break checkout */
-  }
 }
 
 function fundedOrderToConfirmed(order: FundedOrder, currency: CurrencyCode): ConfirmedOrder {

@@ -1,13 +1,28 @@
-/** POST /api/client-log — dev-only checkout telemetry (disabled in production). */
+/** POST /api/client-log — checkout telemetry fallback (also captured in Sentry when configured). */
+import * as Sentry from "@sentry/nextjs";
+
+import { isSentryEnabled } from "@/lib/sentry/sentry.shared.config";
+
 export async function POST(request: Request) {
-  if (process.env.NODE_ENV === "production") {
-    return new Response(null, { status: 404 });
-  }
+  let body: Record<string, unknown> = {};
   try {
-    const body = (await request.json()) as Record<string, unknown>;
-    console.error("[client-error]", JSON.stringify(body).slice(0, 2000));
+    body = (await request.json()) as Record<string, unknown>;
   } catch {
-    console.error("[client-error] unparseable payload");
+    body = { message: "unparseable payload" };
   }
+
+  const stage = typeof body.stage === "string" ? body.stage : "unknown";
+  const message = typeof body.message === "string" ? body.message : "client error";
+
+  if (isSentryEnabled()) {
+    Sentry.withScope((scope) => {
+      scope.setTag("checkout_stage", stage);
+      scope.setContext("client", body);
+      Sentry.captureMessage(`[client-log] ${stage}: ${message}`, "error");
+    });
+  } else if (process.env.NODE_ENV !== "production") {
+    console.error("[client-error]", JSON.stringify(body).slice(0, 2000));
+  }
+
   return new Response(null, { status: 204 });
 }
