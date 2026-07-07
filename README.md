@@ -85,8 +85,9 @@ See [`lib/ante-credentials.ts`](./lib/ante-credentials.ts) (`verifyAnteWebhookSi
 | `ANTE_SECRET_KEY_TEST` | Server only | **Test** — `ante_sk_test_*` for sandbox sessions |
 | `ANTE_WEBHOOK_SECRET` | Server only | **Live** — `whsec_*` for live webhook deliveries |
 | `ANTE_WEBHOOK_SECRET_TEST` | Server only | **Test** — `whsec_*` for sandbox webhooks |
+| `NEXT_PUBLIC_SENTRY_DSN` | Client | Optional — Sentry error reporting (checkout failures, etc.) |
 
-Optional aliases: `NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY_LIVE`, `ANTE_WEBHOOK_SECRET_LIVE`, `ANTE_SECRET_KEY_LIVE`.
+Optional aliases: `NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY_LIVE`, `ANTE_WEBHOOK_SECRET_LIVE`, `ANTE_SECRET_KEY_LIVE`, `SENTRY_DSN`.
 
 The browser SDK still uses the **publishable** key. Session create/cancel is proxied through `/api/ante/v1` and authenticated upstream with the **secret** key (`payments:write`).
 
