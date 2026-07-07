@@ -89,7 +89,13 @@ export function explainAnteApiError(
   }
 
   if (message === "Unauthorized") {
-    return "Ante accepted your key and signature but could not create the session (splitante.com internal auth). Set ANTE_INTERNAL_SECRET on splitante.com Vercel and Convex, then redeploy.";
+    return [
+      "Ante accepted your key and signature but splitante.com could not reach its backend (internal bearer auth failed).",
+      "• Set the same write secret on Vercel Production and Convex Production: ANTE_INTERNAL_WRITE_SECRET (preferred) or ANTE_INTERNAL_SECRET.",
+      "• If both ANTE_INTERNAL_WRITE_SECRET and ANTE_INTERNAL_SECRET exist, the write secret wins — they must match on both sides.",
+      "• Redeploy splitante.com on Vercel after changing env vars (Convex picks up env immediately).",
+      "• Check GET https://splitante.com/api/health/sdk — internal_convex_auth should be \"ok\".",
+    ].join("\n");
   }
 
   if (message.includes("Service temporarily unavailable")) {
