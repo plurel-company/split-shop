@@ -1,12 +1,12 @@
 {
-  "name": "ante-demo-store",
+  "name": "split-shop",
   "version": "0.1.0",
-  "description": "Reference Next.js storefront for Plurel Pay group checkout — cart signing, SDK modal, and webhooks",
+  "description": "Reference Next.js storefront for Plurel Pay group checkout \u2014 cart signing, SDK modal, and webhooks",
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/plurel-company/ante-demo-store.git"
+    "url": "https://github.com/plurel-company/split-shop.git"
   },
   "scripts": {
     "dev": "next dev",
@@ -16,8 +16,8 @@
     "test": "node --import tsx --test lib/*.test.ts"
   },
   "dependencies": {
-    "@plurel/react-sdk": "file:../ante-sdk/packages/react",
-    "@plurel/sdk": "file:../ante-sdk/packages/core",
+    "@plurel/react-sdk": "^1.0.1",
+    "@plurel/sdk": "^1.0.1",
     "@sentry/nextjs": "^10.63.0",
     "next": "^15.3.3",
     "react": "^19.1.0",
