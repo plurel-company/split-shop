@@ -68,7 +68,10 @@ export default function Image() {
                 top: 34,
                 width: 36,
                 height: 14,
-                borderRadius: "0 0 18px 18px",
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 18,
+                borderBottomLeftRadius: 18,
                 background: "#E6E1DC",
               }}
             />

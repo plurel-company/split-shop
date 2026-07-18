@@ -65,7 +65,10 @@ export default function AppleIcon() {
               top: 72,
               width: 72,
               height: 28,
-              borderRadius: "0 0 36px 36px",
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 36,
+              borderBottomLeftRadius: 36,
               background: "#E6E1DC",
             }}
           />
