@@ -6,47 +6,47 @@
      figures render in Geist like the marketing site; the token stays so every old
      var(--font-mono) usage flips together. */
   --font-mono: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-instrument-serif), "Instrument Serif", serif;
-  --color-paper: #fafaf7;
-  --color-paper-2: #f1efe9;
-  --color-paper-3: #e9e6de;
-  --color-ink: #0e0e11;
+  --font-serif: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
+  --color-paper: #F4F5F7;
+  --color-paper-2: #ECEEF1;
+  --color-paper-3: #E6E1DC;
+  --color-ink: #0D0F12;
   --color-ink-2: #3a3a40;
   --color-ink-3: #76747c;
   --color-ink-4: #a8a5ad;
-  --color-hair: #e2ded4;
+  --color-hair: #E6E1DC;
   --color-hair-2: #d2cdc0;
   --color-terra: #F26A2E;
-  --color-terra-dim: #f6e3d7;
-  --color-terra-soft: #fff1e8;
-  --color-terra-deep: #8a2e0f;
-  --color-mint: #3f7a55;
-  --color-mint-soft: #eef4f0;
-  --color-mint-dim: #cbdcd2;
-  --color-mint-deep: #2e5a3f;
+  --color-terra-dim: #F5D5C4;
+  --color-terra-soft: #FFF1EA;
+  --color-terra-deep: #B84A1A;
+  --color-mint: #22C55E;
+  --color-mint-soft: #ECFDF3;
+  --color-mint-dim: #BBF7D0;
+  --color-mint-deep: #15803D;
 }
 
 :root {
   /* Plurel Pay brand (from plurelpay.com) */
-  --bg-1: #fafaf7;
-  --bg-2: #f1efe9;
-  --bg-3: #e9e6de;
-  --ink: #0e0e11;
+  --bg-1: #F4F5F7;
+  --bg-2: #ECEEF1;
+  --bg-3: #E6E1DC;
+  --ink: #0D0F12;
   --ink-2: #3a3a40;
   --ink-3: #76747c;
   --ink-4: #a8a5ad;
-  --hair: #e2ded4;
+  --hair: #E6E1DC;
   --hair-2: #d2cdc0;
   --terra: #F26A2E;
-  --terra-2: #f4631e;
-  --terra-dim: #f6e3d7;
-  --terra-soft: #fff1e8;
-  --terra-deep: #8a2e0f;
-  --mint: #3f7a55;
-  --mint-soft: #eef4f0;
-  --mint-dim: #cbdcd2;
-  --mint-deep: #2e5a3f;
-  --dark: #111114;
+  --terra-2: #F26A2E;
+  --terra-dim: #F5D5C4;
+  --terra-soft: #FFF1EA;
+  --terra-deep: #B84A1A;
+  --mint: #22C55E;
+  --mint-soft: #ECFDF3;
+  --mint-dim: #BBF7D0;
+  --mint-deep: #15803D;
+  --dark: #0D0F12;
   --dark-2: #191a1e;
   --dark-3: #26272d;
   --dark-hair: #2e2f35;
@@ -93,40 +93,20 @@ body {
   font-variant-emoji: text;
 }
 
-/* ── Brand mark (the Plurel Pay orb, from plurelpay.com) ─────────── */
+/* ── Plurel mark ─────────────────────────────────────────────────── */
 
-.orb-sphere {
-  position: relative;
+.plurel-mark {
   display: block;
   flex-shrink: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  contain: paint;
-  background: radial-gradient(
-    circle at 32% 28%,
-    #ffe0cb 0%,
-    #ffb48a 18%,
-    #e66a37 52%,
-    #b8421a 82%,
-    #6e2510 100%
-  );
-  /* Single inset shade only — NO outer drop shadow (it smudged into a boxy
-     halo a shade darker than the page). Matches plurelpay.com's orb exactly. */
-  box-shadow: inset 0 -3px 6px rgba(110, 37, 16, 0.35);
+  width: 22px;
+  height: 22px;
+}
+.plurel-mark--footer {
+  width: 28px;
+  height: 28px;
 }
 
-.orb-sphere::after {
-  /* Soft, small specular highlight — NOT the oversized hard disc that read as
-     a second sphere floating over the orb. */
-  content: "";
-  position: absolute;
-  top: 20%;
-  left: 20%;
-  width: 32%;
-  height: 22%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 65%);
-}
+
 
 /* ── Store layout & catalog ─────────────────────────────────────── */
 
@@ -179,7 +159,7 @@ body {
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgb(226 222 212 / 0.7);
+  border-bottom: 1px solid rgb(230 225 220 / 0.7);
 }
 
 .product-card {
@@ -187,7 +167,7 @@ body {
   background: var(--store-surface);
   border-radius: 0.75rem;
   box-shadow:
-    0 1px 2px rgba(14, 14, 17, 0.03),
+    0 1px 2px rgba(13, 15, 18, 0.03),
     0 4px 20px rgba(242, 106, 46, 0.04);
   transition:
     border-color 0.2s ease,
@@ -198,7 +178,7 @@ body {
 .product-card:hover {
   border-color: var(--hair-2);
   box-shadow:
-    0 4px 12px rgba(14, 14, 17, 0.06),
+    0 4px 12px rgba(13, 15, 18, 0.06),
     0 22px 44px -28px rgba(0, 0, 0, 0.35);
   transform: translateY(-2px);
 }
@@ -211,7 +191,7 @@ body {
 .product-card--muted:hover {
   transform: none;
   box-shadow:
-    0 1px 2px rgba(14, 14, 17, 0.03),
+    0 1px 2px rgba(13, 15, 18, 0.03),
     0 4px 20px rgba(242, 106, 46, 0.04);
 }
 
@@ -269,11 +249,11 @@ code {
   max-width: 14ch;
 }
 .store-hero__accent {
-  font-family: var(--font-instrument-serif), serif;
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 600;
   font-size: 1.05em;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.035em;
   color: var(--terra);
 }
 .store-hero__lede {
@@ -310,7 +290,7 @@ code {
   background: linear-gradient(180deg, #ffffff 0%, var(--bg-1) 100%);
   border-radius: 12px;
   box-shadow:
-    0 1px 2px rgba(14, 14, 17, 0.03),
+    0 1px 2px rgba(13, 15, 18, 0.03),
     0 6px 22px -14px rgba(0, 0, 0, 0.18);
 }
 
@@ -473,8 +453,8 @@ code {
   background: linear-gradient(165deg, var(--success-surface) 0%, #ffffff 55%);
   border-radius: 12px;
   box-shadow:
-    0 1px 2px rgba(63, 122, 85, 0.06),
-    0 8px 24px rgba(63, 122, 85, 0.08);
+    0 1px 2px rgba(34, 197, 94, 0.06),
+    0 8px 24px rgba(34, 197, 94, 0.08);
   overflow: hidden;
 }
 
@@ -493,7 +473,7 @@ code {
   background: var(--mint);
   color: #ffffff;
   font-size: 1.25rem;
-  box-shadow: 0 4px 12px rgba(63, 122, 85, 0.35);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
   animation: order-success-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
@@ -783,7 +763,7 @@ code {
 }
 
 
-/* ── plurelpay.com chrome: page scaffold + halo ──────────────────── */
+/* ── Page scaffold ─────────────────────────────────────────────────── */
 
 .store-page {
   position: relative;
@@ -792,39 +772,6 @@ code {
   flex-direction: column;
 }
 
-.store-halo {
-  position: absolute;
-  top: -170px;
-  left: 0;
-  right: 0;
-  margin-inline: auto;
-  width: min(1000px, 100%);
-  height: 800px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(242, 106, 46, 0.12) 0%,
-    rgba(242, 106, 46, 0.04) 35%,
-    transparent 70%
-  );
-  pointer-events: none;
-  z-index: 0;
-  animation: halo-pulse 7000ms ease-in-out infinite;
-}
-@keyframes halo-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.82;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .store-halo {
-    animation: none;
-  }
-}
 
 .store-container {
   position: relative;
@@ -841,7 +788,7 @@ code {
   }
 }
 
-/* ── plurelpay.com header: transparent sticky, centered nav pill ─── */
+/* ── Header: transparent sticky, centered nav pill ──────────────── */
 
 .store-header {
   position: sticky;
@@ -871,28 +818,15 @@ code {
 }
 
 .brand-name {
-  font-family: var(--font-instrument-serif), serif;
-  font-style: italic;
-  font-size: 24px;
-  letter-spacing: -0.01em;
+  font-family: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.02em;
   line-height: 1;
   white-space: nowrap;
 }
 
-.orb-sphere--pill {
-  width: 22px;
-  height: 22px;
-}
-.orb-sphere--xs {
-  width: 14px;
-  height: 14px;
-  box-shadow: inset 0 -2px 3px rgba(110, 37, 16, 0.3);
-}
-.orb-sphere--footer {
-  width: 28px;
-  height: 28px;
-  box-shadow: inset 0 -3px 6px rgba(110, 37, 16, 0.35);
-}
 
 .header-pill {
   grid-column: 2;
@@ -900,7 +834,7 @@ code {
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  background: rgba(252, 251, 248, 0.82);
+  background: rgba(244, 245, 247, 0.88);
   border: 1px solid var(--hair);
   border-radius: 999px;
   padding: 4px;
@@ -967,7 +901,7 @@ code {
 
 @media (max-width: 900px) {
   .store-header {
-    background: rgba(250, 250, 247, 0.82);
+    background: rgba(244, 245, 247, 0.88);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--hair);
@@ -984,7 +918,7 @@ code {
   }
 }
 
-/* ── plurelpay.com footer: dark band ─────────────────────────────── */
+/* ── Footer: dark band ──────────────────────────────────────────── */
 
 .site-footer {
   background: var(--dark);
@@ -1019,10 +953,11 @@ code {
   gap: 12px;
 }
 .footer-brand__name {
-  font-family: var(--font-instrument-serif), serif;
-  font-style: italic;
-  font-size: 32px;
-  letter-spacing: -0.01em;
+  font-family: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 
@@ -1036,10 +971,10 @@ code {
   min-width: min(280px, 100%);
 }
 .footer-quote em {
-  font-family: var(--font-instrument-serif), serif;
-  font-style: italic;
-  font-weight: 400;
-  color: #ffa277;
+  font-family: var(--font-geist-sans), "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  color: #F26A2E;
 }
 
 .site-footer__dev {
@@ -1052,7 +987,7 @@ code {
   color: var(--dark-ink-2);
 }
 .site-footer__dev a {
-  color: #ffa277;
+  color: #F26A2E;
   text-decoration: none;
 }
 .site-footer__dev a:hover {

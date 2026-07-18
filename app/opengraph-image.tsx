@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Split Shop · Plurel Pay open demo";
+export const alt = "Split Shop · Plurel Pay";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -15,22 +15,67 @@ export default function Image() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "72px 80px",
-          background: "#F4F2EC",
-          color: "#111114",
+          background: "#F4F5F7",
+          color: "#0D0F12",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
           <div
             style={{
-              width: 44,
-              height: 44,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle at 34% 30%, #FFE0CB 0%, #FFB48A 18%, #E66A37 52%, #B8421A 82%, #6E2510 100%)",
-              boxShadow: "0 0 0 10px rgba(242, 106, 46,0.14)",
+              width: 52,
+              height: 52,
+              display: "flex",
+              position: "relative",
             }}
-          />
-          <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em" }}>Plurel Pay</div>
+          >
+            <div
+              style={{
+                position: "absolute",
+                left: 18,
+                top: 2,
+                width: 16,
+                height: 16,
+                borderRadius: "50%",
+                background: "#F26A2E",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 4,
+                top: 16,
+                width: 18,
+                height: 18,
+                borderRadius: "50%",
+                background: "#0D0F12",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                right: 4,
+                top: 16,
+                width: 18,
+                height: 18,
+                borderRadius: "50%",
+                background: "#0D0F12",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 8,
+                top: 34,
+                width: 36,
+                height: 14,
+                borderRadius: "0 0 18px 18px",
+                background: "#E6E1DC",
+              }}
+            />
+          </div>
+          <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em", color: "#F26A2E" }}>
+            Plurel Pay
+          </div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
@@ -39,7 +84,7 @@ export default function Image() {
               fontSize: 18,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
-              color: "#8A888F",
+              color: "#76747c",
             }}
           >
             Open demo · Sandbox only
@@ -53,18 +98,17 @@ export default function Image() {
               maxWidth: 920,
             }}
           >
-            Split Shop.
+            Split Shop · Plurel Pay
           </div>
           <div
             style={{
               fontSize: 30,
               lineHeight: 1.35,
-              color: "#5C5A63",
+              color: "#3a3a40",
               maxWidth: 860,
             }}
           >
-            Build a cart, tap split with plurel, and split payment with friends — no real money
-            moves.
+            Build a cart, split with Plurel Pay, and pay with friends — no real money moves.
           </div>
         </div>
       </div>

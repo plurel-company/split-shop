@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 
-/* Apple touch icon — a full-bleed terracotta orb tile (iOS masks the corners).
-   Mirrors the .orb-mark gradient used throughout the site. */
+/* Apple touch icon — solid Plurel accent (iOS masks the corners). */
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
@@ -13,10 +12,65 @@ export default function AppleIcon() {
           width: "100%",
           height: "100%",
           display: "flex",
-          background:
-            "radial-gradient(circle at 34% 30%, #FFE0CB 0%, #FFB48A 18%, #E66A37 52%, #B8421A 82%, #6E2510 100%)",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "#F4F5F7",
         }}
-      />
+      >
+        <div
+          style={{
+            width: 112,
+            height: 112,
+            display: "flex",
+            position: "relative",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: 43,
+              top: 8,
+              width: 26,
+              height: 26,
+              borderRadius: "50%",
+              background: "#F26A2E",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: 12,
+              top: 36,
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: "#0D0F12",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              right: 12,
+              top: 36,
+              width: 36,
+              height: 36,
+              borderRadius: "50%",
+              background: "#0D0F12",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: 20,
+              top: 72,
+              width: 72,
+              height: 28,
+              borderRadius: "0 0 36px 36px",
+              background: "#E6E1DC",
+            }}
+          />
+        </div>
+      </div>
     ),
     { ...size },
   );
