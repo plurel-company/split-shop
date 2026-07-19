@@ -16,8 +16,8 @@
     "test": "node --import tsx --test lib/*.test.ts"
   },
   "dependencies": {
-    "@plurel/react-sdk": "^1.0.3",
-    "@plurel/sdk": "^1.0.3",
+    "@plurel/react-sdk": "^1.0.4",
+    "@plurel/sdk": "^1.0.4",
     "@sentry/nextjs": "^10.63.0",
     "next": "^15.3.3",
     "react": "^19.1.0",

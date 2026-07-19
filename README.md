@@ -99,8 +99,8 @@ See [`.env.example`](./.env.example) for commented templates including legacy `A
 This repo depends on the published npm packages:
 
 ```json
-"@plurel/sdk": "^1.0.3",
-"@plurel/react-sdk": "^1.0.3"
+"@plurel/sdk": "^1.0.4",
+"@plurel/react-sdk": "^1.0.4"
 ```
 
 ## Webhooks
