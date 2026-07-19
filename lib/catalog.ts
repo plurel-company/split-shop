@@ -1,11 +1,10 @@
 import type { CurrencyCode } from "@/lib/currency";
 import { CURRENCY_ORDER, convertFromUsd, getMinimumOrderMinor } from "@/lib/currency";
+import { resolveSiteUrl } from "@/lib/site-url";
 import type { Product, ProductCategory } from "@/lib/types";
 
 /** Public site origin for absolute product image URLs (Plurel Pay hosted checkout). */
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://splitshop.dev";
+const SITE_URL = resolveSiteUrl();
 
 function productImageUrl(filename: string): string {
   return `${SITE_URL}/products/${filename}`;
