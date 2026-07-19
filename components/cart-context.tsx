@@ -19,7 +19,8 @@ import {
   type CurrencyCode,
 } from "@/lib/store";
 
-const CURRENCY_STORAGE_KEY = "ante-demo-currency";
+const CURRENCY_STORAGE_KEY = "plurel-demo-currency";
+const LEGACY_CURRENCY_STORAGE_KEY = "ante-demo-currency";
 
 type CartContextValue = {
   cart: CartState;
@@ -43,7 +44,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(CURRENCY_STORAGE_KEY) as CurrencyCode | null;
+      const stored = (localStorage.getItem(CURRENCY_STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_CURRENCY_STORAGE_KEY)) as CurrencyCode | null;
       if (stored && CURRENCY_ORDER.includes(stored)) setCurrencyState(stored);
     } catch {
       /* ignore */

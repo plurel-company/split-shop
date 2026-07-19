@@ -2,7 +2,7 @@ import type { CartFee } from "@plurel/sdk";
 
 import { catalogInCurrency, PRODUCTS } from "@/lib/catalog";
 import {
-  anteCurrencyCode,
+  plurelCurrencyCode,
   CURRENCY_META,
   type CurrencyCode,
   getMinimumOrderMinor,
@@ -103,7 +103,7 @@ export function buildPlurelCart(
 
   return {
     total: merchandiseSubtotal + tax + shipping + feesTotal,
-    currency: anteCurrencyCode(currency),
+    currency: plurelCurrencyCode(currency),
     items,
     tax,
     shipping,

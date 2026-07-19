@@ -3,7 +3,7 @@ import { PlurelModeProvider } from "@/components/plurel-mode-provider";
 import { SetupBanner } from "@/components/setup-banner";
 import { StoreShell } from "@/components/store-shell";
 import { Storefront } from "@/components/storefront";
-import { credentialAvailability, merchantId, resolvePublishableKey } from "@/lib/ante-credentials";
+import { credentialAvailability, merchantId, resolvePublishableKey } from "@/lib/plurel-credentials";
 
 export default function HomePage() {
   const id = merchantId();

@@ -6,8 +6,8 @@ import {
   credentialModeFromPublishableKey,
   keyModeMatches,
   parsePlurelCredentialMode,
-} from "@/lib/ante-credential-mode";
-import { signingSecret } from "@/lib/ante-credentials";
+} from "@/lib/plurel-credential-mode";
+import { signingSecret } from "@/lib/plurel-credentials";
 import { createCartSignature } from "@/lib/cart-signing";
 import { registerPendingOrder } from "@/lib/order-store";
 

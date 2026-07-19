@@ -1,2 +1,2 @@
-/** Legacy alias — forwards to /api/webhooks/plurel. */
-export { GET, POST } from "@/app/api/webhooks/plurel/route";
+/** Legacy alias — forwards to /api/webhooks/plurelpay. */
+export { GET, POST } from "@/app/api/webhooks/plurelpay/route";

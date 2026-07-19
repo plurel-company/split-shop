@@ -7,8 +7,8 @@
 import {
   PLUREL_KEY_MODE_HEADER,
   parseCredentialModeFromRequest,
-} from "@/lib/ante-credential-mode";
-import { PLUREL_API_BASE, buildUpstreamSessionHeaders } from "@/lib/ante-upstream";
+} from "@/lib/plurel-credential-mode";
+import { PLUREL_API_BASE, buildUpstreamSessionHeaders } from "@/lib/plurel-upstream";
 
 /** Only the session endpoints the storefront SDK actually uses. */
 const ALLOWED_PATH = /^sessions(\/|$)?/;

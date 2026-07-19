@@ -1,5 +1,5 @@
 /** Client-safe test/live mode helpers (no Node crypto). */
-import { publishableKeyMode } from "@/lib/ante-env";
+import { publishableKeyMode } from "@/lib/plurel-env";
 
 export type PlurelCredentialMode = "sandbox" | "live";
 

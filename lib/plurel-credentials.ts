@@ -1,10 +1,10 @@
 /** Server-only Plurel Pay credential resolution and webhook verification. */
 import "server-only";
 
-import type { PlurelCredentialMode } from "@/lib/ante-credential-mode";
+import type { PlurelCredentialMode } from "@/lib/plurel-credential-mode";
 import { readEnv } from "@/lib/read-env";
 
-export type { PlurelCredentialMode, AnteCredentialMode } from "@/lib/ante-credential-mode";
+export type { PlurelCredentialMode, AnteCredentialMode } from "@/lib/plurel-credential-mode";
 export {
   PLUREL_KEY_MODE_HEADER,
   ANTE_KEY_MODE_HEADER,
@@ -13,13 +13,13 @@ export {
   parsePlurelCredentialMode,
   parseAnteCredentialMode,
   parseCredentialModeFromRequest,
-} from "@/lib/ante-credential-mode";
+} from "@/lib/plurel-credential-mode";
 
 export {
   listWebhookSecrets,
   verifyPlurelWebhookSignature,
   verifyAnteWebhookSignature,
-} from "@/lib/ante-webhook-verification";
+} from "@/lib/plurel-webhook-verification";
 
 export function resolvePublishableKey(mode: PlurelCredentialMode): string {
   if (mode === "live") {

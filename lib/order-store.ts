@@ -1,5 +1,5 @@
 /** In-memory order ledger for demo fulfillment (pending → funded via webhook). */
-import type { AnteCredentialMode } from "@/lib/ante-credential-mode";
+import type { PlurelCredentialMode } from "@/lib/plurel-credential-mode";
 import type { CartLine } from "@/lib/types";
 
 export type OrderFee = {
@@ -18,7 +18,7 @@ export type PendingOrder = {
   total: number;
   createdAt: number;
   /** Credential mode active when the cart was signed — webhook must match. */
-  credentialMode: AnteCredentialMode;
+  credentialMode: PlurelCredentialMode;
 };
 
 export type FundedOrder = PendingOrder & {
@@ -36,7 +36,7 @@ type OrderStoreState = {
   funded: Map<string, FundedOrder>;
 };
 
-const STORE_KEY = "__ante_demo_order_store__";
+const STORE_KEY = "__plurel_demo_order_store__";
 
 function getStore(): OrderStoreState {
   const globalStore = globalThis as typeof globalThis & {

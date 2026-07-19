@@ -4,7 +4,7 @@ import { afterEach, describe, it } from "node:test";
 import { fulfillGroupFunded } from "./webhook-fulfillment";
 import { getOrder, registerPendingOrder } from "./order-store";
 
-const STORE_KEY = "__ante_demo_order_store__";
+const STORE_KEY = "__plurel_demo_order_store__";
 
 function resetOrderStore(): void {
   const globalStore = globalThis as typeof globalThis & {

@@ -1,7 +1,7 @@
 /** Webhook secret resolution and signature verification (Node-safe, unit-testable). */
 import { verifyWebhookSignature } from "@plurel/sdk/signing";
 
-import type { PlurelCredentialMode } from "@/lib/ante-credential-mode";
+import type { PlurelCredentialMode } from "@/lib/plurel-credential-mode";
 import { readEnv } from "@/lib/read-env";
 
 type WebhookSecretCandidate = { secret: string; mode: PlurelCredentialMode };

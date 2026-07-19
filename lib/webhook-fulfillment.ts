@@ -1,5 +1,5 @@
 /** group.funded webhook fulfillment — extracted for unit tests. */
-import type { AnteCredentialMode } from "@/lib/ante-credential-mode";
+import type { PlurelCredentialMode } from "@/lib/plurel-credential-mode";
 import {
   getOrder,
   markOrderFunded,
@@ -25,7 +25,7 @@ function parseFundedTotal(data: Record<string, unknown>): number | null {
 
 export function fulfillGroupFunded(
   event: GroupFundedEvent,
-  verifiedMode: AnteCredentialMode,
+  verifiedMode: PlurelCredentialMode,
 ): FulfillGroupFundedResult {
   const orderRef = typeof event.data.order_ref === "string" ? event.data.order_ref : undefined;
   const sessionId = typeof event.data.session_id === "string" ? event.data.session_id : "";

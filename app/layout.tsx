@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import { resolveSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://split-shop.vercel.app";
+const SITE_URL = resolveSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
