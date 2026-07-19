@@ -1,8 +1,8 @@
 /** Server-side Plurel Pay REST helpers — upstream auth uses secret keys (payments:write). */
 import "server-only";
 
-import type { PlurelCredentialMode } from "@/lib/ante-credential-mode";
-import { merchantId, resolveSecretKey } from "@/lib/ante-credentials";
+import type { PlurelCredentialMode } from "@/lib/plurel-credential-mode";
+import { merchantId, resolveSecretKey } from "@/lib/plurel-credentials";
 import { correctStaleSdkVersionHeaders } from "@/lib/installed-sdk-versions";
 import { readEnv } from "@/lib/read-env";
 

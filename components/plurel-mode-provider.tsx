@@ -10,13 +10,13 @@ import {
   type ReactNode,
 } from "react";
 
-import { plurelEnvironmentFromKey } from "@/lib/ante-env";
+import { plurelEnvironmentFromKey } from "@/lib/plurel-env";
 import {
   type PlurelCredentialMode,
   PLUREL_KEY_MODE_HEADER,
   modeLabel,
   parsePlurelCredentialMode,
-} from "@/lib/ante-credential-mode";
+} from "@/lib/plurel-credential-mode";
 
 const STORAGE_KEY = "plurel-demo-key-mode";
 

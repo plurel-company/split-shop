@@ -1,11 +1,18 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import packageJson from "../package.json";
 import {
   INSTALLED_PLUREL_REACT_SDK_VERSION,
   INSTALLED_PLUREL_SDK_VERSION,
   correctStaleSdkVersionHeaders,
 } from "./installed-sdk-versions";
+
+/** Mirrors installedPackageVersion()'s range-prefix stripping in installed-sdk-versions.ts. */
+const expectedInstalledSdkVersion = packageJson.dependencies["@plurel/sdk"].replace(
+  /^[\^~>=<]*/,
+  "",
+);
 
 describe("correctStaleSdkVersionHeaders", () => {
   it("corrects stale SDK telemetry to match installed package.json", () => {
@@ -25,7 +32,7 @@ describe("correctStaleSdkVersionHeaders", () => {
       headers.get("X-Plurel-React-SDK-Version"),
       INSTALLED_PLUREL_REACT_SDK_VERSION,
     );
-    assert.equal(INSTALLED_PLUREL_SDK_VERSION, "1.0.0");
+    assert.equal(INSTALLED_PLUREL_SDK_VERSION, expectedInstalledSdkVersion);
   });
 
   it("does not overwrite when telemetry already matches package.json", () => {

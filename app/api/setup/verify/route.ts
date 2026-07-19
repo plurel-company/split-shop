@@ -6,9 +6,9 @@ import {
   modeLabel,
   parseCredentialModeFromRequest,
   signingSecret,
-} from "@/lib/ante-credentials";
-import { PLUREL_API_BASE, secretKeyForSessions } from "@/lib/ante-upstream";
-import { explainPlurelApiError } from "@/lib/ante-env";
+} from "@/lib/plurel-credentials";
+import { PLUREL_API_BASE, secretKeyForSessions } from "@/lib/plurel-upstream";
+import { explainPlurelApiError } from "@/lib/plurel-env";
 import { createCartSignature } from "@/lib/cart-signing";
 
 const PROBE_CART: Cart = {

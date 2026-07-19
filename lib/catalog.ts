@@ -5,7 +5,7 @@ import type { Product, ProductCategory } from "@/lib/types";
 /** Public site origin for absolute product image URLs (Plurel Pay hosted checkout). */
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://ante-demo-store.vercel.app";
+  "https://splitshop.dev";
 
 function productImageUrl(filename: string): string {
   return `${SITE_URL}/products/${filename}`;

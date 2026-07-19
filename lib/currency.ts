@@ -82,9 +82,12 @@ export function formatMoney(minorUnits: number, currency: CurrencyCode): string 
   }).format(toMajorUnits(minorUnits, currency));
 }
 
-export function anteCurrencyCode(currency: CurrencyCode): string {
+export function plurelCurrencyCode(currency: CurrencyCode): string {
   return currency.toLowerCase();
 }
+
+/** @deprecated Use plurelCurrencyCode */
+export const anteCurrencyCode = plurelCurrencyCode;
 
 export function getMinimumOrderMinor(currency: CurrencyCode): number {
   return CURRENCY_META[currency].minimumOrderMinor;

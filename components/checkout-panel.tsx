@@ -8,7 +8,7 @@ import { usePlurelMode } from "@/components/plurel-mode-provider";
 import { CurrencyBadge } from "@/components/store/CurrencyBadge";
 import { OrderConfirmation } from "@/components/order-confirmation";
 import { useOrderFundingPoll } from "@/hooks/use-order-funding-poll";
-import { explainPlurelApiError } from "@/lib/ante-env";
+import { explainPlurelApiError } from "@/lib/plurel-env";
 import type { FundedOrder } from "@/lib/order-store";
 import { formatMoney } from "@/components/ui/format-money";
 import {
@@ -304,7 +304,7 @@ export function CheckoutPanel() {
       ) : null}
 
       {plurelCart ? (
-        <div className="checkout-ante-button-wrap" ref={plurelButtonWrapRef}>
+        <div className="checkout-plurel-button-wrap" ref={plurelButtonWrapRef}>
           <PlurelButton
             getSignature={signCart}
             cart={plurelCart}
@@ -360,7 +360,7 @@ export function CheckoutPanel() {
       <p className="checkout-footnote">
         Checkout uses <strong>{mode === "live" ? "live" : "test"}</strong> Plurel Pay keys. One currency
         per cart. Order confirmation appears after Plurel Pay sends <code>group.funded</code> to{" "}
-        <code>/api/webhooks/plurel</code>.
+        <code>/api/webhooks/plurelpay</code>.
       </p>
     </aside>
   );

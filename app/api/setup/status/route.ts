@@ -7,8 +7,8 @@ import {
   resolveSecretKey,
   resolveWebhookSecret,
   signingSecret,
-} from "@/lib/ante-credentials";
-import { publishableKeyMode, validateCredentialShapes } from "@/lib/ante-env";
+} from "@/lib/plurel-credentials";
+import { publishableKeyMode, validateCredentialShapes } from "@/lib/plurel-env";
 
 export async function GET(req: Request) {
   const mode = parseCredentialModeFromRequest(req);

@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@plurel/react-sdk':
-        specifier: ^1.0.1
-        version: 1.0.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: ^1.0.2
+        version: 1.0.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@plurel/sdk':
-        specifier: ^1.0.1
-        version: 1.0.1
+        specifier: ^1.0.2
+        version: 1.0.2
       '@sentry/nextjs':
         specifier: ^10.63.0
         version: 10.63.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.9.0(@opentelemetry/api@1.9.1))(next@15.5.19(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(webpack@5.108.4)
@@ -561,15 +561,15 @@ packages:
     resolution: {integrity: sha512-icc5xCzndZfhuJMy5oqk5AvloWquR7jtae74qzpkKkhGp8BivK+oCcEXgGnjCdTfp8hA44l+w8gE8yYJbocJJw==}
     engines: {node: '>=14'}
 
-  '@plurel/react-sdk@1.0.1':
-    resolution: {integrity: sha512-nhemGo2upDLuBH4drxiIFMTW6CU1Fe1hqKPoRMO5TOSw2Q/KocupbUY//IgyVS1e2+OXMalMJqSmnMLRKt+9/g==}
+  '@plurel/react-sdk@1.0.2':
+    resolution: {integrity: sha512-KW8YK27+gKaQ/FQHgfHqV3+uOVgRyPeMSRUOdXmzPTA42Cgc95QiWxe4kGMt7Ik8UWiU5ftY/PpyyS3W44WR7g==}
     engines: {node: '>=20'}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  '@plurel/sdk@1.0.1':
-    resolution: {integrity: sha512-EOn0KOr2FzNgRqSz7g3k+X54YekVuRbIP/bVo5j+LGa0ywIV8yN9Ed0l13khHGMs9FQnoLLJlrs/FgJ4Kd6WeQ==}
+  '@plurel/sdk@1.0.2':
+    resolution: {integrity: sha512-dm22Im5ae+gdo/RYWlrXQKAQEFPNcfeGTTPa7WBXoVwAGB6//M4gIE9PmwHqQaWvr01noN+2XQKP5KE+BVPI8g==}
     engines: {node: '>=20'}
 
   '@rollup/plugin-commonjs@28.0.1':
@@ -2061,13 +2061,13 @@ snapshots:
 
   '@opentelemetry/semantic-conventions@1.42.0': {}
 
-  '@plurel/react-sdk@1.0.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@plurel/react-sdk@1.0.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@plurel/sdk': 1.0.1
+      '@plurel/sdk': 1.0.2
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@plurel/sdk@1.0.1': {}
+  '@plurel/sdk@1.0.2': {}
 
   '@rollup/plugin-commonjs@28.0.1(rollup@4.62.2)':
     dependencies:

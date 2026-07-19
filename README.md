@@ -1,6 +1,6 @@
 # Plurel Pay Demo Store
 
-**Live sandbox:** [https://ante-demo-store.vercel.app](https://ante-demo-store.vercel.app)
+**Live sandbox:** [https://splitshop.dev](https://splitshop.dev)
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
@@ -19,11 +19,11 @@ Official docs: [plurelpay.com/docs](https://plurelpay.com/docs)
 | Product catalog + cart | `lib/catalog.ts`, `lib/cart.ts`, React context |
 | Server-side cart signing | `POST /api/cart/sign` with `@plurel/sdk/signing` |
 | Hosted checkout modal | `@plurel/react-sdk` (`PlurelButton`) |
-| Test vs live credentials | Header switch + `lib/ante-credentials.ts` |
-| Order fulfillment | `POST /api/webhooks/plurel` on `group.funded` |
+| Test vs live credentials | Header switch + `lib/plurel-credentials.ts` |
+| Order fulfillment | `POST /api/webhooks/plurelpay` on `group.funded` |
 | Setup diagnostics | `GET /api/setup/status`, `POST /api/setup/verify` |
 
-Legacy routes `/api/ante/v1/*` and `/api/webhooks/ante` re-export the Plurel paths for backward compatibility.
+Legacy routes `/api/ante/v1/*`, `/api/webhooks/ante`, and `/api/webhooks/plurel` re-export `/api/webhooks/plurelpay` for backward compatibility.
 
 ## Quick start
 
@@ -50,7 +50,7 @@ Cart state ──► buildPlurelCart ──► POST /api/cart/sign ──► HMA
                      │                    │                              │
                      │                    └── registerPendingOrder       │
                      │                                                       │
-Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄── POST /api/webhooks/plurel
+Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄── POST /api/webhooks/plurelpay
 ```
 
 **Fulfill on `group.funded`**, not on client callbacks alone.
@@ -72,7 +72,7 @@ Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄──
 | Order fulfillment | Requires a registered **pending** order + valid `total` | Fail closed on unknown `order_ref` or underpayment |
 | Order store | In-memory map | Durable database with idempotent webhook handling |
 
-See [`lib/ante-webhook-verification.ts`](./lib/ante-webhook-verification.ts) and [`app/api/webhooks/plurel/route.ts`](./app/api/webhooks/plurel/route.ts).
+See [`lib/plurel-webhook-verification.ts`](./lib/plurel-webhook-verification.ts) and [`app/api/webhooks/plurelpay/route.ts`](./app/api/webhooks/plurelpay/route.ts).
 
 ## Environment variables
 
@@ -96,16 +96,22 @@ See [`.env.example`](./.env.example) for commented templates including legacy `A
 
 ## SDK dependency
 
-This repo links to the local monorepo by default:
+This repo depends on the published npm packages:
 
 ```json
-"@plurel/sdk": "file:../ante-sdk/packages/core",
-"@plurel/react-sdk": "file:../ante-sdk/packages/react"
+"@plurel/sdk": "^1.0.2",
+"@plurel/react-sdk": "^1.0.2"
 ```
 
-Switch to `"@plurel/sdk": "1.0.0"` once published to npm.
+## Webhooks
 
-## Webhooks (local dev)
+The production deployment of this demo registers its webhook at:
+
+```
+https://splitshop.dev/api/webhooks/plurelpay
+```
+
+### Local dev
 
 Plurel Pay needs a public HTTPS URL. Use a tunnel (ngrok, Cloudflare Tunnel, etc.):
 
@@ -113,7 +119,7 @@ Plurel Pay needs a public HTTPS URL. Use a tunnel (ngrok, Cloudflare Tunnel, etc
 ngrok http 3000
 ```
 
-Register `https://YOUR_TUNNEL/api/webhooks/plurel` in the merchant dashboard and subscribe to `group.funded`.
+Register `https://YOUR_TUNNEL/api/webhooks/plurelpay` in the merchant dashboard and subscribe to `group.funded`. (The legacy `/api/webhooks/plurel` and `/api/webhooks/ante` paths still work — they re-export the same handler.)
 
 ## Troubleshooting checkout
 
@@ -132,14 +138,15 @@ Docs: [Cart signing](https://plurelpay.com/docs/cart-signing) · [Troubleshootin
 app/
   api/plurel/v1/[...path]/route.ts   # Session API proxy (primary)
   api/ante/v1/[...path]/route.ts     # Legacy alias
-  api/webhooks/plurel/route.ts       # Webhook fulfillment (primary)
+  api/webhooks/plurelpay/route.ts    # Webhook fulfillment (primary)
+  api/webhooks/plurel/route.ts       # Legacy alias
   api/webhooks/ante/route.ts         # Legacy alias
 components/
   plurel-mode-provider.tsx           # Test/live credential switch
   checkout-panel.tsx                 # PlurelButton + cart summary
 lib/
   cart.ts                            # Cart → Plurel payload builders
-  ante-credentials.ts                # PLUREL_* env with ANTE_* fallbacks
+  plurel-credentials.ts              # PLUREL_* env with ANTE_* fallbacks
 ```
 
 ## Scripts

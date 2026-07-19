@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { listWebhookSecrets, verifyPlurelWebhookSignature } from "./ante-webhook-verification";
+import { listWebhookSecrets, verifyPlurelWebhookSignature } from "./plurel-webhook-verification";
 
 describe("verifyPlurelWebhookSignature", () => {
   it("returns null when no secrets are configured", () => {

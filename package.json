@@ -1,7 +1,7 @@
 {
   "name": "split-shop",
   "version": "0.1.0",
-  "description": "Reference Next.js storefront for Plurel Pay group checkout \u2014 cart signing, SDK modal, and webhooks",
+  "description": "Reference Next.js storefront for Plurel Pay group checkout — cart signing, SDK modal, and webhooks",
   "license": "MIT",
   "private": true,
   "repository": {
@@ -16,8 +16,8 @@
     "test": "node --import tsx --test lib/*.test.ts"
   },
   "dependencies": {
-    "@plurel/react-sdk": "^1.0.1",
-    "@plurel/sdk": "^1.0.1",
+    "@plurel/react-sdk": "^1.0.2",
+    "@plurel/sdk": "^1.0.2",
     "@sentry/nextjs": "^10.63.0",
     "next": "^15.3.3",
     "react": "^19.1.0",

@@ -378,7 +378,7 @@ code {
 }
 
 /* The Plurel Pay button stands on its own — no outlined frame behind the mark. */
-.checkout-ante-button-wrap {
+.checkout-plurel-button-wrap {
   margin-top: 1rem;
 }
 
