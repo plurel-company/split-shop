@@ -1,3 +1,4 @@
+import { PlurelMark } from "@/components/plurel-mark";
 import { PlurelModeSwitch } from "@/components/plurel-mode-switch";
 import { CurrencyPicker } from "@/components/store/CurrencyPicker";
 
@@ -5,28 +6,6 @@ type StoreShellProps = {
   configured: boolean;
   children: React.ReactNode;
 };
-
-function PlurelMark({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className ?? "plurel-mark"}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 64 64"
-      width="64"
-      height="64"
-      role="img"
-      aria-hidden="true"
-    >
-      <circle cx="32" cy="14" r="6.5" fill="#F26A2E" />
-      <circle cx="20" cy="30" r="9" fill="#0D0F12" />
-      <circle cx="44" cy="30" r="9" fill="#0D0F12" />
-      <path
-        d="M14.5 41c3.2 10.2 10.8 16.5 17.5 16.5S46.3 51.2 49.5 41c-3.6 6.4-9.8 10-17.5 10S18.1 47.4 14.5 41z"
-        fill="#E6E1DC"
-      />
-    </svg>
-  );
-}
 
 export function StoreShell({ configured, children }: StoreShellProps) {
   return (
