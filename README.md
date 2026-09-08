@@ -32,6 +32,9 @@ cp .env.example .env.local
 # Add credentials from the Plurel Pay merchant dashboard (Developers tab)
 
 pnpm install
+# In another terminal: pnpm db:dev
+# Set DATABASE_URL to local Postgres, then create the schema.
+pnpm db:migrate
 pnpm dev
 ```
 
@@ -55,22 +58,13 @@ Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄──
 
 **Fulfill on `group.funded`**, not on client callbacks alone.
 
-### In-memory order store (demo only)
+### Durable orders on Postgres
 
-`lib/order-store.ts` keeps pending and funded orders in a **process-local `Map`**. That is fine for local dev and single-instance demos, but it is **not** production-safe:
+`lib/order-store.ts` persists every signed cart to Postgres before checkout opens. Cloudflare Hyperdrive provides the connection pool. Each request creates its own `pg` client. Workers releases its socket when the request ends; Node development closes it explicitly. There is no process-local order fallback.
 
-- Restarts wipe all orders.
-- Serverless / multi-instance hosts may route the webhook and the browser poll to **different** instances, so funding never appears in the UI.
-- There is no cross-region durability or replay protection beyond idempotent webhook handling in this route.
+Orders have unique, immutable references. Re-signing an identical pending cart is safe; a changed or funded cart needs a new reference. A single conditional SQL update moves an order from pending to funded, checks credential mode and payment amount, and prevents duplicate fulfillment when webhook deliveries race. Replays return the stored funded order. The signed total remains separate from the actual amount paid.
 
-**Production pattern:** persist orders in Postgres, Redis, or your OMS before opening checkout; fulfill inside the webhook with idempotent updates keyed by `order_ref` (and optionally `event.id`). The demo’s fail-closed checks (registered pending order, matching credential mode, minimum `total`) should carry over unchanged.
-
-| Pattern | Demo behavior | Production recommendation |
-| --- | --- | --- |
-| Cart prices | Signed server-side in `/api/cart/sign` | **Always** sign carts on your server; never trust browser prices |
-| Webhook auth | Verifies against **all** configured secrets | Use separate test/live webhook secrets; do not pick secret from client headers |
-| Order fulfillment | Requires a registered **pending** order + valid `total` | Fail closed on unknown `order_ref` or underpayment |
-| Order store | In-memory map | Durable database with idempotent webhook handling |
+The `split_shop_orders` table uses its own namespace, so it can share a PlanetScale Postgres database with the API. Run the schema migration before starting checkout. There are no durable orders to export from the old process-local Map. Complete or reconcile in-flight checkouts before switching traffic.
 
 See [`lib/plurel-webhook-verification.ts`](./lib/plurel-webhook-verification.ts) and [`app/api/webhooks/plurelpay/route.ts`](./app/api/webhooks/plurelpay/route.ts).
 
@@ -116,7 +110,7 @@ https://splitshop.dev/api/webhooks/plurelpay
 Plurel Pay needs a public HTTPS URL. Use a tunnel (ngrok, Cloudflare Tunnel, etc.):
 
 ```bash
-ngrok http 3000
+cloudflared tunnel --url http://localhost:3000
 ```
 
 Register `https://YOUR_TUNNEL/api/webhooks/plurelpay` in the merchant dashboard and subscribe to `group.funded`. (The legacy `/api/webhooks/plurel` and `/api/webhooks/ante` paths still work — they re-export the same handler.)
@@ -154,7 +148,11 @@ lib/
 | Command | Description |
 | --- | --- |
 | `pnpm dev` | Start Next.js dev server |
-| `pnpm build` | Production build |
+| `pnpm build` | Next.js production build |
+| `pnpm build:cloudflare` | Cloudflare Worker production build |
+| `pnpm preview` | Build and run in local Workers runtime |
+| `pnpm deploy` | Configure Hyperdrive, build, and deploy Worker |
+| `pnpm db:migrate` | Apply Postgres schema migrations |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm test` | Unit tests (`lib/*.test.ts`) |
 
@@ -165,3 +163,23 @@ lib/
 - [Cart signing](https://plurelpay.com/docs/cart-signing)
 - [Webhooks](https://plurelpay.com/docs/webhooks)
 - [@plurel/sdk on npm](https://www.npmjs.com/package/@plurel/sdk)
+
+## Cloudflare deployment
+
+The storefront runs on Cloudflare Workers with OpenNext, serves static assets through Workers Static Assets, caches Next.js output in R2, and stores orders in PlanetScale Postgres through Hyperdrive. The [OpenNext setup guide](https://opennext.js.org/cloudflare/get-started) and [Cloudflare pg guide](https://developers.cloudflare.com/hyperdrive/examples/connect-to-postgres/postgres-drivers-and-libraries/node-postgres/) describe the adapter and connection lifecycle.
+
+1. Provision a PlanetScale **Postgres** database and set `DATABASE_URL` to its direct connection URL in your local environment. Keep the provider's TLS parameters.
+2. Run `pnpm db:migrate`. The migration runner takes an advisory lock, applies new SQL files in one transaction, and records each applied migration.
+3. Create Hyperdrive with `pnpm exec wrangler hyperdrive create split-shop --connection-string "$DATABASE_URL" --caching-disabled`. Order reads must observe funding immediately, so disable Hyperdrive query caching.
+4. Create the cache bucket with `pnpm exec wrangler r2 bucket create split-shop-cache`.
+5. Set `CLOUDFLARE_HYPERDRIVE_ID` to the returned ID. `pnpm cloudflare:configure` writes the ignored `wrangler.deploy.json` with the actual binding. No placeholder ID is deployed.
+6. Set `NEXT_PUBLIC_*` values in the build environment. Set `PLUREL_SIGNING_SECRET`, the live/test API keys, and the live/test webhook secrets with `pnpm exec wrangler secret put NAME`. Build-time public values require rebuilding when changed.
+7. Run `pnpm deploy`. Attach `splitshop.dev` as a Worker custom domain after checking the deployment. Register `https://splitshop.dev/api/webhooks/plurelpay` in the Plurel dashboard.
+
+`pnpm db:dev` starts a local Postgres-compatible PGlite server and saves its data under the ignored `.local/postgres` directory. A standard local Postgres server works too.
+
+The manual GitHub deployment workflow reads Cloudflare credentials from production environment secrets and the Hyperdrive ID and public build values from production environment variables. Provision the database schema and Worker secrets before running it.
+
+For local development, `.env.local` supplies `DATABASE_URL` and credentials. For Workers preview, copy `.dev.vars.example` to `.dev.vars` and add those credentials there too. The default Wrangler config deliberately has no remote Hyperdrive binding, so local preview uses your explicit local database. Production fails closed without the generated Hyperdrive binding.
+
+`pnpm test` exercises SQL against PGlite's Postgres engine, including duplicate webhooks, cross-client persistence, credential mode checks, underpayment, and immutable order refs. `pnpm test:cloudflare` also starts a local Postgres wire-protocol server and verifies cart signing, durable order reads, signed webhooks and replay behavior through the real Workers runtime. A successful local build does not provision a database or cut over production traffic.

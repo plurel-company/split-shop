@@ -83,7 +83,7 @@ function cartHasShopItems(cart: CartState): boolean {
 }
 
 export function makeOrderRef(): string {
-  return `ORD-${Date.now().toString(36).toUpperCase()}`;
+  return `ORD-${crypto.randomUUID()}`;
 }
 
 /** Build the signed cart payload for Plurel Pay checkout (tax/shipping are demo approximations). */

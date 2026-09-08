@@ -9,7 +9,7 @@ export function isSentryEnabled(): boolean {
 export function sentryRelease(): string | undefined {
   return (
     process.env.SENTRY_RELEASE?.trim() ||
-    process.env.VERCEL_GIT_COMMIT_SHA?.trim() ||
+    process.env.WORKERS_CI_COMMIT_SHA?.trim() ||
     undefined
   );
 }
@@ -17,7 +17,7 @@ export function sentryRelease(): string | undefined {
 export function sharedSentryOptions(): Partial<BrowserOptions> {
   const environment =
     process.env.SENTRY_ENVIRONMENT?.trim() ||
-    process.env.VERCEL_ENV ||
+    process.env.CLOUDFLARE_ENV ||
     process.env.NODE_ENV ||
     "development";
 

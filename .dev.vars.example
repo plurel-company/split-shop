@@ -1,0 +1,4 @@
+NEXTJS_ENV=development
+# Add the same PLUREL_* secrets as .env.local for Workers preview.
+# For local Workers preview without Hyperdrive, use a local Postgres connection.
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/split_shop

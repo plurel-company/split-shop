@@ -21,7 +21,6 @@ import {
   makeOrderRef,
   minimumOrderForCart,
   type ConfirmedOrder,
-  type CurrencyCode,
 } from "@/lib/store";
 import { fetchFundedOrder } from "@/hooks/use-order-funding-poll";
 import { reportClientError } from "@/lib/report-client-error";
@@ -30,11 +29,11 @@ function checkoutErrorMessage(error: Error): string {
   return explainPlurelApiError(error.message);
 }
 
-function fundedOrderToConfirmed(order: FundedOrder, currency: CurrencyCode): ConfirmedOrder {
+function fundedOrderToConfirmed(order: FundedOrder): ConfirmedOrder {
   return {
     orderRef: order.orderRef,
     groupId: order.groupId,
-    currency,
+    currency: order.currency,
     lines: order.lines,
     fees: order.fees,
     subtotal: order.subtotal,
@@ -67,6 +66,11 @@ export function CheckoutPanel() {
   const plurelButtonWrapRef = useRef<HTMLDivElement | null>(null);
   const [autoRetry, setAutoRetry] = useState(false);
 
+  // A signed order is immutable. Cart or credential changes begin a new order.
+  useEffect(() => {
+    setOrderRef(makeOrderRef());
+  }, [cart, currency, mode]);
+
   useEffect(() => {
     if (!autoRetry || !apiFallback) return;
     setAutoRetry(false);
@@ -94,13 +98,12 @@ export function CheckoutPanel() {
 
   const handleWebhookFunded = useCallback(
     (order: FundedOrder) => {
-      const orderCurrency = currency;
-      setConfirmedOrder(fundedOrderToConfirmed(order, orderCurrency));
+      setConfirmedOrder(fundedOrderToConfirmed(order));
       setPollingOrderRef(null);
       clearCart();
       setStatus(null);
     },
-    [clearCart, currency],
+    [clearCart],
   );
 
   const resetCheckoutWait = useCallback(() => {
@@ -108,32 +111,8 @@ export function CheckoutPanel() {
     setStatus(null);
   }, []);
 
-  const confirmFromSdk = useCallback(
-    (ref: string, sessionId: string) => {
-      if (!plurelCart) return;
-      const feeSummary = buildCartFeeSummary(cart, currency);
-      setConfirmedOrder({
-        orderRef: ref,
-        groupId: sessionId,
-        currency,
-        lines: buildProductCartLines(cart, currency),
-        fees: feeSummary.length > 0 ? feeSummary : undefined,
-        subtotal: cartSubtotal(cart, currency),
-        tax: plurelCart.tax ?? 0,
-        shipping: plurelCart.shipping ?? 0,
-        total: plurelCart.total,
-        confirmedAt: Date.now(),
-        confirmedVia: "sdk",
-      });
-      setPollingOrderRef(null);
-      clearCart();
-      setStatus(null);
-    },
-    [plurelCart, cart, clearCart, currency],
-  );
-
   const waitForWebhookConfirmation = useCallback(
-    async (ref: string, sessionId: string) => {
+    async (ref: string) => {
       setPollingOrderRef(ref);
       setStatus("Payment complete — confirming your order…");
 
@@ -146,9 +125,9 @@ export function CheckoutPanel() {
         await new Promise((resolve) => setTimeout(resolve, 400));
       }
 
-      confirmFromSdk(ref, sessionId);
+      setStatus("Payment received. Waiting for the verified webhook to confirm your order…");
     },
-    [confirmFromSdk, handleWebhookFunded],
+    [handleWebhookFunded],
   );
 
   useOrderFundingPoll({
@@ -317,8 +296,8 @@ export function CheckoutPanel() {
                 setPollingOrderRef(orderRef);
                 setStatus("Waiting for group.funded webhook to confirm your order…");
               },
-              onGroupFunded: (sessionId, fundedOrderRef) => {
-                void waitForWebhookConfirmation(fundedOrderRef ?? orderRef, sessionId);
+              onGroupFunded: (_sessionId, fundedOrderRef) => {
+                void waitForWebhookConfirmation(fundedOrderRef ?? orderRef);
               },
               onGroupCancelled: () => {
                 resetCheckoutWait();

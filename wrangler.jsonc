@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "split-shop",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-08",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "split-shop" }],
+  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "split-shop-cache" }],
+  "images": { "binding": "IMAGES" },
+  "observability": { "enabled": true },
+  "vars": { "CLOUDFLARE_ENV": "development" }
+  // Generate wrangler.deploy.json with pnpm cloudflare:configure after provisioning Hyperdrive.
+}

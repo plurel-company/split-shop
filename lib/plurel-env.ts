@@ -95,13 +95,7 @@ export function explainPlurelApiError(
   }
 
   if (message === "Unauthorized") {
-    return [
-      "Plurel Pay accepted your key and signature but plurelpay.com could not reach its backend (internal bearer auth failed).",
-      "• Set the same write secret on Vercel Production and Convex Production: PLUREL_INTERNAL_WRITE_SECRET (preferred) or PLUREL_INTERNAL_SECRET (legacy ANTE_INTERNAL_* also accepted).",
-      "• If both write and legacy internal secrets exist, the write secret wins — they must match on both sides.",
-      "• Redeploy plurelpay.com on Vercel after changing env vars (Convex picks up env immediately).",
-      "• Check GET https://plurelpay.com/api/health/sdk — internal_convex_auth should be \"ok\".",
-    ].join("\n");
+    return "Plurel Pay could not authenticate the request. Verify the merchant credentials in the dashboard. If they are correct, contact Plurel support.";
   }
 
   if (message.includes("Service temporarily unavailable")) {

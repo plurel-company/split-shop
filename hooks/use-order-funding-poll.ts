@@ -59,6 +59,9 @@ export function useOrderFundingPoll({
         }
         await new Promise((resolve) => setTimeout(resolve, POLL_MS));
       }
+      if (!cancelled) {
+        onErrorRef.current?.("Order confirmation is taking longer than expected. Keep your order reference and contact support.");
+      }
     }
 
     void poll();

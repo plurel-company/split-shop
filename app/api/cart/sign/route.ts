@@ -1,5 +1,6 @@
 /** POST /api/cart/sign — HMAC-sign cart with PLUREL_SIGNING_SECRET; registers pending order. */
 import type { Cart } from "@plurel/sdk";
+import { CURRENCY_ORDER, type CurrencyCode } from "@/lib/currency";
 
 import {
   PLUREL_KEY_MODE_HEADER,
@@ -9,13 +10,13 @@ import {
 } from "@/lib/plurel-credential-mode";
 import { signingSecret } from "@/lib/plurel-credentials";
 import { createCartSignature } from "@/lib/cart-signing";
-import { registerPendingOrder } from "@/lib/order-store";
+import { registerPendingOrder, OrderConflictError } from "@/lib/order-store";
 
 function isSigningSecret(value: string): boolean {
   return value.startsWith("plurel_sign_") || value.startsWith("ante_sign_");
 }
 
-/** Map signed Plurel cart → in-memory pending order (keyed by metadata.order_ref). */
+/** Map signed Plurel cart → durable pending order (keyed by metadata.order_ref). */
 function pendingFromCart(
   cart: Cart,
   credentialMode: ReturnType<typeof parsePlurelCredentialMode>,
@@ -42,6 +43,7 @@ function pendingFromCart(
 
   return {
     orderRef,
+    currency: cart.currency.toUpperCase() as CurrencyCode,
     lines,
     ...(fees?.length ? { fees } : {}),
     subtotal,
@@ -59,7 +61,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error:
-          "PLUREL_SIGNING_SECRET (or ANTE_SIGNING_SECRET) is not configured on this deployment. Copy your signing secret from Plurel Pay → Developers → Signing and add it in Vercel/host env vars.",
+          "PLUREL_SIGNING_SECRET (or ANTE_SIGNING_SECRET) is not configured on this deployment. Copy your signing secret from Plurel Pay → Developers → Signing and add it as a Cloudflare Worker secret.",
       },
       { status: 503 },
     );
@@ -83,8 +85,12 @@ export async function POST(req: Request) {
   }
 
   const { cart, publishableKey } = body;
-  if (!cart?.total || !cart.currency || !Array.isArray(cart.items) || cart.items.length === 0) {
+  if (!cart?.total || typeof cart.currency !== "string" || !cart.currency || !Array.isArray(cart.items) || cart.items.length === 0) {
     return Response.json({ error: "Invalid cart" }, { status: 400 });
+  }
+
+  if (!CURRENCY_ORDER.includes(cart.currency.toUpperCase() as CurrencyCode)) {
+    return Response.json({ error: "Unsupported currency" }, { status: 400 });
   }
 
   const key = publishableKey?.trim();
@@ -102,8 +108,17 @@ export async function POST(req: Request) {
       return Response.json({ error: "Publishable key does not match x-plurel-key-mode" }, { status: 400 });
     }
     const pending = pendingFromCart(cart, credentialMode);
-    if (pending) {
-      registerPendingOrder(pending);
+    if (!pending) {
+      return Response.json({ error: "cart.metadata.order_ref is required" }, { status: 400 });
+    }
+    try {
+      await registerPendingOrder(pending);
+    } catch (error) {
+      if (error instanceof OrderConflictError) {
+        return Response.json({ error: error.message }, { status: 409 });
+      }
+      console.error("[cart sign] Could not persist order");
+      return Response.json({ error: "Order storage is unavailable. Retry checkout shortly." }, { status: 503 });
     }
     return Response.json({ signature });
   } catch (error) {
