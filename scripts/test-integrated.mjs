@@ -48,9 +48,53 @@ try {
     assert.equal(new URL(request.url).pathname, "/api/v1/sessions");
     assert.equal(request.headers.get("authorization"), `Bearer ${env.DEMO_SHOP_SECRET_KEY_TEST}`);
     seen.push(request.headers.get("x-merchant-id"));
-    return Response.json({ ok: true });
+    return Response.json({ session_id: `session_${id}`, expires_at: new Date(Date.now() + 3600_000).toISOString(), environment: "sandbox" });
   } })));
   assert.deepEqual(seen.sort(), ["first", "second"]);
   assert.equal((await invoke("/plurel/v1/sessions-evil", post({}))).status, 404);
+  const calls = [];
+  const sandbox = { session_id: "session_owner", environment: "sandbox", expires_at: new Date(Date.now() + 3600_000).toISOString(), status: "pending", group: { members: [{ name: "Owner" }] } };
+  let returnedEnvironment = "sandbox";
+  const upstream = { fetchApi: async request => {
+    calls.push(`${request.method} ${new URL(request.url).pathname}`);
+    return Response.json({ ...sandbox, environment: returnedEnvironment });
+  } };
+  const created = await invoke("/plurel/v1/sessions", post({}), env, upstream);
+  assert.equal(created.status, 200);
+  const cookie = created.headers.get("set-cookie").split(";")[0];
+  assert.match(created.headers.get("set-cookie"), /HttpOnly; SameSite=Strict;/);
+  const authenticated = { headers: { cookie } };
+  const noDispatch = { fetchApi: () => { throw new Error("Unauthorized upstream call"); } };
+  const blocked = [
+    ["/plurel/v1/sessions", {}],
+    ["/plurel/v1/sessions/session_owner", {}],
+    ["/plurel/v1/sessions/session_other", authenticated],
+    ["/plurel/v1/sessions/session_owner", { headers: { cookie: cookie + "x" } }],
+    ["/plurel/v1/sessions/session_owner/cancel", post({})],
+  ];
+  for (const [path, init] of blocked) {
+    const response = await invoke(path, init, env, noDispatch);
+    assert.ok([403, 404].includes(response.status), `${path}: ${response.status}`);
+  }
+  const owned = await invoke("/plurel/v1/sessions/session_owner", authenticated, env, upstream);
+  assert.equal(owned.status, 200);
+  assert.equal((await owned.json()).group.members[0].name, "Owner");
+  const cancelRequest = { ...post({}), headers: { ...post({}).headers, cookie } };
+  const cancelled = await invoke("/plurel/v1/sessions/session_owner/cancel", cancelRequest, env, upstream);
+  assert.equal(cancelled.status, 200);
+  assert.deepEqual(calls.slice(-2), ["GET /api/v1/sessions/session_owner", "POST /api/v1/sessions/session_owner/cancel"]);
+  returnedEnvironment = "live";
+  const callsBeforeLive = calls.length;
+  for (const [path, init] of [["/plurel/v1/sessions/session_owner", authenticated], ["/plurel/v1/sessions/session_owner/cancel", cancelRequest]]) {
+    const response = await invoke(path, init, env, upstream);
+    assert.equal(response.status, 403);
+    assert.doesNotMatch(await response.text(), /Owner/);
+  }
+  assert.ok(calls.slice(callsBeforeLive).every(call => call.startsWith("GET ")));
+  const liveCreate = await invoke("/plurel/v1/sessions", post({}), env, upstream);
+  assert.equal(liveCreate.status, 502);
+  assert.equal(liveCreate.headers.get("set-cookie"), null);
+  assert.doesNotMatch(await liveCreate.text(), /session_owner/);
+
   console.log("Integrated demo passed: static mount, public readiness, sandbox isolation, CSRF/body guards, PostgreSQL signing + webhook replay, concurrent internal API dispatch.");
 } finally { await server.stop(); await database.close(); }

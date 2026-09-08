@@ -7,10 +7,11 @@ import { build } from "esbuild";
 const root = resolve(import.meta.dirname, "..");
 const staging = join(root, ".integrated-build");
 const dist = join(root, "dist");
+execFileSync(process.execPath, [join(root, "scripts/verify-vendored-sdk.mjs")], { cwd: root, stdio: "inherit" });
 await rm(staging, { recursive: true, force: true });
 await rm(dist, { recursive: true, force: true });
 await mkdir(staging, { recursive: true });
-for (const name of ["app", "components", "hooks", "lib", "public", "package.json", "tsconfig.json", "postcss.config.mjs", "cloudflare-env.d.ts"])
+for (const name of ["app", "components", "hooks", "lib", "public", "vendor", "package.json", "tsconfig.json", "postcss.config.mjs", "cloudflare-env.d.ts"])
   await cp(join(root, name), join(staging, name), { recursive: true });
 await rm(join(staging, "app/api"), { recursive: true });
 await rm(join(staging, "app/opengraph-image.tsx"), { force: true });
@@ -42,5 +43,6 @@ async function hashDirectory(directory) {
 await hashDirectory(dist);
 const commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
 const dirty = Boolean(execFileSync("git", ["status", "--porcelain"], { cwd: root, encoding: "utf8" }).trim());
-await writeFile(join(dist, "provenance.json"), JSON.stringify({ repository: "plurel-company/split-shop", commit, dirty, digests }, null, 2) + "\n");
+const sdk = JSON.parse(await readFile(join(root, "vendor/sdk/provenance.json"), "utf8"));
+await writeFile(join(dist, "provenance.json"), JSON.stringify({ repository: "plurel-company/split-shop", commit, dirty, sdk, digests }, null, 2) + "\n");
 console.log("Integrated demo assets and API handler are ready in dist/. No Worker was deployed.");

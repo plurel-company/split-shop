@@ -10,10 +10,11 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm verify:sdk && next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test lib/*.test.ts",
+    "typecheck": "pnpm verify:sdk && tsc --noEmit",
+    "test": "pnpm verify:sdk && node --import tsx --test lib/*.test.ts",
+    "verify:sdk": "node scripts/verify-vendored-sdk.mjs",
     "build:cloudflare": "opennextjs-cloudflare build",
     "preview": "pnpm build:cloudflare && opennextjs-cloudflare preview",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
@@ -25,8 +26,8 @@
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.6",
-    "@plurel/react-sdk": "^1.0.5",
-    "@plurel/sdk": "^1.0.5",
+    "@plurel/react-sdk": "file:vendor/sdk/plurel-react-sdk-1.1.1.tgz",
+    "@plurel/sdk": "file:vendor/sdk/plurel-sdk-1.1.1.tgz",
     "@sentry/nextjs": "^10.63.0",
     "next": "^15.5.25",
     "pg": "^8.23.0",
@@ -50,5 +51,10 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0",
+  "pnpm": {
+    "overrides": {
+      "@plurel/react-sdk>@plurel/sdk": "file:vendor/sdk/plurel-sdk-1.1.1.tgz"
+    }
+  }
 }

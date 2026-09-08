@@ -38,6 +38,8 @@ pnpm test:integrated
 | `dist/migrations/` | Main migration runner's demo migration input |
 | `dist/provenance.json` | Reviewed source commit, dirty flag, SHA256 digests |
 
+The demo pins the reviewed, unpublished SDK 1.1.1 tarballs under `vendor/sdk/` using local `file:` dependencies. React's SDK dependency resolves to the same vendored core package. Their provenance records the SDK source commit and SHA256 checksums; builds verify those checksums. This makes CI independent of npm release timing and includes the reduced, sequential polling behavior.
+
 The main repository's sync command copies these artifacts for review. Commit them there so remote CI requires no sibling checkout. Rebuild after source changes, then validate the final main Worker bundle. A build does not deploy or activate anything.
 
 The handler exports:
@@ -65,7 +67,7 @@ The integrated handler reads only these demo-specific values, avoiding accidenta
 | `CLOUDFLARE_ENV` | Set to `production` in hosted production |
 | `DATABASE_URL` | Local development only; never substitutes for production Hyperdrive |
 
-`GET /api/demo-shop/setup/public` returns only the merchant ID, publishable key, and readiness. It checks the order table before enabling checkout. No credential is compiled into the static export. Live requests and live cart keys are rejected. Production exposes no setup-probe or client-log route. Configure the sandbox merchant's `group.funded` webhook for `https://plurelpay.com/api/demo-shop/webhooks/plurelpay` when rollout is authorized.
+`GET /api/demo-shop/setup/public` returns only the merchant ID, publishable key, and readiness. It checks the order table before enabling checkout. No credential is compiled into the static export. Live requests and live cart keys are rejected. Production exposes no setup-probe or client-log route. The session proxy denies collection listing. Successful sandbox creation sets a per-session HttpOnly, Secure-on-HTTPS, SameSite=Strict capability cookie, bound by HMAC to the session, merchant, origin and expiry (at most 24 hours). Reads and cancellation require that cookie before any merchant-authenticated API request; both recheck the stored session's sandbox environment. The same-origin SDK fetches send the cookie automatically. Copying a session ID to another browser grants no proxy access. Configure the sandbox merchant's `group.funded` webhook for `https://plurelpay.com/api/demo-shop/webhooks/plurelpay` when rollout is authorized.
 
 Apply `db/migrations/*.sql` to the **same** PostgreSQL database before enabling sandbox checkout. The migration runner takes an advisory lock and records applied files. Signed carts get immutable order references; an identical pending cart can reuse its signature, while changed or already-funded carts require a new reference. Conditional SQL updates verify amount and credential mode and tolerate duplicate webhook delivery. There is no process-local order fallback.
 

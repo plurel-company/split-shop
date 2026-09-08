@@ -1,4 +1,5 @@
 import packageJson from "../package.json";
+import sdkProvenance from "../vendor/sdk/provenance.json";
 
 function installedPackageVersion(
   packageName: "@plurel/sdk" | "@plurel/react-sdk",
@@ -6,12 +7,16 @@ function installedPackageVersion(
   const spec = packageJson.dependencies[packageName];
   if (!spec) return "0.0.0";
   if (spec.startsWith("file:")) {
-    return "1.0.0";
+    const artifact = sdkProvenance.packages[packageName];
+    if (spec !== `file:vendor/sdk/${artifact.file}`) {
+      throw new Error(`Unverified local SDK dependency: ${packageName}`);
+    }
+    return artifact.version;
   }
   return spec.replace(/^[\^~>=<]*/, "");
 }
 
-/** Installed @plurel/* versions from this app's package.json. */
+/** Package versions verified against vendored archives and installed modules at build time. */
 export const INSTALLED_PLUREL_SDK_VERSION = installedPackageVersion("@plurel/sdk");
 export const INSTALLED_PLUREL_REACT_SDK_VERSION = installedPackageVersion("@plurel/react-sdk");
 
@@ -22,7 +27,7 @@ export const INSTALLED_ANTE_REACT_SDK_VERSION = INSTALLED_PLUREL_REACT_SDK_VERSI
 
 /**
  * Correct upstream telemetry when the browser sends a version older than this app's
- * installed package.json dependency.
+ * verified SDK dependency.
  */
 export function correctStaleSdkVersionHeaders(
   headers: Headers,
