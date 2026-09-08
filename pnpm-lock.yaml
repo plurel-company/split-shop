@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@plurel/react-sdk>@plurel/sdk': file:vendor/sdk/plurel-sdk-1.1.1.tgz
+  '@plurel/react-sdk>@plurel/sdk': file:vendor/sdk/plurel-sdk-1.1.2.tgz
 
 importers:
 
@@ -15,11 +15,11 @@ importers:
         specifier: ^1.20.6
         version: 1.20.6(next@15.5.25(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(wrangler@4.130.0)
       '@plurel/react-sdk':
-        specifier: file:vendor/sdk/plurel-react-sdk-1.1.1.tgz
-        version: file:vendor/sdk/plurel-react-sdk-1.1.1.tgz(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        specifier: file:vendor/sdk/plurel-react-sdk-1.1.2.tgz
+        version: file:vendor/sdk/plurel-react-sdk-1.1.2.tgz(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@plurel/sdk':
-        specifier: file:vendor/sdk/plurel-sdk-1.1.1.tgz
-        version: file:vendor/sdk/plurel-sdk-1.1.1.tgz
+        specifier: file:vendor/sdk/plurel-sdk-1.1.2.tgz
+        version: file:vendor/sdk/plurel-sdk-1.1.2.tgz
       '@sentry/nextjs':
         specifier: ^10.63.0
         version: 10.66.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.9.0(@opentelemetry/api@1.9.1))(next@15.5.25(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(webpack@5.108.4(esbuild@0.28.2))
@@ -1406,17 +1406,17 @@ packages:
     resolution: {integrity: sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg==}
     engines: {node: '>=14'}
 
-  '@plurel/react-sdk@file:vendor/sdk/plurel-react-sdk-1.1.1.tgz':
-    resolution: {integrity: sha512-Eaa559YQybRU4Q03RAjc44TLph8U1PO+qnl2xslpBprX+IML4xgSFZCw7u+xqY3oYY/4Ait+06vHUZmhuwPZWg==, tarball: file:vendor/sdk/plurel-react-sdk-1.1.1.tgz}
-    version: 1.1.1
+  '@plurel/react-sdk@file:vendor/sdk/plurel-react-sdk-1.1.2.tgz':
+    resolution: {integrity: sha512-n1js6Xnpdoashbrmmb9wwCi8CaujPwV3P82+faguWxYbQoUfOf7YxXPVt0baVCn6uoDwz/Ug26tFbtB8VbSBRA==, tarball: file:vendor/sdk/plurel-react-sdk-1.1.2.tgz}
+    version: 1.1.2
     engines: {node: '>=20'}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  '@plurel/sdk@file:vendor/sdk/plurel-sdk-1.1.1.tgz':
-    resolution: {integrity: sha512-hKCro8AKPmbodv/nLuTcv80aXhvI/PhAbFzM9d/M+5FAzpyNMgmLIZtgv3AbuPggHe3YIs5EVKX62/xntfp6kQ==, tarball: file:vendor/sdk/plurel-sdk-1.1.1.tgz}
-    version: 1.1.1
+  '@plurel/sdk@file:vendor/sdk/plurel-sdk-1.1.2.tgz':
+    resolution: {integrity: sha512-FpUnpsCqi61I4onr+Iwgv3nK2vR4hglKutybdL02C19GknZWqKr3W+KjC6xcI+uhx4JU4O0M3UZLsMwXXzHXFg==, tarball: file:vendor/sdk/plurel-sdk-1.1.2.tgz}
+    version: 1.1.2
     engines: {node: '>=20'}
 
   '@poppinss/colors@4.1.6':
@@ -4760,13 +4760,13 @@ snapshots:
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
 
-  '@plurel/react-sdk@file:vendor/sdk/plurel-react-sdk-1.1.1.tgz(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@plurel/react-sdk@file:vendor/sdk/plurel-react-sdk-1.1.2.tgz(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@plurel/sdk': file:vendor/sdk/plurel-sdk-1.1.1.tgz
+      '@plurel/sdk': file:vendor/sdk/plurel-sdk-1.1.2.tgz
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@plurel/sdk@file:vendor/sdk/plurel-sdk-1.1.1.tgz': {}
+  '@plurel/sdk@file:vendor/sdk/plurel-sdk-1.1.2.tgz': {}
 
   '@poppinss/colors@4.1.6':
     dependencies:

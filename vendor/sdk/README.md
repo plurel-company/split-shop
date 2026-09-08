@@ -1,7 +1,7 @@
 # Plurel SDK preview packages
 
 These two packages were built and packed from the clean SDK commit recorded in
-`provenance.json`. Version 1.1.1 has not been published to npm. The storefront
+`provenance.json`. Version 1.1.2 has not been published to npm. The storefront
 uses checked-in tarballs so CI and reviewers install the same release without
 access to a sibling checkout.
 

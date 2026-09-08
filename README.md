@@ -38,7 +38,7 @@ pnpm test:integrated
 | `dist/migrations/` | Main migration runner's demo migration input |
 | `dist/provenance.json` | Reviewed source commit, dirty flag, SHA256 digests |
 
-The demo pins the reviewed, unpublished SDK 1.1.1 tarballs under `vendor/sdk/` using local `file:` dependencies. React's SDK dependency resolves to the same vendored core package. Their provenance records the SDK source commit and SHA256 checksums; builds verify those checksums. This makes CI independent of npm release timing and includes the reduced, sequential polling behavior.
+The demo pins the reviewed, unpublished SDK 1.1.2 tarballs under `vendor/sdk/` using local `file:` dependencies. React's SDK dependency resolves to the same vendored core package. Their provenance records the SDK source commit and SHA256 checksums; builds verify those checksums. This makes CI independent of npm release timing and includes the reduced, sequential polling behavior.
 
 The main repository's sync command copies these artifacts for review. Commit them there so remote CI requires no sibling checkout. Rebuild after source changes, then validate the final main Worker bundle. A build does not deploy or activate anything.
 

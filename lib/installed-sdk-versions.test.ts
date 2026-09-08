@@ -34,7 +34,7 @@ describe("correctStaleSdkVersionHeaders", () => {
     );
     assert.equal(INSTALLED_PLUREL_SDK_VERSION, packageVersion("@plurel/sdk"));
     assert.equal(INSTALLED_PLUREL_REACT_SDK_VERSION, packageVersion("@plurel/react-sdk"));
-    assert.equal(INSTALLED_PLUREL_SDK_VERSION, "1.1.1");
+    assert.equal(INSTALLED_PLUREL_SDK_VERSION, "1.1.2");
   });
 
   it("does not overwrite when telemetry already matches package.json", () => {
