@@ -2,6 +2,8 @@
 
 A sandbox storefront for the Plurel Pay group-checkout SDK. Choose a weekend away, a night out, or a group gift; adjust quantities and currency; preview shares for two to six people. Reset returns the demo to an empty cart. Prices and shares are illustrative. No goods ship and no real money moves.
 
+This reference app demonstrates the **Custom SDK + Stripe** integration: a merchant-owned storefront opens Plurel's hosted checkout, with sandbox payments processed through Stripe Connect.
+
 The catalog and split preview work without a backend. The UI enables sandbox checkout only when runtime credentials and the order table are available. Payment success appears only after a verified webhook updates the stored order.
 
 ## One application Worker
@@ -16,7 +18,7 @@ Production mounts this repository inside **plurelpay-web's existing Cloudflare W
 | Hosted checkout and session API | Main `/pay/*`, `/api/v1/*` routes | Main Worker |
 | Durable orders | `split_shop_orders` | Existing PostgreSQL through Hyperdrive |
 
-There is no additional production storefront Worker, cache bucket, database, or SDK Worker. Shopify extensions retain Shopify's runtime. The standalone OpenNext configuration in this repository is a local validation harness, with no production routes or deployment workflow.
+There is no additional production storefront Worker, cache bucket, database, or SDK Worker. The standalone OpenNext configuration in this repository is a local validation harness, with no production routes or deployment workflow.
 
 ## Build the handoff
 
