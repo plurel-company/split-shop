@@ -8,10 +8,10 @@ import {
   PLUREL_KEY_MODE_HEADER,
   parseCredentialModeFromRequest,
 } from "@/lib/plurel-credential-mode";
-import { PLUREL_API_BASE, buildUpstreamSessionHeaders } from "@/lib/plurel-upstream";
+import { fetchPlurelApi, buildUpstreamSessionHeaders } from "@/lib/plurel-upstream";
 
 /** Only the session endpoints the storefront SDK actually uses. */
-const ALLOWED_PATH = /^sessions(\/|$)?/;
+const ALLOWED_PATH = /^sessions(?:\/[A-Za-z0-9_-]+(?:\/(?:cancel))?)?$/;
 
 type RouteParams = { params: Promise<{ path: string[] }> };
 
@@ -33,7 +33,7 @@ async function forward(request: Request, { params }: RouteParams) {
   }
 
   const search = new URL(request.url).search;
-  const upstream = await fetch(`${PLUREL_API_BASE}/${joined}${search}`, {
+  const upstream = await fetchPlurelApi(`/${joined}${search}`, {
     method: request.method,
     headers,
     body: request.method === "GET" || request.method === "HEAD" ? undefined : await request.text(),

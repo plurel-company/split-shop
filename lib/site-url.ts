@@ -1,5 +1,5 @@
 /** Canonical public origin for metadata and absolute product image URLs. */
-export const PRODUCTION_SITE_URL = "https://splitshop.dev";
+export const PRODUCTION_SITE_URL = "https://plurelpay.com";
 
 /** Set NEXT_PUBLIC_SITE_URL at build time for custom and preview domains. */
 export function resolveSiteUrl(): string {

@@ -13,22 +13,11 @@ type SetupStatus = {
   liveKey?: boolean;
 };
 
-function isSuccessMessage(message: string): boolean {
-  const lower = message.toLowerCase();
-  return (
-    lower.includes("verified") ||
-    lower.includes("success") ||
-    lower.includes("ok") ||
-    lower.includes("valid")
-  );
-}
-
-function VerifyMessage({ message }: { message: string }) {
+function VerifyMessage({ message, success }: { message: string; success: boolean }) {
   const lines = message
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
-  const success = isSuccessMessage(message);
   const showChecklist = !success && lines.length > 1;
 
   return (
@@ -57,6 +46,7 @@ export function SetupBanner() {
   const { mode, modeHeaders } = usePlurelMode();
   const [status, setStatus] = useState<SetupStatus | null>(null);
   const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
+  const [verifySuccess, setVerifySuccess] = useState(false);
   const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
@@ -69,6 +59,7 @@ export function SetupBanner() {
   async function verifyCredentials() {
     setVerifying(true);
     setVerifyMessage(null);
+    setVerifySuccess(false);
     try {
       const res = await fetch("/api/setup/verify", {
         method: "POST",
@@ -81,7 +72,8 @@ export function SetupBanner() {
         detail?: string;
         details?: string[];
       };
-      if (data.ok) {
+      if (res.ok && data.ok) {
+        setVerifySuccess(true);
         setVerifyMessage(data.message ?? "Credentials verified.");
       } else {
         const parts: string[] = [];
@@ -114,7 +106,7 @@ export function SetupBanner() {
           `Verify ${modeLabel(mode)} credentials`
         )}
       </button>
-      {verifyMessage ? <VerifyMessage message={verifyMessage} /> : null}
+      {verifyMessage ? <VerifyMessage message={verifyMessage} success={verifySuccess} /> : null}
     </div>
   );
 

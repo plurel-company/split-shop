@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import { resolveSiteUrl } from "@/lib/site-url";
 import "./globals.css";
-
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 
 const SITE_URL = resolveSiteUrl();
 
@@ -31,7 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} min-h-screen text-ink antialiased`}>
+      <body className="min-h-screen text-ink antialiased">
         {children}
       </body>
     </html>

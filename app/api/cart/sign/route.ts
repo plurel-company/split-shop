@@ -94,6 +94,7 @@ export async function POST(req: Request) {
   }
 
   const key = publishableKey?.trim();
+  if (key && !/^(?:plurel|ante)_pk_test_/.test(key)) return Response.json({ error: "This demonstration accepts sandbox keys only." }, { status: 403 });
   if (!key) {
     return Response.json({ error: "publishableKey is required" }, { status: 400 });
   }

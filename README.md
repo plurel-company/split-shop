@@ -1,185 +1,96 @@
-# Plurel Pay Demo Store
+# Split Shop · the Plurel Pay convention demo
 
-**Live sandbox:** [https://splitshop.dev](https://splitshop.dev)
+A sandbox storefront for the Plurel Pay group-checkout SDK. Choose a weekend away, a night out, or a group gift; adjust quantities and currency; preview shares for two to six people. Reset returns the demo to an empty cart. Prices and shares are illustrative. No goods ship and no real money moves.
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+The catalog and split preview work without a backend. The UI enables sandbox checkout only when runtime credentials and the order table are available. Payment success appears only after a verified webhook updates the stored order.
 
-**Reference implementation** for [Plurel Pay](https://plurelpay.com) merchants — a minimal Next.js storefront that shows cart signing, hosted group checkout, and webhook fulfillment. Copy patterns from this repo into your own stack; it is not a production e-commerce platform.
+## One application Worker
 
-Official docs: [plurelpay.com/docs](https://plurelpay.com/docs)
+Production mounts this repository inside **plurelpay-web's existing Cloudflare Worker**:
 
-**Repository access:** This repo is **public** — anyone can clone or fork it. Only [Plurel](https://github.com/plurel-company) organization members can push to `main`. Merchants should fork into their own GitHub account or copy files into an existing project.
+| Surface | Mount | Owner |
+| --- | --- | --- |
+| Static storefront, scripts, product images | `/demo/shop/` | Main Worker Static Assets |
+| Cart signatures, session proxy, order reads | `/api/demo-shop/*` | Bundled demo handler in the main Worker |
+| Signed payment confirmation | `/api/demo-shop/webhooks/plurelpay` | Bundled demo handler |
+| Hosted checkout and session API | Main `/pay/*`, `/api/v1/*` routes | Main Worker |
+| Durable orders | `split_shop_orders` | Existing PostgreSQL through Hyperdrive |
 
-## What this demonstrates
+There is no additional production storefront Worker, cache bucket, database, or SDK Worker. Shopify extensions retain Shopify's runtime. The standalone OpenNext configuration in this repository is a local validation harness, with no production routes or deployment workflow.
 
-| Flow | Implementation |
+## Build the handoff
+
+```bash
+pnpm install
+pnpm test
+pnpm typecheck
+pnpm build:integrated
+pnpm test:integrated
+```
+
+`build:integrated` creates an isolated Next.js static-export staging directory without API routes, then bundles the native Request/Response route handlers separately:
+
+| Artifact | Destination in plurelpay-web |
 | --- | --- |
-| Product catalog + cart | `lib/catalog.ts`, `lib/cart.ts`, React context |
-| Server-side cart signing | `POST /api/cart/sign` with `@plurel/sdk/signing` |
-| Hosted checkout modal | `@plurel/react-sdk` (`PlurelButton`) |
-| Test vs live credentials | Header switch + `lib/plurel-credentials.ts` |
-| Order fulfillment | `POST /api/webhooks/plurelpay` on `group.funded` |
-| Setup diagnostics | `GET /api/setup/status`, `POST /api/setup/verify` |
+| `dist/cloudflare-assets/demo/shop/` | `public/demo/shop/` |
+| `dist/cloudflare-handler.mjs` | `vendor/demo-shop/handler.mjs` |
+| `dist/cloudflare-handler.d.mts` | `vendor/demo-shop/handler.d.mts` |
+| `dist/migrations/` | Main migration runner's demo migration input |
+| `dist/provenance.json` | Reviewed source commit, dirty flag, SHA256 digests |
 
-Legacy routes `/api/ante/v1/*`, `/api/webhooks/ante`, and `/api/webhooks/plurel` re-export `/api/webhooks/plurelpay` for backward compatibility.
+The main repository's sync command copies these artifacts for review. Commit them there so remote CI requires no sibling checkout. Rebuild after source changes, then validate the final main Worker bundle. A build does not deploy or activate anything.
 
-## Quick start
+The handler exports:
+
+```ts
+handleDemoShopRequest(request, env, {
+  fetchApi: request => mainApplication.fetch(request, env, context),
+});
+```
+
+Dispatch `/api/demo-shop/` before the main application router. `fetchApi` receives a same-origin `/api/v1/` request and lets the Worker call the API in process. `pg` stays external to the artifact and is supplied by the main application. The handler requires Workers `nodejs_compat`. Request-scoped bindings use AsyncLocalStorage; concurrent demo requests cannot exchange credentials.
+
+## Runtime configuration
+
+The integrated handler reads only these demo-specific values, avoiding accidental use of the main application's live credentials:
+
+| Variable/binding | Purpose |
+| --- | --- |
+| `DEMO_SHOP_MERCHANT_ID` | Sandbox merchant identifier |
+| `DEMO_SHOP_PUBLISHABLE_KEY_TEST` | Public sandbox key |
+| `DEMO_SHOP_SECRET_KEY_TEST` | Server-only sandbox session key |
+| `DEMO_SHOP_SIGNING_SECRET` | Server-only cart HMAC secret |
+| `DEMO_SHOP_WEBHOOK_SECRET_TEST` | Server-only sandbox webhook verification secret |
+| `HYPERDRIVE` | Main Worker's existing PostgreSQL binding |
+| `CLOUDFLARE_ENV` | Set to `production` in hosted production |
+| `DATABASE_URL` | Local development only; never substitutes for production Hyperdrive |
+
+`GET /api/demo-shop/setup/public` returns only the merchant ID, publishable key, and readiness. It checks the order table before enabling checkout. No credential is compiled into the static export. Live requests and live cart keys are rejected. Production exposes no setup-probe or client-log route. Configure the sandbox merchant's `group.funded` webhook for `https://plurelpay.com/api/demo-shop/webhooks/plurelpay` when rollout is authorized.
+
+Apply `db/migrations/*.sql` to the **same** PostgreSQL database before enabling sandbox checkout. The migration runner takes an advisory lock and records applied files. Signed carts get immutable order references; an identical pending cart can reuse its signature, while changed or already-funded carts require a new reference. Conditional SQL updates verify amount and credential mode and tolerate duplicate webhook delivery. There is no process-local order fallback.
+
+## Local development
 
 ```bash
 cp .env.example .env.local
-# Add credentials from the Plurel Pay merchant dashboard (Developers tab)
-
 pnpm install
-# In another terminal: pnpm db:dev
-# Set DATABASE_URL to local Postgres, then create the schema.
+# Separate terminal: pnpm db:dev
+# Set DATABASE_URL to local PostgreSQL, then:
 pnpm db:migrate
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), add items, and click **Split with Plurel**.
+The standalone Next.js server uses `/api/*` and sandbox `PLUREL_*` credentials from `.env.local`; legacy `ANTE_*` names remain accepted. Use `PLUREL_API_BASE=http://localhost:3000/api/v1` for a locally running main API, and run this storefront on another port. `NEXT_PUBLIC_SITE_URL` controls absolute catalog image URLs. The integrated export always uses the main Worker's origin for checkout.
 
-### Sandbox test card
-
-Use Stripe test card `4242 4242 4242 4242` inside the Plurel Pay modal. Pay every share to trigger `group.funded`.
-
-## Architecture
-
-```
-Browser                         Next.js server                    Plurel Pay (plurelpay.com)
-───────                         ──────────────                    ────────────────────────
-Cart state ──► buildPlurelCart ──► POST /api/cart/sign ──► HMAC ──► PlurelButton opens modal
-                     │                    │                              │
-                     │                    └── registerPendingOrder       │
-                     │                                                       │
-Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄── POST /api/webhooks/plurelpay
-```
-
-**Fulfill on `group.funded`**, not on client callbacks alone.
-
-### Durable orders on Postgres
-
-`lib/order-store.ts` persists every signed cart to Postgres before checkout opens. Cloudflare Hyperdrive provides the connection pool. Each request creates its own `pg` client. Workers releases its socket when the request ends; Node development closes it explicitly. There is no process-local order fallback.
-
-Orders have unique, immutable references. Re-signing an identical pending cart is safe; a changed or funded cart needs a new reference. A single conditional SQL update moves an order from pending to funded, checks credential mode and payment amount, and prevents duplicate fulfillment when webhook deliveries race. Replays return the stored funded order. The signed total remains separate from the actual amount paid.
-
-The `split_shop_orders` table uses its own namespace, so it can share a PlanetScale Postgres database with the API. Run the schema migration before starting checkout. There are no durable orders to export from the old process-local Map. Complete or reconcile in-flight checkouts before switching traffic.
-
-See [`lib/plurel-webhook-verification.ts`](./lib/plurel-webhook-verification.ts) and [`app/api/webhooks/plurelpay/route.ts`](./app/api/webhooks/plurelpay/route.ts).
-
-## Environment variables
-
-Use `PLUREL_*` names in new deployments. Legacy `ANTE_*` / `NEXT_PUBLIC_ANTE_*` env vars are still read as fallbacks.
-
-| Variable | Where | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_PLUREL_MERCHANT_ID` | Client | `plurel_merch_*` (or legacy `ante_merch_*`) |
-| `NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY` | Client | **Live** publishable key |
-| `NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY_TEST` | Client | **Test** publishable key |
-| `NEXT_PUBLIC_SITE_URL` | Client | Origin for absolute product image URLs |
-| `PLUREL_SIGNING_SECRET` | Server only | Cart HMAC signing secret |
-| `PLUREL_SECRET_KEY` | Server only | **Live** secret key for session create/cancel |
-| `PLUREL_SECRET_KEY_TEST` | Server only | **Test** secret key |
-| `PLUREL_WEBHOOK_SECRET` | Server only | **Live** webhook secret |
-| `PLUREL_WEBHOOK_SECRET_TEST` | Server only | **Test** webhook secret |
-
-The browser SDK uses the **publishable** key. Session create/cancel is proxied through `/api/plurel/v1` and authenticated upstream with the **secret** key.
-
-See [`.env.example`](./.env.example) for commented templates including legacy `ANTE_*` aliases.
-
-## SDK dependency
-
-This repo depends on the published npm packages:
-
-```json
-"@plurel/sdk": "^1.0.5",
-"@plurel/react-sdk": "^1.0.5"
-```
-
-## Webhooks
-
-The production deployment of this demo registers its webhook at:
-
-```
-https://splitshop.dev/api/webhooks/plurelpay
-```
-
-### Local dev
-
-Plurel Pay needs a public HTTPS URL. Use a tunnel (ngrok, Cloudflare Tunnel, etc.):
-
-```bash
-cloudflared tunnel --url http://localhost:3000
-```
-
-Register `https://YOUR_TUNNEL/api/webhooks/plurelpay` in the merchant dashboard and subscribe to `group.funded`. (The legacy `/api/webhooks/plurel` and `/api/webhooks/ante` paths still work — they re-export the same handler.)
-
-## Troubleshooting checkout
-
-### `Invalid cart signature`
-
-1. Use **`PLUREL_SIGNING_SECRET`** (or legacy `ANTE_SIGNING_SECRET`) — not secret or webhook keys.
-2. Copy the **full** secret, redeploy after env changes.
-3. Sign with **`createCartSignature`** from `@plurel/sdk/signing` (**≥ 1.0.0**).
-4. Re-sign at checkout click if the cart changed after signing.
-
-Docs: [Cart signing](https://plurelpay.com/docs/cart-signing) · [Troubleshooting](https://plurelpay.com/docs/troubleshooting)
-
-## Project layout
-
-```
-app/
-  api/plurel/v1/[...path]/route.ts   # Session API proxy (primary)
-  api/ante/v1/[...path]/route.ts     # Legacy alias
-  api/webhooks/plurelpay/route.ts    # Webhook fulfillment (primary)
-  api/webhooks/plurel/route.ts       # Legacy alias
-  api/webhooks/ante/route.ts         # Legacy alias
-components/
-  plurel-mode-provider.tsx           # Test/live credential switch
-  checkout-panel.tsx                 # PlurelButton + cart summary
-lib/
-  cart.ts                            # Cart → Plurel payload builders
-  plurel-credentials.ts              # PLUREL_* env with ANTE_* fallbacks
-```
-
-## Scripts
-
-| Command | Description |
+| Command | Validation |
 | --- | --- |
-| `pnpm dev` | Start Next.js dev server |
-| `pnpm build` | Next.js production build |
-| `pnpm build:cloudflare` | Cloudflare Worker production build |
-| `pnpm preview` | Build and run in local Workers runtime |
-| `pnpm deploy` | Configure Hyperdrive, build, and deploy Worker |
-| `pnpm db:migrate` | Apply Postgres schema migrations |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm test` | Unit tests (`lib/*.test.ts`) |
+| `pnpm test` | PostgreSQL fulfillment, signature handling, currencies and minor-unit splits |
+| `pnpm typecheck` | TypeScript |
+| `pnpm build:integrated` | Static presentation and API handoff bundle |
+| `pnpm test:integrated` | Bundle routing, sandbox isolation, CSRF, body limits, internal API dispatch |
+| `pnpm preview:integrated` | Local static + API preview at `http://127.0.0.1:3108/demo/shop/` |
+| `pnpm test:cloudflare` | Standalone workerd smoke with a local PostgreSQL wire server |
 
-## Links
+Order polling runs only while awaiting an order, pauses network requests in hidden tabs, and stops after five minutes. SDK callbacks cannot mark an order funded. A reset clears only the local demo; it does not cancel an existing hosted checkout.
 
-- [Getting started](https://plurelpay.com/docs/getting-started)
-- [JavaScript SDK](https://plurelpay.com/docs/sdk)
-- [Cart signing](https://plurelpay.com/docs/cart-signing)
-- [Webhooks](https://plurelpay.com/docs/webhooks)
-- [@plurel/sdk on npm](https://www.npmjs.com/package/@plurel/sdk)
-
-## Cloudflare deployment
-
-The storefront runs on Cloudflare Workers with OpenNext, serves static assets through Workers Static Assets, caches Next.js output in R2, and stores orders in PlanetScale Postgres through Hyperdrive. The [OpenNext setup guide](https://opennext.js.org/cloudflare/get-started) and [Cloudflare pg guide](https://developers.cloudflare.com/hyperdrive/examples/connect-to-postgres/postgres-drivers-and-libraries/node-postgres/) describe the adapter and connection lifecycle.
-
-1. Provision a PlanetScale **Postgres** database and set `DATABASE_URL` to its direct connection URL in your local environment. Keep the provider's TLS parameters.
-2. Run `pnpm db:migrate`. The migration runner takes an advisory lock, applies new SQL files in one transaction, and records each applied migration.
-3. Create Hyperdrive with `pnpm exec wrangler hyperdrive create split-shop --connection-string "$DATABASE_URL" --caching-disabled`. Order reads must observe funding immediately, so disable Hyperdrive query caching.
-4. Create the cache bucket with `pnpm exec wrangler r2 bucket create split-shop-cache`.
-5. Set `CLOUDFLARE_HYPERDRIVE_ID` to the returned ID. `pnpm cloudflare:configure` writes the ignored `wrangler.deploy.json` with the actual binding. No placeholder ID is deployed.
-6. Set `NEXT_PUBLIC_*` values in the build environment. Set `PLUREL_SIGNING_SECRET`, the live/test API keys, and the live/test webhook secrets with `pnpm exec wrangler secret put NAME`. Build-time public values require rebuilding when changed.
-7. Run `pnpm deploy`. Attach `splitshop.dev` as a Worker custom domain after checking the deployment. Register `https://splitshop.dev/api/webhooks/plurelpay` in the Plurel dashboard.
-
-`pnpm db:dev` starts a local Postgres-compatible PGlite server and saves its data under the ignored `.local/postgres` directory. A standard local Postgres server works too.
-
-The manual GitHub deployment workflow reads Cloudflare credentials from production environment secrets and the Hyperdrive ID and public build values from production environment variables. Provision the database schema and Worker secrets before running it.
-
-For local development, `.env.local` supplies `DATABASE_URL` and credentials. For Workers preview, copy `.dev.vars.example` to `.dev.vars` and add those credentials there too. The default Wrangler config deliberately has no remote Hyperdrive binding, so local preview uses your explicit local database. Production fails closed without the generated Hyperdrive binding.
-
-`pnpm test` exercises SQL against PGlite's Postgres engine, including duplicate webhooks, cross-client persistence, credential mode checks, underpayment, and immutable order refs. `pnpm test:cloudflare` also starts a local Postgres wire-protocol server and verifies cart signing, durable order reads, signed webhooks and replay behavior through the real Workers runtime. A successful local build does not provision a database or cut over production traffic.
+[Integration docs](https://plurelpay.com/docs) · [Cart signing](https://plurelpay.com/docs/cart-signing) · [Webhooks](https://plurelpay.com/docs/webhooks)

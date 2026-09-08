@@ -21,3 +21,9 @@ jobs:
       - run: pnpm build:cloudflare
       - run: pnpm exec wrangler deploy --dry-run
       - run: node scripts/smoke-cloudflare.mjs
+      - run: pnpm build:integrated
+      - run: pnpm test:integrated
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo-shop-handoff
+          path: dist

@@ -1,3 +1,4 @@
+import { resolveSiteUrl } from "./site-url";
 import type { CartFee } from "@plurel/sdk";
 
 import { catalogInCurrency, PRODUCTS } from "@/lib/catalog";
@@ -94,7 +95,8 @@ export function buildPlurelCart(
 ): PlurelCart | null {
   if (!Object.values(cart).some((qty) => qty > 0)) return null;
 
-  const items = buildProductCartLines(cart, currency);
+  const origin = typeof window === "undefined" ? resolveSiteUrl() : window.location.origin;
+  const items = buildProductCartLines(cart, currency).map(item => ({ ...item, image_url: item.image_url ? new URL(item.image_url, origin).href : undefined }));
   const fees = buildCartFees(cart, currency);
   const feesTotal = fees.reduce((sum, fee) => sum + fee.amount, 0);
   const merchandiseSubtotal = cartSubtotal(cart, currency);

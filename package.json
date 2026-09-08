@@ -16,11 +16,12 @@
     "test": "node --import tsx --test lib/*.test.ts",
     "build:cloudflare": "opennextjs-cloudflare build",
     "preview": "pnpm build:cloudflare && opennextjs-cloudflare preview",
-    "cloudflare:configure": "node scripts/configure-cloudflare.mjs",
-    "deploy": "pnpm cloudflare:configure && opennextjs-cloudflare build --config wrangler.deploy.json && opennextjs-cloudflare deploy --config wrangler.deploy.json",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "db:dev": "pglite-server --db=./.local/postgres --port=5432 --host=127.0.0.1 --max-connections=10",
-    "test:cloudflare": "pnpm build:cloudflare && node scripts/smoke-cloudflare.mjs"
+    "test:cloudflare": "pnpm build:cloudflare && node scripts/smoke-cloudflare.mjs",
+    "build:integrated": "node scripts/build-integrated.mjs",
+    "test:integrated": "node scripts/test-integrated.mjs",
+    "preview:integrated": "node --env-file-if-exists=.env.local scripts/preview-integrated.mjs"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.6",
@@ -40,6 +41,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
+    "esbuild": "^0.28.2",
     "tailwindcss": "^4.1.8",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",

@@ -1,13 +1,10 @@
 import type { CurrencyCode } from "@/lib/currency";
 import { CURRENCY_ORDER, convertFromUsd, getMinimumOrderMinor } from "@/lib/currency";
-import { resolveSiteUrl } from "@/lib/site-url";
+import { demoAssetPath } from "./demo-config";
 import type { Product, ProductCategory } from "@/lib/types";
 
-/** Public site origin for absolute product image URLs (Plurel Pay hosted checkout). */
-const SITE_URL = resolveSiteUrl();
-
 function productImageUrl(filename: string): string {
-  return `${SITE_URL}/products/${filename}`;
+  return demoAssetPath(`/products/${filename}`);
 }
 
 /** Stable Unsplash hotlinks (same pattern as the plurelpay.com catalog seed) —

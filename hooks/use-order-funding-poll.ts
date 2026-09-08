@@ -1,10 +1,11 @@
 "use client";
 
+import { demoApiPath } from "@/lib/demo-config";
 import { useEffect, useRef } from "react";
 
 import type { FundedOrder } from "@/lib/order-store";
 
-const POLL_MS = 2000;
+const POLL_MS = 5000;
 const TIMEOUT_MS = 5 * 60 * 1000;
 
 type UseOrderFundingPollOptions = {
@@ -16,7 +17,7 @@ type UseOrderFundingPollOptions = {
 
 export async function fetchFundedOrder(orderRef: string): Promise<FundedOrder | null> {
   try {
-    const response = await fetch(`/api/orders/${encodeURIComponent(orderRef)}`);
+    const response = await fetch(demoApiPath(`/orders/${encodeURIComponent(orderRef)}`));
     if (!response.ok) return null;
     const data = (await response.json()) as { order?: FundedOrder };
     return data.order?.status === "funded" ? data.order : null;
@@ -51,7 +52,7 @@ export function useOrderFundingPoll({
 
     async function poll() {
       while (!cancelled && Date.now() - startedAt < TIMEOUT_MS) {
-        const funded = await fetchFundedOrder(ref);
+        const funded = document.visibilityState === "hidden" ? null : await fetchFundedOrder(ref);
         if (cancelled) return;
         if (funded) {
           onFundedRef.current(funded);

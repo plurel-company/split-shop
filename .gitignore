@@ -34,3 +34,6 @@ next-env.d.ts
 wrangler.deploy.json
 
 .local
+
+dist
+.integrated-build

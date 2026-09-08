@@ -1,18 +1,20 @@
 import { Client } from "pg";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { getDemoRuntime } from "./demo-runtime";
 import type { OrderQuery } from "./order-store";
 
 /** Never retain database clients across Worker requests. Hyperdrive owns the pool. */
 export async function withOrderDatabase<T>(callback: (query: OrderQuery) => Promise<T>): Promise<T> {
-  let connectionString: string | undefined;
-  try {
+  const runtime = getDemoRuntime();
+  let connectionString = runtime?.env.HYPERDRIVE?.connectionString;
+  if (!runtime) try {
     const { env } = await getCloudflareContext({ async: true });
     connectionString = env.HYPERDRIVE?.connectionString;
   } catch {
     // Plain Node.js tools and local Next.js development can use DATABASE_URL.
   }
-  if (!connectionString && process.env.CLOUDFLARE_ENV !== "production") {
-    connectionString = process.env.DATABASE_URL;
+  if (!connectionString && (runtime?.env.CLOUDFLARE_ENV ?? process.env.CLOUDFLARE_ENV) !== "production") {
+    connectionString = runtime ? runtime.env.DATABASE_URL : process.env.DATABASE_URL;
   }
   if (!connectionString) throw new Error("Order database is not configured. Bind HYPERDRIVE to Postgres.");
   const client = new Client({ connectionString, connectionTimeoutMillis: 10_000, query_timeout: 10_000 });
