@@ -23,6 +23,18 @@ function parseFundedTotal(data: Record<string, unknown>): number | null {
   return total;
 }
 
+function replayResult(
+  order: FundedOrder,
+  sessionId: string,
+  groupId: string,
+  totalPaid: number,
+): FulfillGroupFundedResult {
+  if (order.sessionId !== sessionId || order.groupId !== groupId || order.totalPaid !== totalPaid) {
+    return { ok: false, status: 409, error: "Funded order payment identity mismatch" };
+  }
+  return { ok: true, status: 200, order, duplicate: true };
+}
+
 export async function fulfillGroupFunded(
   event: GroupFundedEvent,
   verifiedMode: PlurelCredentialMode,
@@ -36,6 +48,10 @@ export async function fulfillGroupFunded(
 
   if (!orderRef) {
     return { ok: false, status: 400, error: "Missing order_ref" };
+  }
+
+  if (!sessionId.trim() || !groupId.trim()) {
+    return { ok: false, status: 400, error: "Missing payment session or group identity" };
   }
 
   if (totalPaid === null) {
@@ -52,7 +68,7 @@ export async function fulfillGroupFunded(
   }
 
   if (existing.status === "funded") {
-    return { ok: true, status: 200, order: existing, duplicate: true };
+    return replayResult(existing, sessionId, groupId, totalPaid);
   }
 
   if (totalPaid < existing.total) {
@@ -72,7 +88,7 @@ export async function fulfillGroupFunded(
     // A competing webhook may have funded this order after the initial read.
     const current = await store.getOrder(orderRef);
     if (current?.status === "funded" && current.credentialMode === verifiedMode) {
-      return { ok: true, status: 200, order: current, duplicate: true };
+      return replayResult(current, sessionId, groupId, totalPaid);
     }
     return { ok: false, status: 409, error: "Order is not pending fulfillment" };
   }

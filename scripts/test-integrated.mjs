@@ -38,6 +38,11 @@ try {
   const signature = createHmac("sha256", env.DEMO_SHOP_WEBHOOK_SECRET_TEST).update(`${timestamp}.${payload}`).digest("hex");
   const delivery = { method: "POST", headers: { "plurel-signature": `t=${timestamp},v1=${signature}` }, body: payload };
   for (let attempt = 0; attempt < 2; attempt++) assert.equal((await invoke("/webhooks/plurelpay", delivery)).status, 200);
+  const conflictingPayload = JSON.stringify({ type: "group.funded", data: { order_ref: "ORD-integrated", session_id: "different_session", total: 5000 } });
+  const conflictingSignature = createHmac("sha256", env.DEMO_SHOP_WEBHOOK_SECRET_TEST).update(`${timestamp}.${conflictingPayload}`).digest("hex");
+  const conflict = await invoke("/webhooks/plurelpay", { method: "POST", headers: { "plurel-signature": `t=${timestamp},v1=${conflictingSignature}` }, body: conflictingPayload });
+  assert.equal(conflict.status, 409);
+  assert.equal((await (await invoke("/orders/ORD-integrated")).json()).order.sessionId, "session");
   assert.equal((await (await invoke("/orders/ORD-integrated")).json()).status, "funded");
   // A live key from the parent application's environment must never be used.
   const isolated = await invoke("/plurel/v1/sessions", post({}), { PLUREL_SECRET_KEY: "plurel_sk_live_parent" }, { fetchApi: () => { throw new Error("Unexpected dispatch"); } });
