@@ -1,167 +1,100 @@
-# Plurel Pay Demo Store
+# Split Shop · the Plurel Pay convention demo
 
-**Live sandbox:** [https://splitshop.dev](https://splitshop.dev)
+A sandbox storefront for the Plurel Pay group-checkout SDK. Choose a weekend away, a night out, or a group gift; adjust quantities and currency; preview shares for two to six people. Reset returns the demo to an empty cart. Prices and shares are illustrative. No goods ship and no real money moves.
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+This reference app demonstrates the **Custom SDK + Stripe** integration: a merchant-owned storefront opens Plurel's hosted checkout, with sandbox payments processed through Stripe Connect.
 
-**Reference implementation** for [Plurel Pay](https://plurelpay.com) merchants — a minimal Next.js storefront that shows cart signing, hosted group checkout, and webhook fulfillment. Copy patterns from this repo into your own stack; it is not a production e-commerce platform.
+The catalog and split preview work without a backend. The UI enables sandbox checkout only when runtime credentials and the order table are available. Payment success appears only after a verified webhook updates the stored order.
 
-Official docs: [plurelpay.com/docs](https://plurelpay.com/docs)
+## One application Worker
 
-**Repository access:** This repo is **public** — anyone can clone or fork it. Only [Plurel](https://github.com/plurel-company) organization members can push to `main`. Merchants should fork into their own GitHub account or copy files into an existing project.
+Production mounts this repository inside **plurelpay-web's existing Cloudflare Worker**:
 
-## What this demonstrates
+| Surface | Mount | Owner |
+| --- | --- | --- |
+| Static storefront, scripts, product images | `/demo/shop/` | Main Worker Static Assets |
+| Cart signatures, session proxy, order reads | `/api/demo-shop/*` | Bundled demo handler in the main Worker |
+| Signed payment confirmation | `/api/demo-shop/webhooks/plurelpay` | Bundled demo handler |
+| Hosted checkout and session API | Main `/pay/*`, `/api/v1/*` routes | Main Worker |
+| Durable orders | `split_shop_orders` | Existing PostgreSQL through Hyperdrive |
 
-| Flow | Implementation |
+There is no additional production storefront Worker, cache bucket, database, or SDK Worker. The standalone OpenNext configuration in this repository is a local validation harness, with no production routes or deployment workflow.
+
+## Build the handoff
+
+```bash
+pnpm install
+pnpm test
+pnpm typecheck
+pnpm build:integrated
+pnpm test:integrated
+```
+
+`build:integrated` creates an isolated Next.js static-export staging directory without API routes, then bundles the native Request/Response route handlers separately:
+
+| Artifact | Destination in plurelpay-web |
 | --- | --- |
-| Product catalog + cart | `lib/catalog.ts`, `lib/cart.ts`, React context |
-| Server-side cart signing | `POST /api/cart/sign` with `@plurel/sdk/signing` |
-| Hosted checkout modal | `@plurel/react-sdk` (`PlurelButton`) |
-| Test vs live credentials | Header switch + `lib/plurel-credentials.ts` |
-| Order fulfillment | `POST /api/webhooks/plurelpay` on `group.funded` |
-| Setup diagnostics | `GET /api/setup/status`, `POST /api/setup/verify` |
+| `dist/cloudflare-assets/demo/shop/` | `public/demo/shop/` |
+| `dist/cloudflare-handler.mjs` | `vendor/demo-shop/handler.mjs` |
+| `dist/cloudflare-handler.d.mts` | `vendor/demo-shop/handler.d.mts` |
+| `dist/migrations/` | Main migration runner's demo migration input |
+| `dist/provenance.json` | Reviewed source commit, dirty flag, SHA256 digests |
 
-Legacy routes `/api/ante/v1/*`, `/api/webhooks/ante`, and `/api/webhooks/plurel` re-export `/api/webhooks/plurelpay` for backward compatibility.
+The demo pins the reviewed, unpublished SDK 1.1.2 tarballs under `vendor/sdk/` using local `file:` dependencies. React's SDK dependency resolves to the same vendored core package. Their provenance records the SDK source commit and SHA256 checksums; builds verify those checksums. This makes CI independent of npm release timing and includes the reduced, sequential polling behavior.
 
-## Quick start
+The main repository's sync command copies these artifacts for review. Commit them there so remote CI requires no sibling checkout. Rebuild after source changes, then validate the final main Worker bundle. A build does not deploy or activate anything.
+
+The handler exports:
+
+```ts
+handleDemoShopRequest(request, env, {
+  fetchApi: request => mainApplication.fetch(request, env, context),
+});
+```
+
+Dispatch `/api/demo-shop/` before the main application router. `fetchApi` receives a same-origin `/api/v1/` request and lets the Worker call the API in process. `pg` stays external to the artifact and is supplied by the main application. The handler requires Workers `nodejs_compat`. Request-scoped bindings use AsyncLocalStorage; concurrent demo requests cannot exchange credentials.
+
+## Runtime configuration
+
+The integrated handler reads only these demo-specific values, avoiding accidental use of the main application's live credentials:
+
+| Variable/binding | Purpose |
+| --- | --- |
+| `DEMO_SHOP_MERCHANT_ID` | Sandbox merchant identifier |
+| `DEMO_SHOP_PUBLISHABLE_KEY_TEST` | Public sandbox key |
+| `DEMO_SHOP_SECRET_KEY_TEST` | Server-only sandbox session key |
+| `DEMO_SHOP_SIGNING_SECRET` | Server-only cart HMAC secret |
+| `DEMO_SHOP_WEBHOOK_SECRET_TEST` | Server-only sandbox webhook verification secret |
+| `HYPERDRIVE` | Main Worker's existing PostgreSQL binding |
+| `CLOUDFLARE_ENV` | Set to `production` in hosted production |
+| `DATABASE_URL` | Local development only; never substitutes for production Hyperdrive |
+
+`GET /api/demo-shop/setup/public` returns only the merchant ID, publishable key, and readiness. It checks the order table before enabling checkout. No credential is compiled into the static export. Live requests and live cart keys are rejected. Production exposes no setup-probe or client-log route. The session proxy denies collection listing. Successful sandbox creation sets a per-session HttpOnly, Secure-on-HTTPS, SameSite=Strict capability cookie, bound by HMAC to the session, merchant, origin and expiry (at most 24 hours). Reads and cancellation require that cookie before any merchant-authenticated API request; both recheck the stored session's sandbox environment. The same-origin SDK fetches send the cookie automatically. Copying a session ID to another browser grants no proxy access. Configure the sandbox merchant's `group.funded` webhook for `https://plurelpay.com/api/demo-shop/webhooks/plurelpay` when rollout is authorized.
+
+Apply `db/migrations/*.sql` to the **same** PostgreSQL database before enabling sandbox checkout. The migration runner takes an advisory lock and records applied files. Signed carts get immutable order references; an identical pending cart can reuse its signature, while changed or already-funded carts require a new reference. Conditional SQL updates verify amount and credential mode and tolerate duplicate webhook delivery. There is no process-local order fallback.
+
+## Local development
 
 ```bash
 cp .env.example .env.local
-# Add credentials from the Plurel Pay merchant dashboard (Developers tab)
-
 pnpm install
+# Separate terminal: pnpm db:dev
+# Set DATABASE_URL to local PostgreSQL, then:
+pnpm db:migrate
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000), add items, and click **Split with Plurel**.
+The standalone Next.js server uses `/api/*` and sandbox `PLUREL_*` credentials from `.env.local`; legacy `ANTE_*` names remain accepted. Use `PLUREL_API_BASE=http://localhost:3000/api/v1` for a locally running main API, and run this storefront on another port. `NEXT_PUBLIC_SITE_URL` controls absolute catalog image URLs. The integrated export always uses the main Worker's origin for checkout.
 
-### Sandbox test card
-
-Use Stripe test card `4242 4242 4242 4242` inside the Plurel Pay modal. Pay every share to trigger `group.funded`.
-
-## Architecture
-
-```
-Browser                         Next.js server                    Plurel Pay (plurelpay.com)
-───────                         ──────────────                    ────────────────────────
-Cart state ──► buildPlurelCart ──► POST /api/cart/sign ──► HMAC ──► PlurelButton opens modal
-                     │                    │                              │
-                     │                    └── registerPendingOrder       │
-                     │                                                       │
-Webhook poll ◄── GET /api/orders/[ref] ◄── markOrderFunded ◄── POST /api/webhooks/plurelpay
-```
-
-**Fulfill on `group.funded`**, not on client callbacks alone.
-
-### In-memory order store (demo only)
-
-`lib/order-store.ts` keeps pending and funded orders in a **process-local `Map`**. That is fine for local dev and single-instance demos, but it is **not** production-safe:
-
-- Restarts wipe all orders.
-- Serverless / multi-instance hosts may route the webhook and the browser poll to **different** instances, so funding never appears in the UI.
-- There is no cross-region durability or replay protection beyond idempotent webhook handling in this route.
-
-**Production pattern:** persist orders in Postgres, Redis, or your OMS before opening checkout; fulfill inside the webhook with idempotent updates keyed by `order_ref` (and optionally `event.id`). The demo’s fail-closed checks (registered pending order, matching credential mode, minimum `total`) should carry over unchanged.
-
-| Pattern | Demo behavior | Production recommendation |
-| --- | --- | --- |
-| Cart prices | Signed server-side in `/api/cart/sign` | **Always** sign carts on your server; never trust browser prices |
-| Webhook auth | Verifies against **all** configured secrets | Use separate test/live webhook secrets; do not pick secret from client headers |
-| Order fulfillment | Requires a registered **pending** order + valid `total` | Fail closed on unknown `order_ref` or underpayment |
-| Order store | In-memory map | Durable database with idempotent webhook handling |
-
-See [`lib/plurel-webhook-verification.ts`](./lib/plurel-webhook-verification.ts) and [`app/api/webhooks/plurelpay/route.ts`](./app/api/webhooks/plurelpay/route.ts).
-
-## Environment variables
-
-Use `PLUREL_*` names in new deployments. Legacy `ANTE_*` / `NEXT_PUBLIC_ANTE_*` env vars are still read as fallbacks.
-
-| Variable | Where | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_PLUREL_MERCHANT_ID` | Client | `plurel_merch_*` (or legacy `ante_merch_*`) |
-| `NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY` | Client | **Live** publishable key |
-| `NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY_TEST` | Client | **Test** publishable key |
-| `NEXT_PUBLIC_SITE_URL` | Client | Origin for absolute product image URLs |
-| `PLUREL_SIGNING_SECRET` | Server only | Cart HMAC signing secret |
-| `PLUREL_SECRET_KEY` | Server only | **Live** secret key for session create/cancel |
-| `PLUREL_SECRET_KEY_TEST` | Server only | **Test** secret key |
-| `PLUREL_WEBHOOK_SECRET` | Server only | **Live** webhook secret |
-| `PLUREL_WEBHOOK_SECRET_TEST` | Server only | **Test** webhook secret |
-
-The browser SDK uses the **publishable** key. Session create/cancel is proxied through `/api/plurel/v1` and authenticated upstream with the **secret** key.
-
-See [`.env.example`](./.env.example) for commented templates including legacy `ANTE_*` aliases.
-
-## SDK dependency
-
-This repo depends on the published npm packages:
-
-```json
-"@plurel/sdk": "^1.0.5",
-"@plurel/react-sdk": "^1.0.5"
-```
-
-## Webhooks
-
-The production deployment of this demo registers its webhook at:
-
-```
-https://splitshop.dev/api/webhooks/plurelpay
-```
-
-### Local dev
-
-Plurel Pay needs a public HTTPS URL. Use a tunnel (ngrok, Cloudflare Tunnel, etc.):
-
-```bash
-ngrok http 3000
-```
-
-Register `https://YOUR_TUNNEL/api/webhooks/plurelpay` in the merchant dashboard and subscribe to `group.funded`. (The legacy `/api/webhooks/plurel` and `/api/webhooks/ante` paths still work — they re-export the same handler.)
-
-## Troubleshooting checkout
-
-### `Invalid cart signature`
-
-1. Use **`PLUREL_SIGNING_SECRET`** (or legacy `ANTE_SIGNING_SECRET`) — not secret or webhook keys.
-2. Copy the **full** secret, redeploy after env changes.
-3. Sign with **`createCartSignature`** from `@plurel/sdk/signing` (**≥ 1.0.0**).
-4. Re-sign at checkout click if the cart changed after signing.
-
-Docs: [Cart signing](https://plurelpay.com/docs/cart-signing) · [Troubleshooting](https://plurelpay.com/docs/troubleshooting)
-
-## Project layout
-
-```
-app/
-  api/plurel/v1/[...path]/route.ts   # Session API proxy (primary)
-  api/ante/v1/[...path]/route.ts     # Legacy alias
-  api/webhooks/plurelpay/route.ts    # Webhook fulfillment (primary)
-  api/webhooks/plurel/route.ts       # Legacy alias
-  api/webhooks/ante/route.ts         # Legacy alias
-components/
-  plurel-mode-provider.tsx           # Test/live credential switch
-  checkout-panel.tsx                 # PlurelButton + cart summary
-lib/
-  cart.ts                            # Cart → Plurel payload builders
-  plurel-credentials.ts              # PLUREL_* env with ANTE_* fallbacks
-```
-
-## Scripts
-
-| Command | Description |
+| Command | Validation |
 | --- | --- |
-| `pnpm dev` | Start Next.js dev server |
-| `pnpm build` | Production build |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm test` | Unit tests (`lib/*.test.ts`) |
+| `pnpm test` | PostgreSQL fulfillment, signature handling, currencies and minor-unit splits |
+| `pnpm typecheck` | TypeScript |
+| `pnpm build:integrated` | Static presentation and API handoff bundle |
+| `pnpm test:integrated` | Bundle routing, sandbox isolation, CSRF, body limits, internal API dispatch |
+| `pnpm preview:integrated` | Local static + API preview at `http://127.0.0.1:3108/demo/shop/` |
+| `pnpm test:cloudflare` | Standalone workerd smoke with a local PostgreSQL wire server |
 
-## Links
+Order polling runs only while awaiting an order, pauses network requests in hidden tabs, and stops after five minutes. SDK callbacks cannot mark an order funded. A reset clears only the local demo; it does not cancel an existing hosted checkout.
 
-- [Getting started](https://plurelpay.com/docs/getting-started)
-- [JavaScript SDK](https://plurelpay.com/docs/sdk)
-- [Cart signing](https://plurelpay.com/docs/cart-signing)
-- [Webhooks](https://plurelpay.com/docs/webhooks)
-- [@plurel/sdk on npm](https://www.npmjs.com/package/@plurel/sdk)
+[Integration docs](https://plurelpay.com/docs) · [Cart signing](https://plurelpay.com/docs/cart-signing) · [Webhooks](https://plurelpay.com/docs/webhooks)

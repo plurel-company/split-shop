@@ -1,8 +1,10 @@
 "use client";
 
 import { PlurelButton, type Cart } from "@plurel/react-sdk";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { splitPreview } from "@/lib/demo-scenarios";
+import { demoApiPath } from "@/lib/demo-config";
 import { useCart } from "@/components/cart-context";
 import { usePlurelMode } from "@/components/plurel-mode-provider";
 import { CurrencyBadge } from "@/components/store/CurrencyBadge";
@@ -21,7 +23,6 @@ import {
   makeOrderRef,
   minimumOrderForCart,
   type ConfirmedOrder,
-  type CurrencyCode,
 } from "@/lib/store";
 import { fetchFundedOrder } from "@/hooks/use-order-funding-poll";
 import { reportClientError } from "@/lib/report-client-error";
@@ -30,11 +31,11 @@ function checkoutErrorMessage(error: Error): string {
   return explainPlurelApiError(error.message);
 }
 
-function fundedOrderToConfirmed(order: FundedOrder, currency: CurrencyCode): ConfirmedOrder {
+function fundedOrderToConfirmed(order: FundedOrder): ConfirmedOrder {
   return {
     orderRef: order.orderRef,
     groupId: order.groupId,
-    currency,
+    currency: order.currency,
     lines: order.lines,
     fees: order.fees,
     subtotal: order.subtotal,
@@ -58,23 +59,17 @@ function isErrorStatus(status: string | null): boolean {
 }
 
 export function CheckoutPanel() {
-  const { cart, itemCount, subtotal, currency, clearCart } = useCart();
-  const { modeHeaders, mode, publishableKey, apiFallback, enableApiFallback } = usePlurelMode();
+  const { cart, itemCount, subtotal, currency, clearCart, people } = useCart();
+  const { modeHeaders, mode, publishableKey, ready } = usePlurelMode();
   const [orderRef, setOrderRef] = useState(makeOrderRef);
   const [status, setStatus] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<ConfirmedOrder | null>(null);
   const [pollingOrderRef, setPollingOrderRef] = useState<string | null>(null);
-  const plurelButtonWrapRef = useRef<HTMLDivElement | null>(null);
-  const [autoRetry, setAutoRetry] = useState(false);
 
+  // A signed order is immutable. Cart or credential changes begin a new order.
   useEffect(() => {
-    if (!autoRetry || !apiFallback) return;
-    setAutoRetry(false);
-    const timer = setTimeout(() => {
-      plurelButtonWrapRef.current?.querySelector("button")?.click();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [autoRetry, apiFallback]);
+    setOrderRef(makeOrderRef());
+  }, [cart, currency, mode]);
 
   const cartLines = useMemo(() => buildProductCartLines(cart, currency), [cart, currency]);
   const plurelCart = useMemo(() => buildPlurelCart(cart, orderRef, currency), [cart, currency, orderRef]);
@@ -94,13 +89,12 @@ export function CheckoutPanel() {
 
   const handleWebhookFunded = useCallback(
     (order: FundedOrder) => {
-      const orderCurrency = currency;
-      setConfirmedOrder(fundedOrderToConfirmed(order, orderCurrency));
+      setConfirmedOrder(fundedOrderToConfirmed(order));
       setPollingOrderRef(null);
       clearCart();
       setStatus(null);
     },
-    [clearCart, currency],
+    [clearCart],
   );
 
   const resetCheckoutWait = useCallback(() => {
@@ -108,58 +102,20 @@ export function CheckoutPanel() {
     setStatus(null);
   }, []);
 
-  const confirmFromSdk = useCallback(
-    (ref: string, sessionId: string) => {
-      if (!plurelCart) return;
-      const feeSummary = buildCartFeeSummary(cart, currency);
-      setConfirmedOrder({
-        orderRef: ref,
-        groupId: sessionId,
-        currency,
-        lines: buildProductCartLines(cart, currency),
-        fees: feeSummary.length > 0 ? feeSummary : undefined,
-        subtotal: cartSubtotal(cart, currency),
-        tax: plurelCart.tax ?? 0,
-        shipping: plurelCart.shipping ?? 0,
-        total: plurelCart.total,
-        confirmedAt: Date.now(),
-        confirmedVia: "sdk",
-      });
-      setPollingOrderRef(null);
-      clearCart();
-      setStatus(null);
-    },
-    [plurelCart, cart, clearCart, currency],
-  );
-
-  const waitForWebhookConfirmation = useCallback(
-    async (ref: string, sessionId: string) => {
-      setPollingOrderRef(ref);
-      setStatus("Payment complete — confirming your order…");
-
-      for (let attempt = 0; attempt < 15; attempt += 1) {
-        const funded = await fetchFundedOrder(ref);
-        if (funded) {
-          handleWebhookFunded(funded);
-          return;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 400));
-      }
-
-      confirmFromSdk(ref, sessionId);
-    },
-    [confirmFromSdk, handleWebhookFunded],
-  );
+  const waitForWebhookConfirmation = useCallback((ref: string) => {
+    setPollingOrderRef(ref);
+    setStatus("Checkout finished. Waiting for verified order confirmation…");
+  }, []);
 
   useOrderFundingPoll({
     orderRef: pollingOrderRef,
     enabled: pollingOrderRef !== null && confirmedOrder === null,
     onFunded: handleWebhookFunded,
-    onError: (message) => setStatus(message),
+    onError: (message) => { setPollingOrderRef(null); setStatus(message); },
   });
 
   async function signCart(cartToSign: Cart) {
-    const response = await fetch("/api/cart/sign", {
+    const response = await fetch(demoApiPath("/cart/sign"), {
       method: "POST",
       headers: { "Content-Type": "application/json", ...modeHeaders },
       body: JSON.stringify({ cart: cartToSign, publishableKey }),
@@ -205,7 +161,7 @@ export function CheckoutPanel() {
           </span>
           <h2 className="text-lg font-medium tracking-[-0.02em] text-ink">Your cart is empty</h2>
           <p className="mt-1.5 max-w-[14rem] text-sm leading-relaxed text-ink-3">
-            Add items from one currency region, then split the total with Plurel Pay group checkout.
+            Choose a scenario or add something you love. Your shared total will appear here.
           </p>
         </div>
       </aside>
@@ -303,22 +259,28 @@ export function CheckoutPanel() {
         </div>
       ) : null}
 
-      {plurelCart ? (
-        <div className="checkout-plurel-button-wrap" ref={plurelButtonWrapRef}>
+      <div className="split-preview" aria-label="Estimated split">
+        <span>Split {people} ways</span>
+        <strong>{format(splitPreview(total, people)[0]!)} <small>per person{total % people ? " or less" : ""}</small></strong>
+        <p>Preview only. Final shares are set in checkout.</p>
+      </div>
+      {!ready && <p className="preview-explanation">You’re exploring a price preview. Sandbox checkout will become available when it’s connected. No payment has been created.</p>}
+      {plurelCart && ready ? (
+        <div className="checkout-plurel-button-wrap">
           <PlurelButton
             getSignature={signCart}
             cart={plurelCart}
-            group={{ minSize: 2, maxSize: 6, defaultMode: "equal" }}
+            group={{ minSize: people, maxSize: people, defaultMode: "equal" }}
             disabled={belowMinimum || pollingOrderRef !== null}
             appearance={{ fullWidth: true, size: "lg" }}
             className="!rounded-full"
             callbacks={{
               onGroupCreated: () => {
                 setPollingOrderRef(orderRef);
-                setStatus("Waiting for group.funded webhook to confirm your order…");
+                setStatus("Group opened. Waiting for everyone to finish test checkout…");
               },
-              onGroupFunded: (sessionId, fundedOrderRef) => {
-                void waitForWebhookConfirmation(fundedOrderRef ?? orderRef, sessionId);
+              onGroupFunded: (_sessionId, fundedOrderRef) => {
+                void waitForWebhookConfirmation(fundedOrderRef ?? orderRef);
               },
               onGroupCancelled: () => {
                 resetCheckoutWait();
@@ -328,22 +290,8 @@ export function CheckoutPanel() {
               },
               onError: (error) => {
                 resetCheckoutWait();
-                reportClientError(apiFallback ? "checkout-fallback" : "checkout", error);
-                const raw = String(error.message);
-                if (
-                  !apiFallback &&
-                  (raw.includes("Load failed") || raw.includes("Failed to fetch") || raw.includes("NetworkError"))
-                ) {
-                  enableApiFallback();
-                  setAutoRetry(true);
-                  setStatus(
-                    "Network hiccup — retrying over a backup connection… If nothing opens, tap Split with Plurel again.",
-                  );
-                  return;
-                }
-                setStatus(
-                  `${checkoutErrorMessage(error)}\n[${error.name}: ${String(error.message).slice(0, 120)}]`,
-                );
+                reportClientError("checkout", error);
+                setStatus(checkoutErrorMessage(error));
               },
             }}
           />
@@ -357,11 +305,7 @@ export function CheckoutPanel() {
         </div>
       ) : null}
 
-      <p className="checkout-footnote">
-        Checkout uses <strong>{mode === "live" ? "live" : "test"}</strong> Plurel Pay keys. One currency
-        per cart. Order confirmation appears after Plurel Pay sends <code>group.funded</code> to{" "}
-        <code>/api/webhooks/plurelpay</code>.
-      </p>
+      <p className="checkout-footnote">Sandbox only. Use test payment details in checkout. Orders appear as confirmed only after verified payment confirmation; no goods are shipped.</p>
     </aside>
   );
 }

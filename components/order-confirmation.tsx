@@ -25,23 +25,12 @@ export function OrderConfirmation({ order, onContinueShopping }: OrderConfirmati
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-lg font-medium tracking-[-0.02em] text-mint-deep">
-                Order confirmed
+                Test order confirmed
               </h2>
               <CurrencyBadge currency={order.currency} size="md" />
             </div>
             <p className="mt-1 text-sm leading-relaxed text-ink-2">
-              {order.confirmedVia === "sdk" ? (
-                <>
-                  Payment confirmed in Plurel Pay checkout. Fulfillment is safest after your server
-                  receives <code className="rounded bg-white/80 px-1 text-xs">group.funded</code>.
-                </>
-              ) : (
-                <>
-                  Payment verified via{" "}
-                  <code className="rounded bg-white/80 px-1 text-xs">group.funded</code> webhook —
-                  safe to fulfill.
-                </>
-              )}
+              Your group’s test payment is verified. This is a demonstration: nothing will be charged or shipped.
             </p>
           </div>
         </div>

@@ -7,7 +7,7 @@ import {
   parseCredentialModeFromRequest,
   signingSecret,
 } from "@/lib/plurel-credentials";
-import { PLUREL_API_BASE, secretKeyForSessions } from "@/lib/plurel-upstream";
+import { fetchPlurelApi, secretKeyForSessions } from "@/lib/plurel-upstream";
 import { explainPlurelApiError } from "@/lib/plurel-env";
 import { createCartSignature } from "@/lib/cart-signing";
 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
 
   const signature = createCartSignature(PROBE_CART, secret);
 
-  const response = await fetch(`${PLUREL_API_BASE}/sessions`, {
+  const response = await fetchPlurelApi(`/sessions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -67,8 +67,8 @@ export async function POST(req: Request) {
 
   if (response.ok) {
     if (payload?.session_id) {
-      await fetch(
-        `${PLUREL_API_BASE}/sessions/${encodeURIComponent(payload.session_id)}/cancel`,
+      await fetchPlurelApi(
+        `/sessions/${encodeURIComponent(payload.session_id)}/cancel`,
         {
           method: "POST",
           headers: {

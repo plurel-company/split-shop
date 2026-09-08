@@ -27,11 +27,19 @@ export async function POST(req: Request) {
     return Response.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const event = JSON.parse(rawBody) as PlurelWebhookEvent;
+  let event: PlurelWebhookEvent;
+  try {
+    event = JSON.parse(rawBody) as PlurelWebhookEvent;
+    if (!event || typeof event.type !== "string" || !event.data || typeof event.data !== "object") {
+      throw new Error("Invalid event");
+    }
+  } catch {
+    return Response.json({ error: "Invalid webhook body" }, { status: 400 });
+  }
   const modeHint = parseCredentialModeFromRequest(req);
 
   if (event.type === "group.funded") {
-    const result = fulfillGroupFunded(event, verifiedMode);
+    const result = await fulfillGroupFunded(event, verifiedMode);
 
     if (!result.ok) {
       if (result.status === 400 && result.error === "Missing order_ref") {

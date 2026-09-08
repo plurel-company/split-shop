@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+initOpenNextCloudflareForDev();
+
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {

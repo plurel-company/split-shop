@@ -24,3 +24,16 @@ next-env.d.ts
 .vercel
 .claude/
 .gstack/
+
+# Cloudflare
+.open-next
+.wrangler
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+wrangler.deploy.json
+
+.local
+
+dist
+.integrated-build

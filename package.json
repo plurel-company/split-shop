@@ -1,7 +1,7 @@
 {
   "name": "split-shop",
   "version": "0.1.0",
-  "description": "Reference Next.js storefront for Plurel Pay group checkout — cart signing, SDK modal, and webhooks",
+  "description": "Reference Next.js storefront for Plurel Pay group checkout \u2014 cart signing, SDK modal, and webhooks",
   "license": "MIT",
   "private": true,
   "repository": {
@@ -10,29 +10,51 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm verify:sdk && next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test lib/*.test.ts"
+    "typecheck": "pnpm verify:sdk && tsc --noEmit",
+    "test": "pnpm verify:sdk && node --import tsx --test lib/*.test.ts",
+    "verify:sdk": "node scripts/verify-vendored-sdk.mjs",
+    "build:cloudflare": "opennextjs-cloudflare build",
+    "preview": "pnpm build:cloudflare && opennextjs-cloudflare preview",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
+    "db:dev": "pglite-server --db=./.local/postgres --port=5432 --host=127.0.0.1 --max-connections=10",
+    "test:cloudflare": "pnpm build:cloudflare && node scripts/smoke-cloudflare.mjs",
+    "build:integrated": "node scripts/build-integrated.mjs",
+    "test:integrated": "node scripts/test-integrated.mjs",
+    "preview:integrated": "node --env-file-if-exists=.env.local scripts/preview-integrated.mjs"
   },
   "dependencies": {
-    "@plurel/react-sdk": "^1.0.5",
-    "@plurel/sdk": "^1.0.5",
+    "@opennextjs/cloudflare": "^1.20.6",
+    "@plurel/react-sdk": "file:vendor/sdk/plurel-react-sdk-1.1.2.tgz",
+    "@plurel/sdk": "file:vendor/sdk/plurel-sdk-1.1.2.tgz",
     "@sentry/nextjs": "^10.63.0",
-    "next": "^15.3.3",
+    "next": "^15.5.25",
+    "pg": "^8.23.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@electric-sql/pglite-socket": "^0.2.11",
     "@tailwindcss/postcss": "^4.1.8",
     "@types/node": "^22.15.21",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
+    "esbuild": "^0.28.2",
     "tailwindcss": "^4.1.8",
     "tsx": "^4.19.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wrangler": "^4.130.0"
   },
   "engines": {
     "node": ">=20"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "pnpm": {
+    "overrides": {
+      "@plurel/react-sdk>@plurel/sdk": "file:vendor/sdk/plurel-sdk-1.1.2.tgz"
+    }
   }
 }

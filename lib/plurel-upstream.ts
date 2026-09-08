@@ -6,11 +6,15 @@ import { merchantId, resolveSecretKey } from "@/lib/plurel-credentials";
 import { correctStaleSdkVersionHeaders } from "@/lib/installed-sdk-versions";
 import { readEnv } from "@/lib/read-env";
 
-export const PLUREL_API_BASE =
-  readEnv("PLUREL_API_BASE", "ANTE_API_BASE") || "https://plurelpay.com/api/v1";
+import { getDemoRuntime } from "./demo-runtime";
 
-/** @deprecated Use PLUREL_API_BASE */
-export const ANTE_API_BASE = PLUREL_API_BASE;
+export async function fetchPlurelApi(path: string, init: RequestInit): Promise<Response> {
+  const runtime = getDemoRuntime();
+  const base = runtime ? `${runtime.origin}/api/v1` :
+    readEnv("PLUREL_API_BASE", "ANTE_API_BASE") || "https://plurelpay.com/api/v1";
+  const request = new Request(`${base}${path}`, init);
+  return runtime?.fetchApi ? runtime.fetchApi(request) : fetch(request);
+}
 
 const FORWARD_HEADERS = [
   "content-type",
@@ -29,15 +33,14 @@ function isSecretKey(value: string): boolean {
 }
 
 export function secretKeyForSessions(mode: PlurelCredentialMode): string {
+  if (mode !== "sandbox") throw new Error("This demonstration accepts sandbox sessions only.");
   const secretKey = resolveSecretKey(mode);
   if (!secretKey) {
     throw new Error(
-      mode === "live"
-        ? "PLUREL_SECRET_KEY (or ANTE_SECRET_KEY) is not configured. Session create requires a server secret key (plurel_sk_live_*)."
-        : "PLUREL_SECRET_KEY_TEST (or ANTE_SECRET_KEY_TEST) is not configured. Session create requires a server secret key (plurel_sk_test_*).",
+      "Sandbox session credentials are not configured.",
     );
   }
-  if (!isSecretKey(secretKey)) {
+  if (!/^(?:plurel|ante)_sk_test_/.test(secretKey)) {
     throw new Error("Secret API key should start with plurel_sk_test_ / plurel_sk_live_ (or legacy ante_sk_*).");
   }
   return secretKey;

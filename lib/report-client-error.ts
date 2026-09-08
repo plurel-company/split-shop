@@ -1,3 +1,4 @@
+import { demoApiPath } from "./demo-config";
 import * as Sentry from "@sentry/nextjs";
 
 import { isSentryEnabled } from "@/lib/sentry/sentry.shared.config";
@@ -29,7 +30,7 @@ export function reportClientError(stage: string, error: Error, extra?: Partial<C
   }
 
   try {
-    void fetch("/api/client-log", {
+    void fetch(demoApiPath("/client-log"), {
       method: "POST",
       keepalive: true,
       headers: { "Content-Type": "application/json" },

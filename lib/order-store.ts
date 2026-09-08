@@ -1,5 +1,6 @@
-/** In-memory order ledger for demo fulfillment (pending → funded via webhook). */
+/** Durable Postgres order ledger shared by every Worker instance. */
 import type { PlurelCredentialMode } from "@/lib/plurel-credential-mode";
+import type { CurrencyCode } from "./currency";
 import type { CartLine } from "@/lib/types";
 
 export type OrderFee = {
@@ -10,6 +11,7 @@ export type OrderFee = {
 
 export type PendingOrder = {
   orderRef: string;
+  currency: CurrencyCode;
   lines: CartLine[];
   fees?: OrderFee[];
   subtotal: number;
@@ -31,66 +33,74 @@ export type FundedOrder = PendingOrder & {
 
 export type OrderRecord = PendingOrder & { status: "pending" } | FundedOrder;
 
-type OrderStoreState = {
-  pending: Map<string, PendingOrder>;
-  funded: Map<string, FundedOrder>;
-};
-
-const STORE_KEY = "__plurel_demo_order_store__";
-
-function getStore(): OrderStoreState {
-  const globalStore = globalThis as typeof globalThis & {
-    [STORE_KEY]?: OrderStoreState;
-  };
-  if (!globalStore[STORE_KEY]) {
-    globalStore[STORE_KEY] = {
-      pending: new Map(),
-      funded: new Map(),
-    };
-  }
-  return globalStore[STORE_KEY];
-}
-
-export function registerPendingOrder(order: PendingOrder): void {
-  const store = getStore();
-  store.pending.set(order.orderRef, order);
-}
-
-export function markOrderFunded(input: {
+export type FundOrderInput = {
   orderRef: string;
   sessionId: string;
   groupId: string;
   totalPaid: number;
   fundedAt: number;
-}): FundedOrder | null {
-  const store = getStore();
-  const pending = store.pending.get(input.orderRef);
-  if (!pending) return null;
+  credentialMode: PlurelCredentialMode;
+};
 
-  const funded: FundedOrder = {
-    ...pending,
-    status: "funded",
-    sessionId: input.sessionId,
-    groupId: input.groupId,
-    fundedAt: input.fundedAt,
-    totalPaid: input.totalPaid,
-    total: input.totalPaid,
+export interface OrderStore {
+  registerPendingOrder(order: PendingOrder): Promise<void>;
+  getOrder(orderRef: string): Promise<OrderRecord | null>;
+  markOrderFunded(input: FundOrderInput): Promise<FundedOrder | null>;
+}
+
+export class OrderConflictError extends Error {
+  constructor() {
+    super("This order reference is already registered with different cart details or is funded.");
+  }
+}
+
+export type OrderQuery = (sql: string, parameters: unknown[]) => Promise<{ rows: { record: OrderRecord }[] }>;
+
+/** Parameterized Postgres queries shared by Workers and database integration tests. */
+export function createPostgresOrderStore(query: OrderQuery): OrderStore {
+  return {
+    async registerPendingOrder(order) {
+      const result = await query(
+        `INSERT INTO split_shop_orders (order_ref, record)
+         VALUES ($1, $2::jsonb)
+         ON CONFLICT (order_ref) DO UPDATE SET updated_at = split_shop_orders.updated_at
+         WHERE split_shop_orders.record->>'status' = 'pending'
+           AND split_shop_orders.record - 'createdAt' = EXCLUDED.record - 'createdAt'
+         RETURNING record`,
+        [order.orderRef, JSON.stringify({ ...order, status: "pending" })],
+      );
+      if (result.rows.length === 0) throw new OrderConflictError();
+    },
+    async getOrder(orderRef) {
+      const result = await query("SELECT record FROM split_shop_orders WHERE order_ref = $1", [orderRef]);
+      return result.rows[0]?.record ?? null;
+    },
+    async markOrderFunded(input) {
+      const result = await query(
+        `UPDATE split_shop_orders
+         SET record = record || $2::jsonb, updated_at = now()
+         WHERE order_ref = $1 AND record->>'status' = 'pending'
+           AND record->>'credentialMode' = $3
+           AND (record->>'total')::numeric <= $4
+         RETURNING record`,
+        [input.orderRef, JSON.stringify({
+          status: "funded", sessionId: input.sessionId, groupId: input.groupId,
+          fundedAt: input.fundedAt, totalPaid: input.totalPaid,
+        }), input.credentialMode, input.totalPaid],
+      );
+      return result.rows[0]?.record as FundedOrder | undefined ?? null;
+    },
   };
-
-  store.funded.set(input.orderRef, funded);
-  store.pending.delete(input.orderRef);
-  return funded;
 }
 
-export function getOrder(orderRef: string): OrderRecord | null {
-  const store = getStore();
-  const funded = store.funded.get(orderRef);
-  if (funded) return funded;
-  const pending = store.pending.get(orderRef);
-  if (pending) return { ...pending, status: "pending" };
-  return null;
+async function withStore<T>(callback: (store: OrderStore) => Promise<T>): Promise<T> {
+  const { withOrderDatabase } = await import("./order-database");
+  return withOrderDatabase((query) => callback(createPostgresOrderStore(query)));
 }
 
-export function listFundedOrderRefs(): string[] {
-  return [...getStore().funded.keys()];
-}
+export const registerPendingOrder: OrderStore["registerPendingOrder"] = (order) =>
+  withStore((store) => store.registerPendingOrder(order));
+export const getOrder: OrderStore["getOrder"] = (orderRef) => withStore((store) => store.getOrder(orderRef));
+export const markOrderFunded: OrderStore["markOrderFunded"] = (input) => withStore((store) => store.markOrderFunded(input));
+
+export const orderStore: OrderStore = { registerPendingOrder, getOrder, markOrderFunded };
