@@ -13,7 +13,7 @@ import { createCartSignature } from "@/lib/cart-signing";
 import { registerPendingOrder, OrderConflictError } from "@/lib/order-store";
 
 function isSigningSecret(value: string): boolean {
-  return value.startsWith("plurel_sign_") || value.startsWith("ante_sign_");
+  return value.startsWith("plurel_sign_");
 }
 
 /** Map signed Plurel cart → durable pending order (keyed by metadata.order_ref). */
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error:
-          "PLUREL_SIGNING_SECRET (or ANTE_SIGNING_SECRET) is not configured on this deployment. Copy your signing secret from Plurel Pay → Developers → Signing and add it as a Cloudflare Worker secret.",
+          "PLUREL_SIGNING_SECRET is not configured on this deployment. Copy your signing secret from Plurel Pay → Developers → Signing and add it as a Cloudflare Worker secret.",
       },
       { status: 503 },
     );
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error:
-          "Signing secret looks invalid (expected plurel_sign_… or ante_sign_…). Copy the full value from Plurel Pay → Developers → Signing.",
+          "Signing secret looks invalid (expected plurel_sign_…). Copy the full value from Plurel Pay → Developers → Signing.",
       },
       { status: 500 },
     );
@@ -94,7 +94,7 @@ export async function POST(req: Request) {
   }
 
   const key = publishableKey?.trim();
-  if (key && !/^(?:plurel|ante)_pk_test_/.test(key)) return Response.json({ error: "This demonstration accepts sandbox keys only." }, { status: 403 });
+  if (key && !/^plurel_pk_test_/.test(key)) return Response.json({ error: "This demonstration accepts sandbox keys only." }, { status: 403 });
   if (!key) {
     return Response.json({ error: "publishableKey is required" }, { status: 400 });
   }
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
     const signature = createCartSignature(cart, secret);
     const credentialMode = credentialModeFromPublishableKey(key);
     const headerMode = parsePlurelCredentialMode(
-      req.headers.get(PLUREL_KEY_MODE_HEADER) ?? req.headers.get("x-ante-key-mode"),
+      req.headers.get(PLUREL_KEY_MODE_HEADER),
     );
     if (!keyModeMatches(headerMode, key)) {
       return Response.json({ error: "Publishable key does not match x-plurel-key-mode" }, { status: 400 });

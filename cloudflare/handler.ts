@@ -17,8 +17,7 @@ export async function handleDemoShopRequest(request: Request, env: DemoShopEnv, 
   const path = url.pathname.slice(PREFIX.length);
   const isWebhook = path === "/webhooks/plurelpay";
   if (!["GET", "POST"].includes(request.method)) return json("Method not allowed", 405);
-  if ((request.headers.get("x-plurel-key-mode") ?? "sandbox") !== "sandbox" ||
-      (request.headers.get("x-ante-key-mode") ?? "sandbox") !== "sandbox") return json("This demonstration accepts sandbox requests only.", 403);
+  if ((request.headers.get("x-plurel-key-mode") ?? "sandbox") !== "sandbox") return json("This demonstration accepts sandbox requests only.", 403);
   if (request.method === "POST" && !isWebhook) {
     const origin = request.headers.get("origin");
     if ((origin && origin !== url.origin) || request.headers.get("sec-fetch-site") === "cross-site") return json("Origin not allowed", 403);

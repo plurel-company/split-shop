@@ -74,6 +74,3 @@ export type CartState = Record<string, number>;
 export type PlurelCart = Cart & {
   items: (Cart["items"][number] & { image_url?: string })[];
 };
-
-/** @deprecated Use PlurelCart */
-export type AnteCart = PlurelCart;

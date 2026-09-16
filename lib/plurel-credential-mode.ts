@@ -3,20 +3,11 @@ import { publishableKeyMode } from "@/lib/plurel-env";
 
 export type PlurelCredentialMode = "sandbox" | "live";
 
-/** @deprecated Use PlurelCredentialMode */
-export type AnteCredentialMode = PlurelCredentialMode;
-
 export const PLUREL_KEY_MODE_HEADER = "x-plurel-key-mode";
-
-/** @deprecated Use PLUREL_KEY_MODE_HEADER */
-export const ANTE_KEY_MODE_HEADER = PLUREL_KEY_MODE_HEADER;
 
 export function parsePlurelCredentialMode(value: string | null | undefined): PlurelCredentialMode {
   return value?.toLowerCase() === "live" ? "live" : "sandbox";
 }
-
-/** @deprecated Use parsePlurelCredentialMode */
-export const parseAnteCredentialMode = parsePlurelCredentialMode;
 
 export function modeLabel(mode: PlurelCredentialMode): string {
   return mode === "live" ? "Live" : "Test";
@@ -33,13 +24,10 @@ export function credentialModeFromPublishableKey(key: string): PlurelCredentialM
   const detected = publishableKeyMode(key.trim());
   if (detected === "live") return "live";
   if (detected === "sandbox") return "sandbox";
-  throw new Error("Invalid publishable key — expected plurel_pk_test_* / plurel_pk_live_* (or legacy ante_pk_*)");
+  throw new Error("Invalid publishable key — expected plurel_pk_test_* / plurel_pk_live_*");
 }
 
-/** Read key mode from request — accepts x-plurel-key-mode or legacy x-ante-key-mode. */
+/** Read key mode from request — uses x-plurel-key-mode. */
 export function parseCredentialModeFromRequest(request: Request): PlurelCredentialMode {
-  return parsePlurelCredentialMode(
-    request.headers.get(PLUREL_KEY_MODE_HEADER) ??
-      request.headers.get("x-ante-key-mode"),
-  );
+  return parsePlurelCredentialMode(request.headers.get(PLUREL_KEY_MODE_HEADER));
 }
