@@ -86,9 +86,6 @@ export function plurelCurrencyCode(currency: CurrencyCode): string {
   return currency.toLowerCase();
 }
 
-/** @deprecated Use plurelCurrencyCode */
-export const anteCurrencyCode = plurelCurrencyCode;
-
 export function getMinimumOrderMinor(currency: CurrencyCode): number {
   return CURRENCY_META[currency].minimumOrderMinor;
 }

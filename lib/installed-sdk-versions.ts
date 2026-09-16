@@ -20,11 +20,6 @@ function installedPackageVersion(
 export const INSTALLED_PLUREL_SDK_VERSION = installedPackageVersion("@plurel/sdk");
 export const INSTALLED_PLUREL_REACT_SDK_VERSION = installedPackageVersion("@plurel/react-sdk");
 
-/** @deprecated Use INSTALLED_PLUREL_SDK_VERSION */
-export const INSTALLED_ANTE_SDK_VERSION = INSTALLED_PLUREL_SDK_VERSION;
-/** @deprecated Use INSTALLED_PLUREL_REACT_SDK_VERSION */
-export const INSTALLED_ANTE_REACT_SDK_VERSION = INSTALLED_PLUREL_REACT_SDK_VERSION;
-
 /**
  * Correct upstream telemetry when the browser sends a version older than this app's
  * verified SDK dependency.
@@ -33,18 +28,13 @@ export function correctStaleSdkVersionHeaders(
   headers: Headers,
   request: Request,
 ): void {
-  const clientSdk =
-    request.headers.get("x-plurel-sdk-version") ?? request.headers.get("x-ante-sdk-version");
+  const clientSdk = request.headers.get("x-plurel-sdk-version");
   if (clientSdk && clientSdk !== INSTALLED_PLUREL_SDK_VERSION) {
     headers.set("X-Plurel-SDK-Version", INSTALLED_PLUREL_SDK_VERSION);
-    headers.set("X-Ante-SDK-Version", INSTALLED_PLUREL_SDK_VERSION);
   }
 
-  const clientReact =
-    request.headers.get("x-plurel-react-sdk-version") ??
-    request.headers.get("x-ante-react-sdk-version");
+  const clientReact = request.headers.get("x-plurel-react-sdk-version");
   if (clientReact && clientReact !== INSTALLED_PLUREL_REACT_SDK_VERSION) {
     headers.set("X-Plurel-React-SDK-Version", INSTALLED_PLUREL_REACT_SDK_VERSION);
-    headers.set("X-Ante-React-SDK-Version", INSTALLED_PLUREL_REACT_SDK_VERSION);
   }
 }

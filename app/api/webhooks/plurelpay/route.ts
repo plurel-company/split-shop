@@ -19,8 +19,7 @@ export async function POST(req: Request) {
   }
 
   const rawBody = await req.text();
-  const signatureHeader =
-    req.headers.get("plurel-signature") ?? req.headers.get("ante-signature") ?? "";
+  const signatureHeader = req.headers.get("plurel-signature") ?? "";
 
   const verifiedMode = verifyPlurelWebhookSignature(rawBody, signatureHeader);
   if (!verifiedMode) {

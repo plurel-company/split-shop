@@ -114,9 +114,6 @@ export function buildPlurelCart(
   };
 }
 
-/** @deprecated Use buildPlurelCart */
-export const buildAnteCart = buildPlurelCart;
-
 export function cartMeetsMinimum(cart: CartState, currency: CurrencyCode = "USD"): boolean {
   const plurelCart = buildPlurelCart(cart, "preview", currency);
   if (!plurelCart) return true;

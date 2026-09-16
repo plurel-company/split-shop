@@ -17,9 +17,9 @@ function webhookSecretCandidates(): WebhookSecretCandidate[] {
     out.push({ secret: trimmed, mode });
   };
 
-  add(readEnv("PLUREL_WEBHOOK_SECRET_TEST", "ANTE_WEBHOOK_SECRET_TEST"), "sandbox");
-  add(readEnv("PLUREL_WEBHOOK_SECRET_LIVE", "ANTE_WEBHOOK_SECRET_LIVE"), "live");
-  add(readEnv("PLUREL_WEBHOOK_SECRET", "ANTE_WEBHOOK_SECRET"), "live");
+  add(readEnv("PLUREL_WEBHOOK_SECRET_TEST"), "sandbox");
+  add(readEnv("PLUREL_WEBHOOK_SECRET_LIVE"), "live");
+  add(readEnv("PLUREL_WEBHOOK_SECRET"), "live");
 
   return out;
 }
@@ -39,6 +39,3 @@ export function verifyPlurelWebhookSignature(
   }
   return null;
 }
-
-/** @deprecated Use verifyPlurelWebhookSignature */
-export const verifyAnteWebhookSignature = verifyPlurelWebhookSignature;

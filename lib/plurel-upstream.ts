@@ -11,7 +11,7 @@ import { getDemoRuntime } from "./demo-runtime";
 export async function fetchPlurelApi(path: string, init: RequestInit): Promise<Response> {
   const runtime = getDemoRuntime();
   const base = runtime ? `${runtime.origin}/api/v1` :
-    readEnv("PLUREL_API_BASE", "ANTE_API_BASE") || "https://plurelpay.com/api/v1";
+    readEnv("PLUREL_API_BASE") || "https://plurelpay.com/api/v1";
   const request = new Request(`${base}${path}`, init);
   return runtime?.fetchApi ? runtime.fetchApi(request) : fetch(request);
 }
@@ -19,18 +19,10 @@ export async function fetchPlurelApi(path: string, init: RequestInit): Promise<R
 const FORWARD_HEADERS = [
   "content-type",
   "x-plurel-signature",
-  "x-ante-signature",
   "x-plurel-cart-signature",
-  "x-ante-cart-signature",
   "x-plurel-sdk-version",
-  "x-ante-sdk-version",
   "x-plurel-react-sdk-version",
-  "x-ante-react-sdk-version",
 ] as const;
-
-function isSecretKey(value: string): boolean {
-  return value.startsWith("plurel_sk_") || value.startsWith("ante_sk_");
-}
 
 export function secretKeyForSessions(mode: PlurelCredentialMode): string {
   if (mode !== "sandbox") throw new Error("This demonstration accepts sandbox sessions only.");
@@ -40,8 +32,8 @@ export function secretKeyForSessions(mode: PlurelCredentialMode): string {
       "Sandbox session credentials are not configured.",
     );
   }
-  if (!/^(?:plurel|ante)_sk_test_/.test(secretKey)) {
-    throw new Error("Secret API key should start with plurel_sk_test_ / plurel_sk_live_ (or legacy ante_sk_*).");
+  if (!/^plurel_sk_test_/.test(secretKey)) {
+    throw new Error("Secret API key should start with plurel_sk_test_.");
   }
   return secretKey;
 }
@@ -53,7 +45,7 @@ export function buildUpstreamSessionHeaders(
   const secretKey = secretKeyForSessions(mode);
   const id = merchantId();
   if (!id) {
-    throw new Error("NEXT_PUBLIC_PLUREL_MERCHANT_ID (or NEXT_PUBLIC_ANTE_MERCHANT_ID) is not configured.");
+    throw new Error("NEXT_PUBLIC_PLUREL_MERCHANT_ID is not configured.");
   }
 
   const headers = new Headers();

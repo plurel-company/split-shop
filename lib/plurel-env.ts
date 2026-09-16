@@ -1,22 +1,16 @@
 /** Publishable-key parsing and user-facing Plurel Pay API error messages. */
 export type PlurelKeyMode = "sandbox" | "live" | null;
 
-/** @deprecated Use PlurelKeyMode */
-export type AnteKeyMode = PlurelKeyMode;
-
 export function publishableKeyMode(key: string | undefined): PlurelKeyMode {
   if (!key) return null;
-  if (key.startsWith("plurel_pk_test_") || key.startsWith("ante_pk_test_")) return "sandbox";
-  if (key.startsWith("plurel_pk_live_") || key.startsWith("ante_pk_live_")) return "live";
+  if (key.startsWith("plurel_pk_test_")) return "sandbox";
+  if (key.startsWith("plurel_pk_live_")) return "live";
   return null;
 }
 
 export function plurelEnvironmentFromKey(key: string): "sandbox" | "production" {
   return publishableKeyMode(key) === "live" ? "production" : "sandbox";
 }
-
-/** @deprecated Use plurelEnvironmentFromKey */
-export const anteEnvironmentFromKey = plurelEnvironmentFromKey;
 
 /** Dashboard shows a 16-char prefix — full keys are longer. */
 export function looksLikeKeyPrefix(key: string): boolean {
@@ -67,7 +61,7 @@ export function explainPlurelApiError(
   }
 
   if (message.includes("Missing Authorization bearer")) {
-    return "Publishable key missing in the browser — set NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY (or NEXT_PUBLIC_ANTE_PUBLISHABLE_KEY) and redeploy.";
+    return "Publishable key missing in the browser — set NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY and redeploy.";
   }
 
   if (message.includes("API key missing scope: payments:write")) {
@@ -109,15 +103,12 @@ export function explainPlurelApiError(
   return message;
 }
 
-/** @deprecated Use explainPlurelApiError */
-export const explainAnteApiError = explainPlurelApiError;
-
 function isMerchantId(value: string): boolean {
-  return value.startsWith("plurel_merch_") || value.startsWith("ante_merch_");
+  return value.startsWith("plurel_merch_");
 }
 
 function isSigningSecret(value: string): boolean {
-  return value.startsWith("plurel_sign_") || value.startsWith("ante_sign_");
+  return value.startsWith("plurel_sign_");
 }
 
 export function validateCredentialShapes(input: {
@@ -129,11 +120,11 @@ export function validateCredentialShapes(input: {
   const { merchantId, publishableKey, signingSecret } = input;
 
   if (merchantId && !isMerchantId(merchantId)) {
-    issues.push("Merchant ID should start with plurel_merch_ (or legacy ante_merch_).");
+    issues.push("Merchant ID should start with plurel_merch_.");
   }
 
   if (publishableKey && !publishableKeyMode(publishableKey)) {
-    issues.push("Publishable key should start with plurel_pk_test_ / plurel_pk_live_ (or legacy ante_pk_*).");
+    issues.push("Publishable key should start with plurel_pk_test_ / plurel_pk_live_.");
   }
 
   if (publishableKey && looksLikeKeyPrefix(publishableKey)) {
@@ -143,7 +134,7 @@ export function validateCredentialShapes(input: {
   }
 
   if (signingSecret && !isSigningSecret(signingSecret)) {
-    issues.push("Signing secret should start with plurel_sign_ (or legacy ante_sign_).");
+    issues.push("Signing secret should start with plurel_sign_.");
   }
 
   if (signingSecret && looksLikeKeyPrefix(signingSecret)) {

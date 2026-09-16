@@ -84,7 +84,7 @@ pnpm db:migrate
 pnpm dev
 ```
 
-The standalone Next.js server uses `/api/*` and sandbox `PLUREL_*` credentials from `.env.local`; legacy `ANTE_*` names remain accepted. Use `PLUREL_API_BASE=http://localhost:3000/api/v1` for a locally running main API, and run this storefront on another port. `NEXT_PUBLIC_SITE_URL` controls absolute catalog image URLs. The integrated export always uses the main Worker's origin for checkout.
+The standalone Next.js server uses `/api/*` and sandbox `PLUREL_*` credentials from `.env.local`. Use `PLUREL_API_BASE=http://localhost:3000/api/v1` for a locally running main API, and run this storefront on another port. `NEXT_PUBLIC_SITE_URL` controls absolute catalog image URLs. The integrated export always uses the main Worker's origin for checkout.
 
 | Command | Validation |
 | --- | --- |

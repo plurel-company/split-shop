@@ -19,7 +19,7 @@ function useGrantWebShareToCheckout() {
     const patch = (el: Element) => {
       if (!(el instanceof HTMLIFrameElement)) return;
       const id = el.id;
-      if (id !== "plurel-checkout-iframe" && id !== "ante-checkout-iframe") return;
+      if (id !== "plurel-checkout-iframe") return;
       if (el.allow.includes("web-share")) return;
       el.allow = `${el.allow}; web-share`;
       const src = el.src;
@@ -30,7 +30,7 @@ function useGrantWebShareToCheckout() {
         mutation.addedNodes.forEach((node) => {
           if (!(node instanceof Element)) return;
           patch(node);
-          node.querySelectorAll?.("iframe#plurel-checkout-iframe, iframe#ante-checkout-iframe").forEach(patch);
+          node.querySelectorAll?.("iframe#plurel-checkout-iframe").forEach(patch);
         });
       }
     });

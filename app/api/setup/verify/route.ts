@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     return Response.json(
       {
         ok: false,
-        error: `Missing merchant ID or PLUREL_SIGNING_SECRET (or ANTE_SIGNING_SECRET).`,
+        error: `Missing merchant ID or PLUREL_SIGNING_SECRET.`,
       },
       { status: 503 },
     );
@@ -50,7 +50,6 @@ export async function POST(req: Request) {
       "X-Merchant-ID": id,
       "Content-Type": "application/json",
       "X-Plurel-Signature": signature,
-      "X-Ante-Signature": signature,
     },
     body: JSON.stringify({
       cart: PROBE_CART,
