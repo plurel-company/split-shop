@@ -38,6 +38,8 @@
     "node_modules",
     "**/*.test.ts",
     ".integrated-build",
-    "dist"
+    "dist",
+    "worker.ts",
+    ".open-next"
   ]
 }

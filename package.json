@@ -17,6 +17,7 @@
     "verify:sdk": "node scripts/verify-vendored-sdk.mjs",
     "build:cloudflare": "opennextjs-cloudflare build",
     "preview": "pnpm build:cloudflare && opennextjs-cloudflare preview",
+    "deploy:production": "NEXT_PUBLIC_SITE_URL=https://splitshop.dev NEXT_PUBLIC_PAY_BASE_URL=https://plurelpay.com pnpm build:cloudflare && env -u CLOUDFLARE_ENV -u WRANGLER_ENV OPEN_NEXT_DEPLOY=true wrangler deploy",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "db:dev": "pglite-server --db=./.local/postgres --port=5432 --host=127.0.0.1 --max-connections=10",
     "test:cloudflare": "pnpm build:cloudflare && node scripts/smoke-cloudflare.mjs",

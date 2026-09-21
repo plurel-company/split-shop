@@ -1,16 +1,35 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "split-shop-local",
-  "workers_dev": false,
-  "preview_urls": false,
-  "main": ".open-next/worker.js",
-  "compatibility_date": "2026-09-08",
+  "name": "splitshop",
+  "account_id": "75a70c45096f40acb6be6a09de4054ea",
+  "main": "worker.ts",
+  "compatibility_date": "2026-09-16",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
-  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "split-shop-local" }],
-  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "split-shop-cache" }],
+  "workers_dev": true,
+  "preview_urls": false,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "splitshop" }
+  ],
+  "r2_buckets": [
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "splitshop-cache" }
+  ],
   "images": { "binding": "IMAGES" },
+  "hyperdrive": [
+    { "binding": "HYPERDRIVE", "id": "11494092435949ef9523a523fbc389ec" }
+  ],
   "observability": { "enabled": true },
-  "vars": { "CLOUDFLARE_ENV": "development" }
-  // Local smoke harness only. Production runs inside the main PlurelPay Worker.
+  "routes": [
+    { "pattern": "splitshop.dev", "custom_domain": true },
+    { "pattern": "www.splitshop.dev", "custom_domain": true }
+  ],
+  "vars": {
+    "CLOUDFLARE_ENV": "production",
+    "NEXT_PUBLIC_SITE_URL": "https://splitshop.dev",
+    "NEXT_PUBLIC_PAY_BASE_URL": "https://plurelpay.com",
+    "PLUREL_API_BASE": "https://plurelpay.com/api/v1"
+  }
 }

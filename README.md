@@ -6,9 +6,11 @@ This reference app demonstrates the **Custom SDK + Stripe** integration: a merch
 
 The catalog and split preview work without a backend. The UI enables sandbox checkout only when runtime credentials and the order table are available. Payment success appears only after a verified webhook updates the stored order.
 
-## One application Worker
+## Production Worker
 
-Production mounts this repository inside **plurelpay-web's existing Cloudflare Worker**:
+The branded storefront is Worker **`splitshop`** on `splitshop.dev` (`wrangler.jsonc`). Hosted checkout still opens on **plurelpay.com**. `plurelpay.com/demo/shop` remains the in-app demo mount on `plurelpay-web`.
+
+The earlier integrated mount inside **plurelpay-web**:
 
 | Surface | Mount | Owner |
 | --- | --- | --- |
@@ -18,7 +20,7 @@ Production mounts this repository inside **plurelpay-web's existing Cloudflare W
 | Hosted checkout and session API | Main `/pay/*`, `/api/v1/*` routes | Main Worker |
 | Durable orders | `split_shop_orders` | Existing PostgreSQL through Hyperdrive |
 
-There is no additional production storefront Worker, cache bucket, database, or SDK Worker. The standalone OpenNext configuration in this repository is a local validation harness, with no production routes or deployment workflow.
+Laptop harness: `wrangler.local.jsonc` (`split-shop-local`). Production and Workers Builds read `wrangler.jsonc` (`name`: `splitshop`). `.env.production` bakes `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_PAY_BASE_URL` into the OpenNext bundle. Workers Builds commands: `pnpm build:cloudflare`, then `npx wrangler deploy`. Preview deploy: `npx wrangler versions upload`.
 
 ## Build the handoff
 

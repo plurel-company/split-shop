@@ -26,7 +26,7 @@ export function resolvePublishableKey(mode: PlurelCredentialMode): string {
     );
   }
 
-  return readEnv("NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY_TEST");
+  return readEnv("NEXT_PUBLIC_PLUREL_PUBLISHABLE_KEY_TEST", "DEMO_SHOP_PUBLISHABLE_KEY_TEST");
 }
 
 export function resolveSecretKey(mode: PlurelCredentialMode): string {
@@ -34,22 +34,22 @@ export function resolveSecretKey(mode: PlurelCredentialMode): string {
     return readEnv("PLUREL_SECRET_KEY_LIVE") || readEnv("PLUREL_SECRET_KEY");
   }
 
-  return readEnv("PLUREL_SECRET_KEY_TEST");
+  return readEnv("PLUREL_SECRET_KEY_TEST", "DEMO_SHOP_SECRET_KEY_TEST");
 }
 
 export function resolveWebhookSecret(mode: PlurelCredentialMode): string {
   if (mode === "live") {
     return readEnv("PLUREL_WEBHOOK_SECRET_LIVE") || readEnv("PLUREL_WEBHOOK_SECRET");
   }
-  return readEnv("PLUREL_WEBHOOK_SECRET_TEST");
+  return readEnv("PLUREL_WEBHOOK_SECRET_TEST", "DEMO_SHOP_WEBHOOK_SECRET_TEST");
 }
 
 export function merchantId(): string {
-  return readEnv("NEXT_PUBLIC_PLUREL_MERCHANT_ID");
+  return readEnv("NEXT_PUBLIC_PLUREL_MERCHANT_ID", "DEMO_SHOP_MERCHANT_ID");
 }
 
 export function signingSecret(): string {
-  return readEnv("PLUREL_SIGNING_SECRET");
+  return readEnv("PLUREL_SIGNING_SECRET", "DEMO_SHOP_SIGNING_SECRET");
 }
 
 export function credentialAvailability(): {

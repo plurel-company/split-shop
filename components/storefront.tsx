@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { PlurelProvider } from "@plurel/react-sdk";
 
 import { usePlurelMode } from "@/components/plurel-mode-provider";
@@ -42,11 +42,10 @@ function useGrantWebShareToCheckout() {
 export function Storefront() {
   const { merchantId, publishableKey, environment, ready } = usePlurelMode();
   const { resetRevision } = useCart();
-  const [origin, setOrigin] = useState("https://plurelpay.com");
-  useEffect(() => { setOrigin(window.location.origin); }, []);
+  const payBaseUrl = process.env.NEXT_PUBLIC_PAY_BASE_URL?.trim().replace(/\/$/, "") || "https://plurelpay.com";
   useGrantWebShareToCheckout();
   const content = <div className="store-grid"><div className="min-w-0"><ProductGrid /></div><div className="cart-column" id="cart"><CheckoutPanel key={resetRevision} /></div></div>;
   // The catalog and split calculator need no SDK credentials or database connection.
   if (!ready) return content;
-  return <PlurelProvider key={publishableKey} merchantId={merchantId} publishableKey={publishableKey} environment={environment} theme="light" apiBaseUrl={demoApiPath("/plurel/v1")} payBaseUrl={origin}>{content}</PlurelProvider>;
+  return <PlurelProvider key={publishableKey} merchantId={merchantId} publishableKey={publishableKey} environment={environment} theme="light" apiBaseUrl={demoApiPath("/plurel/v1")} payBaseUrl={payBaseUrl}>{content}</PlurelProvider>;
 }
