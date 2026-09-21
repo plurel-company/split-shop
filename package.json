@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm verify:sdk && next build",
+    "build": "pnpm verify:sdk && pnpm build:cloudflare",
     "start": "next start",
     "typecheck": "pnpm verify:sdk && tsc --noEmit",
     "test": "pnpm verify:sdk && node --import tsx --test lib/*.test.ts",
