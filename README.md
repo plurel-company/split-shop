@@ -20,7 +20,7 @@ The earlier integrated mount inside **plurelpay-web**:
 | Hosted checkout and session API | Main `/pay/*`, `/api/v1/*` routes | Main Worker |
 | Durable orders | `split_shop_orders` | Existing PostgreSQL through Hyperdrive |
 
-Laptop harness: `wrangler.local.jsonc` (`split-shop-local`). Production and Workers Builds read `wrangler.jsonc` (`name`: `splitshop`). `.env.production` bakes `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_PAY_BASE_URL` into the OpenNext bundle. Workers Builds commands: `pnpm build:cloudflare`, then `npx wrangler deploy`. Preview deploy: `npx wrangler versions upload`.
+Laptop harness: `wrangler.local.jsonc` (`split-shop-local`). Production and Workers Builds read `wrangler.jsonc` (`name`: `splitshop`). `.env.production` bakes `NEXT_PUBLIC_SITE_URL` and `NEXT_PUBLIC_PAY_BASE_URL` into the OpenNext bundle. Workers Builds commands: `pnpm run cf-build`, then `npx wrangler deploy`. Preview deploy: `npx wrangler versions upload`.
 
 ## Build the handoff
 
