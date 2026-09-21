@@ -19,7 +19,11 @@
   ],
   "images": { "binding": "IMAGES" },
   "hyperdrive": [
-    { "binding": "HYPERDRIVE", "id": "11494092435949ef9523a523fbc389ec" }
+    {
+      "binding": "HYPERDRIVE",
+      "id": "11494092435949ef9523a523fbc389ec",
+      "localConnectionString": "postgresql://postgres:postgres@127.0.0.1:5432/postgres"
+    }
   ],
   "observability": { "enabled": true },
   "routes": [

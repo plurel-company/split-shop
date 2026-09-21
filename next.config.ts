@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-initOpenNextCloudflareForDev();
+const isWorkersCi = process.env.WORKERS_CI === "1" || process.env.WORKERS_CI === "true";
+if (process.env.NODE_ENV !== "production" && !isWorkersCi) {
+  initOpenNextCloudflareForDev();
+}
 
 import { withSentryConfig } from "@sentry/nextjs";
 
