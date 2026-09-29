@@ -1,16 +1,16 @@
 {
   "repository": "https://github.com/plurel-company/plurelpay-sdk",
-  "commit": "a1f0fe60a74fa76a3ab7166ebfa8399012b34b62",
+  "commit": "44cd324bf73a64d4c3d4be1c5acd25dfebf2eae4",
   "packages": {
     "@plurel/sdk": {
-      "version": "1.1.2",
-      "file": "plurel-sdk-1.1.2.tgz",
-      "sha256": "d5a35759d6dab3efe97778f6aa7f9d787c635b84559bb68510228ed190c4c70a"
+      "version": "1.2.1",
+      "file": "plurel-sdk-1.2.1.tgz",
+      "sha256": "6688858738815bee95f6f39d1e1be8e9760c60d6aa0b1d7526c98633d3231085"
     },
     "@plurel/react-sdk": {
-      "version": "1.1.2",
-      "file": "plurel-react-sdk-1.1.2.tgz",
-      "sha256": "e5173e60642c2e6d72713a3113131d8408c84c2f4c101d00a808d5c0d22c18e4"
+      "version": "1.2.1",
+      "file": "plurel-react-sdk-1.2.1.tgz",
+      "sha256": "9e4978d952e552e22b67823dadba08d3241bae985c83e66d5ba721357e72ebea"
     }
   }
 }

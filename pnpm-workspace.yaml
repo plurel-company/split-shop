@@ -1,6 +1,9 @@
 packages:
   - .
 
+overrides:
+  "@plurel/react-sdk>@plurel/sdk": "file:vendor/sdk/plurel-sdk-1.2.1.tgz"
+
 # pnpm 10.26+ / 11: explicit allow list for dependency install scripts.
 allowBuilds:
   "@sentry/cli": true
@@ -9,8 +12,8 @@ allowBuilds:
   workerd: true
 
 minimumReleaseAgeExclude:
-  - '@plurel/react-sdk@1.0.5'
-  - '@plurel/sdk@1.0.5'
+  - '@plurel/react-sdk@1.2.1'
+  - '@plurel/sdk@1.2.1'
 # Compatibility for pnpm versions before allowBuilds.
 onlyBuiltDependencies:
   - "@sentry/cli"
