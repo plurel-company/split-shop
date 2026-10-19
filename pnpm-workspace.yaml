@@ -2,7 +2,7 @@ packages:
   - .
 
 overrides:
-  "@plurel/react-sdk>@plurel/sdk": "file:vendor/sdk/plurel-sdk-1.2.1.tgz"
+  "@plurel/react-sdk>@plurel/sdk": "1.2.1"
 
 # pnpm 10.26+ / 11: explicit allow list for dependency install scripts.
 allowBuilds:

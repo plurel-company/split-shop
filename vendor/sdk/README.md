@@ -7,8 +7,9 @@ access to a sibling checkout.
 
 `pnpm verify:sdk` checks archive SHA-256 digests, archive package metadata,
 dependency pins, installed package versions, and React's resolved core package.
-The same verification runs before tests and builds. React's core dependency is
-overridden to the same archive to prevent a registry fallback.
+The same verification runs before tests and builds. `@plurel/sdk` is installed
+from the registry at the reviewed version. React's core dependency is overridden
+to that same published package.
 
 To update, build and test a clean SDK commit, run `pnpm pack --pack-destination`
 for both packages, replace the dependency pins and provenance, and run

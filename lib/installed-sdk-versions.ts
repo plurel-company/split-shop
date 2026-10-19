@@ -16,7 +16,7 @@ function installedPackageVersion(
   return spec.replace(/^[\^~>=<]*/, "");
 }
 
-/** Package versions verified against vendored archives and installed modules at build time. */
+/** Package versions verified against the published core SDK and the vendored React archive. */
 export const INSTALLED_PLUREL_SDK_VERSION = installedPackageVersion("@plurel/sdk");
 export const INSTALLED_PLUREL_REACT_SDK_VERSION = installedPackageVersion("@plurel/react-sdk");
 

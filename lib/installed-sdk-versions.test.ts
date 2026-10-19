@@ -53,7 +53,7 @@ describe("correctStaleSdkVersionHeaders", () => {
     assert.equal(headers.get("X-Plurel-SDK-Version"), INSTALLED_PLUREL_SDK_VERSION);
   });
 
-  it("uses the reviewed core archive for the React SDK's nested dependency too", () => {
+  it("uses the published core SDK for the React SDK's nested dependency too", () => {
     const reactRequire = createRequire(require.resolve("@plurel/react-sdk"));
     assert.equal(reactRequire.resolve("@plurel/sdk"), require.resolve("@plurel/sdk"));
     assert.equal(packageVersion("@plurel/sdk"), sdkProvenance.packages["@plurel/sdk"].version);
