@@ -19,6 +19,14 @@ async function installedPackage(packageName, resolver) {
   return { entry, manifest: installed };
 }
 
+const workspace = await readFile(join(root, "pnpm-workspace.yaml"), "utf8");
+const publishedSdk = provenance.packages["@plurel/sdk"].version;
+assert.equal(manifest.dependencies["@plurel/sdk"], publishedSdk);
+assert.match(
+  workspace,
+  new RegExp(`"@plurel/react-sdk>@plurel/sdk": "${publishedSdk.replaceAll(".", "\\.")}"`),
+);
+
 for (const packageName of ["@plurel/sdk", "@plurel/react-sdk"]) {
   const artifact = provenance.packages[packageName];
   assert.match(artifact.file, /^plurel-(?:react-)?sdk-\d+\.\d+\.\d+\.tgz$/);
@@ -28,14 +36,13 @@ for (const packageName of ["@plurel/sdk", "@plurel/react-sdk"]) {
   const packed = JSON.parse(execFileSync("tar", ["-xOf", file, "package/package.json"], { encoding: "utf8" }));
   assert.equal(packed.name, packageName);
   assert.equal(packed.version, artifact.version);
-  assert.equal(manifest.dependencies[packageName], `file:vendor/sdk/${artifact.file}`);
   const installed = await installedPackage(packageName, require);
   assert.equal(installed.manifest.version, artifact.version, `Run pnpm install to use the reviewed ${packageName}`);
   if (packageName === "@plurel/react-sdk") {
-    assert.equal(packed.dependencies["@plurel/sdk"], provenance.packages["@plurel/sdk"].version);
+    assert.equal(manifest.dependencies[packageName], `file:vendor/sdk/${artifact.file}`);
+    assert.equal(packed.dependencies["@plurel/sdk"], publishedSdk);
     const resolvedCore = await installedPackage("@plurel/sdk", createRequire(installed.entry));
-    assert.equal(resolvedCore.entry, require.resolve("@plurel/sdk"), "React must use the same vendored core SDK");
+    assert.equal(resolvedCore.entry, require.resolve("@plurel/sdk"), "React must use the published core SDK");
   }
 }
-assert.equal(manifest.pnpm.overrides["@plurel/react-sdk>@plurel/sdk"], `file:vendor/sdk/${provenance.packages["@plurel/sdk"].file}`);
-console.log(`Verified vendored SDK ${provenance.packages["@plurel/sdk"].version} from ${provenance.commit.slice(0, 7)}.`);
+console.log(`Verified published SDK ${publishedSdk}; React uses that same package.`);
