@@ -50,7 +50,7 @@
     "tailwindcss": "^4.1.8",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
-    "wrangler": "^4.130.0"
+    "wrangler": "4.152.0"
   },
   "engines": {
     "node": ">=20.9.0"

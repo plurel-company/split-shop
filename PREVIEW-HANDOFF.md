@@ -99,4 +99,3 @@ Latest local checks: 30 tests passed, TypeScript passed, isolated preview build 
 ## Publication authorization — October 23
 
 Connor explicitly requested deploying and publishing the SplitShop changes. This supersedes the preview-only authorization recorded above. The release targets only the existing `splitshop` Worker and its splitshop.dev/www.splitshop.dev routes. The unsupported Next 15 major has been upgraded to pinned Next 16.3.8 with explicit Webpack builds; all production credentials, storage bindings, sandbox enforcement, signatures and webhooks remain unchanged. Publication is gated on build and runtime checks. No other website or integrated merchant mount is to be deployed by this release.
-
