@@ -16,7 +16,9 @@ try {
   await database.exec(await readFile(new URL("../db/migrations/0001_orders.sql", import.meta.url), "utf8"));
   await server.start();
   const html = await readFile(new URL("../dist/cloudflare-assets/demo/shop/index.html", import.meta.url), "utf8");
-  assert.match(html, /Better together/);
+  assert.match(html, /Split the bill/);
+  assert.match(html, /SplitShop home/);
+  assert.doesNotMatch(html, /class="header-brand"[^>]*>[^<]*<svg/);
   assert.match(html, /\/demo\/shop\/_next\//);
   assert.equal((await (await invoke("/setup/public", {}, {})).json()).ready, false);
   const config = await (await invoke("/setup/public")).json();

@@ -27,7 +27,7 @@ export function QuantityStepper({
         type="button"
         onClick={onRemove}
         disabled={quantity === 0}
-        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full border border-hair-2 bg-white text-ink transition hover:bg-paper-2 disabled:cursor-not-allowed disabled:opacity-40`}
+        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-md border border-hair-2 bg-white text-ink transition hover:bg-paper-2 disabled:cursor-not-allowed disabled:opacity-40`}
         aria-label={`Remove one ${unitLabel} at ${productName}`}
       >
         −
@@ -44,7 +44,7 @@ export function QuantityStepper({
         type="button"
         onClick={onAdd}
         disabled={disabled}
-        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-full bg-ink text-white transition hover:bg-[var(--dark-3)] disabled:cursor-not-allowed disabled:opacity-40`}
+        className={`${buttonSize} flex shrink-0 items-center justify-center rounded-md bg-ink text-white transition hover:bg-[var(--dark-3)] disabled:cursor-not-allowed disabled:opacity-40`}
         aria-label={`Add one ${unitLabel} at ${productName}`}
       >
         +

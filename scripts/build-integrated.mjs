@@ -16,9 +16,9 @@ for (const name of ["app", "components", "hooks", "lib", "public", "vendor", "pa
 await rm(join(staging, "app/api"), { recursive: true });
 await rm(join(staging, "app/opengraph-image.tsx"), { force: true });
 await rm(join(staging, "app/apple-icon.tsx"), { force: true });
-await symlink(join(root, "node_modules"), join(staging, "node_modules"), "dir");
+await symlink(join(root, "node_modules"), join(staging, "node_modules"), process.platform === "win32" ? "junction" : "dir");
 await writeFile(join(staging, "next.config.mjs"), `export default {output:"export",basePath:"/demo/shop",trailingSlash:true,images:{unoptimized:true},env:{NEXT_PUBLIC_DEMO_API_BASE:"/api/demo-shop",NEXT_PUBLIC_DEMO_BASE_PATH:"/demo/shop"}};\n`);
-execFileSync(process.execPath, [join(root, "node_modules/next/dist/bin/next"), "build"], { cwd: staging, stdio: "inherit", env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" } });
+execFileSync(process.execPath, [join(root, "node_modules/next/dist/bin/next"), "build", "--webpack"], { cwd: staging, stdio: "inherit", env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" } });
 await mkdir(join(dist, "cloudflare-assets/demo"), { recursive: true });
 await cp(join(staging, "out"), join(dist, "cloudflare-assets/demo/shop"), { recursive: true });
 await build({

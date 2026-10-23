@@ -10,6 +10,8 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  outputFileTracingRoot: process.cwd(),
+  turbopack: { root: process.cwd() },
 };
 
 const sentryOrg = process.env.SENTRY_ORG?.trim();

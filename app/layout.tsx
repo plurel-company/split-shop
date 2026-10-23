@@ -1,27 +1,29 @@
 import type { Metadata } from "next";
 import { resolveSiteUrl } from "@/lib/site-url";
 import "./globals.css";
+import "./plurel-tokens.css";
+import "./plurel-theme.css";
 
 const SITE_URL = resolveSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Split Shop · Plurel Pay open demo",
+  title: "SplitShop · Checkout playground",
   description:
-    "An open reference storefront on the Plurel Pay SDK in sandbox — build a cart, split with Plurel Pay, and pay with friends. No real money moves.",
+    "A checkout playground for developers. Build a cart, invite the group and test a shared checkout. No real money moves.",
   openGraph: {
-    title: "Split Shop · Plurel Pay open demo",
+    title: "SplitShop · Checkout playground",
     description:
-      "Build a cart, split with Plurel Pay, and pay with friends — sandbox only, no real money moves.",
+      "Build a cart and test a shared checkout. Sandbox only, no real money moves.",
     url: SITE_URL,
-    siteName: "Plurel Pay",
+    siteName: "SplitShop",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Split Shop · Plurel Pay open demo",
+    title: "SplitShop · Checkout playground",
     description:
-      "Build a cart, split with Plurel Pay, and pay with friends — sandbox only, no real money moves.",
+      "Build a cart and test a shared checkout. Sandbox only, no real money moves.",
   },
 };
 
