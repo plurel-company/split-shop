@@ -20,7 +20,12 @@ try {
     "--var", "CLOUDFLARE_ENV:development",
     "--var", `DATABASE_URL:postgresql://postgres:postgres@127.0.0.1:${databasePort}/postgres`,
     "--var", "PLUREL_SIGNING_SECRET:plurel_sign_local_test",
-    "--var", "PLUREL_WEBHOOK_SECRET_TEST:whsec_local_test"], { stdio: ["ignore", "pipe", "pipe"], detached: process.platform !== "win32", windowsHide: true });
+    "--var", "PLUREL_WEBHOOK_SECRET_TEST:whsec_local_test"], {
+      stdio: ["ignore", "pipe", "pipe"], detached: process.platform !== "win32", windowsHide: true,
+      // Exercise the actual Hyperdrive code path against this test's isolated DB,
+      // rather than wrangler.jsonc's default local PostgreSQL port (5432).
+      env: { ...process.env, CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: `postgresql://postgres:postgres@127.0.0.1:${databasePort}/postgres` },
+    });
   worker.stdout.on("data", (chunk) => { logs += chunk; });
   worker.stderr.on("data", (chunk) => { logs += chunk; });
   const origin = `http://127.0.0.1:${workerPort}`;
