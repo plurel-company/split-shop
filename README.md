@@ -6,7 +6,13 @@ This reference app demonstrates the **Custom SDK + Stripe** integration: a merch
 
 The catalog and split preview work without a backend. The UI enables sandbox checkout only when runtime credentials and the order table are available. Payment success appears only after a verified webhook updates the stored order.
 
+## Isolated brand preview
+
+See [PREVIEW-HANDOFF.md](PREVIEW-HANDOFF.md) for the visual preview artifact, validation and deployment prerequisites. `pnpm build:brand-preview` prepares a standalone static Worker artifact in `dist/brand-preview/`, with checkout disconnected. It creates no hosted resources and does not use the production Wrangler configuration. Do not use the production or integrated deployment instructions below for this preview.
+
 ## Production Worker
+
+The storefront uses its own SplitShop identity; Plurel Pay is named only as the checkout integration. Next.js is pinned to the supported 16.3.8 release, with Node 20.9 or newer. Production and isolated export builds explicitly retain Webpack. No unsupported-version override is used. The existing sandbox-only checkout enforcement, order signatures, webhook verification and Worker bindings are unchanged.
 
 The branded storefront is Worker **`splitshop`** on `splitshop.dev` (`wrangler.jsonc`). Hosted checkout still opens on **plurelpay.com**. `plurelpay.com/demo/shop` remains the in-app demo mount on `plurelpay-web`.
 

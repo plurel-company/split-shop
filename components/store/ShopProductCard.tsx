@@ -23,12 +23,12 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
+          className="h-full w-full object-cover"
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           <CurrencyBadge currency={product.currency} />
           {quantity > 0 ? (
-            <span className="rounded-full bg-ink/90 px-2.5 py-1 font-mono text-[11px] font-medium text-white backdrop-blur-sm">
+            <span className="rounded bg-ink px-2.5 py-1 font-mono text-[11px] font-medium text-white">
               {quantity} in cart
             </span>
           ) : null}
@@ -46,10 +46,7 @@ export function ShopProductCard({ product }: ShopProductCardProps) {
         </div>
 
         <div className="mt-auto pt-4">
-          {/* nowrap so a wider price ($349) can't push the stepper onto a
-              second line — that made the price row taller on some cards and
-              knocked the prices out of alignment across the row. */}
-          <div className="flex flex-nowrap items-center justify-between gap-x-3">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-3">
             <p className="whitespace-nowrap font-mono text-base font-medium tabular-nums text-ink">
               {formatMoney(product.unitPrice, product.currency)}
             </p>

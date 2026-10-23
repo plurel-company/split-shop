@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { createHmac, randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { PGlite } from "@electric-sql/pglite";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
@@ -15,11 +16,16 @@ let logs = "";
 try {
   await database.exec(await readFile(new URL("../db/migrations/0001_orders.sql", import.meta.url), "utf8"));
   await server.start();
-  worker = spawn("pnpm", ["exec", "wrangler", "dev", "--ip", "127.0.0.1", "--port", String(workerPort),
+  worker = spawn(process.execPath, [fileURLToPath(new URL("../node_modules/wrangler/bin/wrangler.js", import.meta.url)), "dev", "--local", "--ip", "127.0.0.1", "--port", String(workerPort),
     "--var", "CLOUDFLARE_ENV:development",
     "--var", `DATABASE_URL:postgresql://postgres:postgres@127.0.0.1:${databasePort}/postgres`,
     "--var", "PLUREL_SIGNING_SECRET:plurel_sign_local_test",
-    "--var", "PLUREL_WEBHOOK_SECRET_TEST:whsec_local_test"], { stdio: ["ignore", "pipe", "pipe"], detached: true });
+    "--var", "PLUREL_WEBHOOK_SECRET_TEST:whsec_local_test"], {
+      stdio: ["ignore", "pipe", "pipe"], detached: process.platform !== "win32", windowsHide: true,
+      // Exercise the actual Hyperdrive code path against this test's isolated DB,
+      // rather than wrangler.jsonc's default local PostgreSQL port (5432).
+      env: { ...process.env, CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: `postgresql://postgres:postgres@127.0.0.1:${databasePort}/postgres` },
+    });
   worker.stdout.on("data", (chunk) => { logs += chunk; });
   worker.stderr.on("data", (chunk) => { logs += chunk; });
   const origin = `http://127.0.0.1:${workerPort}`;
@@ -59,7 +65,11 @@ try {
   throw error;
 } finally {
   if (worker?.pid) {
-    try { process.kill(-worker.pid, "SIGTERM"); } catch {}
+    if (process.platform === "win32") {
+      spawnSync("taskkill", ["/PID", String(worker.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
+    } else {
+      try { process.kill(-worker.pid, "SIGTERM"); } catch {}
+    }
   }
   await server.stop();
   await database.close();

@@ -34,12 +34,12 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
         <img
           src={product.imageUrl}
           alt={product.name}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+          className="h-full w-full object-cover"
         />
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           <CurrencyBadge currency={product.currency} />
           {quantity > 0 ? (
-            <span className="rounded-full bg-white/95 px-2.5 py-1 font-mono text-[11px] font-medium text-ink shadow-sm backdrop-blur-sm">
+            <span className="rounded border border-hair bg-white px-2.5 py-1 font-mono text-[11px] font-medium text-ink">
               {quantity} {quantity === 1 ? "night" : "nights"}
             </span>
           ) : null}
@@ -75,7 +75,7 @@ export function LodgingProductCard({ product }: LodgingProductCardProps) {
             {lodging.amenities.map((amenity) => (
               <li
                 key={amenity}
-                className="rounded-full border border-hair-2 bg-white px-2.5 py-1 font-mono text-[11px] tracking-[0.02em] text-ink-2"
+                className="rounded border border-hair-2 bg-white px-2.5 py-1 font-mono text-[11px] tracking-[0.02em] text-ink-2"
               >
                 {amenity}
               </li>

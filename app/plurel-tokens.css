@@ -1,0 +1,22 @@
+/* Independent SplitShop tokens. Legacy aliases avoid touching SDK/payment code. */
+:root {
+  --plurel-orange:#2854d9;
+  --plurel-orange-hover:#1d42b7;
+  --plurel-sky:#2854d9;
+  --plurel-yellow:#eef1ff;
+  --plurel-canvas:#f5f4ef;
+  --plurel-cream:#f5f4ef;
+  --plurel-paper:#ffffff;
+  --plurel-blue-soft:#eef1ff;
+  --plurel-ink:#171a21;
+  --plurel-muted:#4d5360;
+  --plurel-blue-ink:#2147bc;
+  --plurel-border:#d5d7db;
+  --plurel-control-border:#747984;
+  --plurel-radius:6px;
+  --plurel-radius-control:4px;
+  --plurel-radius-dialog:6px;
+  --plurel-radius-action:4px;
+  --plurel-body:Arial,Helvetica,sans-serif;
+  --plurel-display:Arial,Helvetica,sans-serif;
+}

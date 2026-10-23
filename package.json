@@ -13,9 +13,11 @@
     "build": "node scripts/app-build.mjs",
     "start": "next start",
     "typecheck": "pnpm verify:sdk && tsc --noEmit",
-    "test": "pnpm verify:sdk && node --import tsx --test lib/*.test.ts",
+    "test": "pnpm verify:sdk && node --import tsx --test lib/*.test.ts scripts/*.test.mjs",
     "verify:sdk": "node scripts/verify-vendored-sdk.mjs",
     "build:cloudflare": "node scripts/app-build.mjs --cloudflare",
+    "build:brand-preview": "node scripts/build-brand-preview.mjs",
+    "check:brand-preview": "node scripts/check-brand-preview.mjs",
     "cf-build": "node scripts/app-build.mjs --cloudflare",
     "preview": "pnpm build:cloudflare && opennextjs-cloudflare preview",
     "deploy:production": "NEXT_PUBLIC_SITE_URL=https://splitshop.dev NEXT_PUBLIC_PAY_BASE_URL=https://plurelpay.com pnpm build:cloudflare && env -u CLOUDFLARE_ENV -u WRANGLER_ENV OPEN_NEXT_DEPLOY=true wrangler deploy",
@@ -31,7 +33,7 @@
     "@plurel/react-sdk": "file:vendor/sdk/plurel-react-sdk-1.2.1.tgz",
     "@plurel/sdk": "1.2.1",
     "@sentry/nextjs": "^10.63.0",
-    "next": "^15.5.25",
+    "next": "16.3.8",
     "pg": "^8.23.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
@@ -48,10 +50,10 @@
     "tailwindcss": "^4.1.8",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
-    "wrangler": "^4.130.0"
+    "wrangler": "4.152.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.9.0"
   },
   "packageManager": "pnpm@9.0.0"
 }

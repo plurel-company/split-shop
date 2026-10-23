@@ -151,7 +151,7 @@ export function CheckoutPanel() {
       >
         <div className="flex flex-col items-center text-center">
           <span
-            className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-paper-2 text-ink-3"
+            className="mb-3 flex h-12 w-12 items-center justify-center rounded-md bg-paper-2 text-ink-3"
             aria-hidden
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -192,7 +192,7 @@ export function CheckoutPanel() {
           </p>
         </div>
         {isWaiting ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-terra-soft px-2.5 py-1 font-mono text-[11px] font-medium text-terra-deep">
+          <span className="inline-flex items-center gap-1.5 rounded bg-terra-soft px-2.5 py-1 font-mono text-[11px] font-medium text-terra-deep">
             <span className="checkout-spinner" aria-hidden />
             Confirming
           </span>
@@ -272,8 +272,8 @@ export function CheckoutPanel() {
             cart={plurelCart}
             group={{ minSize: people, maxSize: people, defaultMode: "equal" }}
             disabled={belowMinimum || pollingOrderRef !== null}
-            appearance={{ fullWidth: true, size: "lg" }}
-            className="!rounded-full"
+            appearance={{ fullWidth: true, size: "lg", variant: "dark", showIcon: false }}
+            className="!rounded-md"
             callbacks={{
               onGroupCreated: () => {
                 setPollingOrderRef(orderRef);
