@@ -15,7 +15,7 @@ test('SplitShop owns the storefront header, footer, metadata and icon', async ()
 
 test('release keeps a supported framework and does not bypass the support guard', async () => {
   const pkg = JSON.parse(await read('package.json'));
-  assert.equal(pkg.dependencies.next, '16.3.8');
+  assert.equal(pkg.dependencies.next, '16.4.6');
   for (const file of ['scripts/app-build.mjs','scripts/build-brand-preview.mjs','scripts/build-integrated.mjs']) {
     const source=await read(file);
     assert.match(source, /--webpack/);

@@ -29,11 +29,11 @@
     "preview:integrated": "node --env-file-if-exists=.env.local scripts/preview-integrated.mjs"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.20.6",
+    "@opennextjs/cloudflare": "^1.20.16",
     "@plurel/react-sdk": "file:vendor/sdk/plurel-react-sdk-1.2.1.tgz",
     "@plurel/sdk": "1.2.1",
     "@sentry/nextjs": "^10.78.0",
-    "next": "16.4.1",
+    "next": "16.4.6",
     "pg": "^8.23.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
