@@ -6,8 +6,11 @@ overrides:
   # Security: miniflare pins undici 7.29.1 (GHSA alerts fixed in 7.30.1).
   # Mirrored in package.json "pnpm.overrides" for the pinned pnpm 9.
   "undici@^7": "^7.30.1"
-  # Security: @node-minify/core pins glob 10.3.3 (fixed in 10.5.0).
-  "glob@^10": "^10.5.0"
+  # Security: GHSA-3g3m-2fjr-6pw4 AbortSignal cancellation bypass.
+  # @opennextjs/cloudflare and @sentry/bundler-plugins pin glob ^13.0.6.
+  # Patched in 14.0.2; the advisory range includes every 13.x release.
+  # Mirrored in package.json "pnpm.overrides" for the pinned pnpm 9.
+  "glob@^13": "14.0.2"
 
 # pnpm 10.26+ / 11: explicit allow list for dependency install scripts.
 allowBuilds:
