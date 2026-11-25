@@ -26,10 +26,7 @@
     }
   ],
   "observability": { "enabled": true },
-  "routes": [
-    { "pattern": "splitshop.dev", "custom_domain": true },
-    { "pattern": "www.splitshop.dev", "custom_domain": true }
-  ],
+  "routes": [],
   "vars": {
     "CLOUDFLARE_ENV": "production",
     "NEXT_PUBLIC_SITE_URL": "https://splitshop.dev",
